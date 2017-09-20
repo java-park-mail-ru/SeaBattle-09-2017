@@ -8,27 +8,24 @@ import java.util.LinkedList;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private LinkedList<User> users;
-
-    UserServiceImpl() {
-        users = new LinkedList<>();
-    }
+    private LinkedList<User> users = new LinkedList<>();
 
     @Override
-    public User addUser(User user) {
+    public void addUser(User user) {
 
         if (user.getLogin() == null || user.getPassword() == null || user.getEmail() == null) {
-            return null;
+            throw new IllegalArgumentException("New user has incompete data!");
         }
 
         for (User dbUser : users) {
-            if (dbUser.getLogin().equals(user.getLogin()) || dbUser.getEmail().equals(user.getEmail())) {
-                return null;
+            if (dbUser.getLogin().equals(user.getLogin())) {
+                throw new IllegalArgumentException("Login is already taken!");
+            }
+            if (dbUser.getEmail().equals(user.getEmail())) {
+                throw new IllegalArgumentException("Email is already taken!");
             }
         }
         users.add(user);
-
-        return user;
     }
 
     @Override

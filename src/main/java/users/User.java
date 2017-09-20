@@ -22,14 +22,17 @@ public final class User {
         this.password = password;
     }
 
+    @NotNull
     public String getEmail() {
         return email;
     }
 
+    @NotNull
     public  String getLogin() {
         return login;
     }
 
+    @NotNull
     public String getPassword() {
         return password;
     }

@@ -40,7 +40,7 @@
 #### Params
 ```
 {
-  "email"(или "login"): string, 
+  "loginEmail": string, 
   "password": string,
 }
 ```

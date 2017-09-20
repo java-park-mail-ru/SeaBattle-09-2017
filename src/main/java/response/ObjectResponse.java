@@ -1,24 +1,29 @@
 package response;
 
-public class ObjectResponse {
-    private Integer status;
-    private String response;
 
-    public ObjectResponse(Integer status, String response) {
-        this.response = response;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+public enum  ObjectResponse {
+    ERROR_INFO(0, "You are not currently logged in!"),
+    SUCCESS_LOGIN(1, "You are successfully logged in!"),
+    ERROR_LOGIN(2, "Wrong data!"),
+    SUCCESS_LOGOUT(3, "You successfully logged out!"),
+    ERROR_USER_EXIST(4, "User already exists!"),
+    SUCCESS_REGISTER(5, "You are now registered!"),
+    ERROR_REGISTER(6, "Wrong data!"),
+    SUCCESS_USER_UPDATE(7, "Data is successfully updated!"),
+    ERROR_USER_UPDATE(8, "New data is corrupted!"),
+    ERROR_ACCESS(9, "Access error");
+
+    private final Integer status;
+    private final String response;
+
+    ObjectResponse(Integer status, String response) {
         this.status = status;
+        this.response = response;
     }
 
-    public static final ObjectResponse ERROR_INFO = new ObjectResponse(0, "You are not currently logged in!");
-    public static final ObjectResponse SUCCESS_LOGIN = new ObjectResponse(1, "You are successfully logged in!");
-    public static final ObjectResponse ERROR_LOGIN = new ObjectResponse(2, "Wrong data!");
-    public static final ObjectResponse SUCCESS_LOGOUT = new ObjectResponse(3, "You successfully logged out!");
-    public static final ObjectResponse ERROR_USER_EXIST = new ObjectResponse(4, "User already exists!");
-    public static final ObjectResponse SUCCESS_REGISTER = new ObjectResponse(5, "You are now registered!");
-    public static final ObjectResponse ERROR_REGISTER = new ObjectResponse(6, "Wrong data!");
-    public static final ObjectResponse SUCCESS_USER_UPDATE = new ObjectResponse(7, "Data is successfully updated!");
-    public static final ObjectResponse ERROR_USER_UPDATE = new ObjectResponse(8, "New data is corrupted!");
-    public static final ObjectResponse ERROR_ACCESS = new ObjectResponse(9, "Access error");
 
     @SuppressWarnings("unused")
     public Integer getStatus() {
