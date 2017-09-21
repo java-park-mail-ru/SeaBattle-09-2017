@@ -1,1 +1,10 @@
 language: java
+deploy:
+  provider: heroku
+  api_key: 
+    secure: 88999d26-72f1-41ad-a88a-230bfcfe50a5
+  app: sea-battle-back
+  on:
+    repo: java-park-mail-ru/SeaBattle-09-2017
+    branch: develop
+skip_cleanup: true
