@@ -12,7 +12,7 @@ import response.ObjectResponse;
 import javax.servlet.http.HttpSession;
 
 @RestController
-@CrossOrigin (origins = "localhost")
+@CrossOrigin (origins = "https://sea-battle-back.herokuapp.com")
 @RequestMapping(path = "/api")
 public class Controller {
 
