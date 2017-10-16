@@ -7,6 +7,7 @@ import seabattle.views.UserView;
 import java.util.LinkedList;
 
 @Service
+@Deprecated
 public class UserServiceImpl implements UserService {
 
     private LinkedList<UserView> users = new LinkedList<>();
@@ -30,26 +31,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserView getByLogin(String login) {
+    public UserView getByLoginOrEmail(String loginOrEmail) {
 
         for (UserView dbUser : users) {
-            if (dbUser.getLogin().equals(login)) {
+            if (dbUser.getLogin().equals(loginOrEmail)) {
+                return dbUser;
+            }
+            if (dbUser.getEmail().equals(loginOrEmail)) {
                 return dbUser;
             }
         }
         return null;
     }
 
-    @Override
-    public UserView getByEmail(String email) {
-
-        for (UserView dbUser : users) {
-            if (dbUser.getEmail().equals(email)) {
-                return dbUser;
-            }
-        }
-        return null;
-    }
 
     @Override
     public UserView changeUser(UserView user) {

@@ -1,8 +1,12 @@
 package seabattle.controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.validation.annotation.Validated;
 import seabattle.dao.UserService;
-import seabattle.jdbcdao.UserServiceImpl;
+import seabattle.jdbcdao.JdbcUserService;
 import seabattle.views.AuthorisationView;
 import seabattle.views.UserView;
 import org.springframework.http.HttpStatus;
@@ -14,12 +18,16 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 @RestController
-@CrossOrigin (origins = "https://sea-battle-front.herokuapp.com")
+//@CrossOrigin (origins = "https://sea-battle-front.herokuapp.com")
 @RequestMapping(path = "/api")
 @Validated
 public class Controller {
 
-    private UserService dbUsers = new UserServiceImpl();
+//    private UserService dbUsers = new JdbcUserService(new JdbcTemplate());
+
+    @Autowired
+    private JdbcUserService dbUsers;
+
     private static final String CURRENT_USER_KEY = "currentUser";
 
     @RequestMapping(method = RequestMethod.GET, path = "info")
@@ -33,11 +41,14 @@ public class Controller {
 
     @RequestMapping(method = RequestMethod.POST, path = "login")
     public ResponseEntity login(@Valid @RequestBody AuthorisationView loggingData, HttpSession httpSession) {
-        UserView currentUser = dbUsers.getByLogin(loggingData.getLoginEmail());
-        if (currentUser == null) {
-            currentUser = dbUsers.getByEmail(loggingData.getLoginEmail());
+        UserView currentUser;
+        try {
+             currentUser = dbUsers.getByLoginOrEmail(loggingData.getLoginEmail());
+        } catch (DataAccessException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseView.ERROR_LOGIN);
         }
-        if (currentUser != null && currentUser.getPassword().equals(loggingData.getPassword())) {
+
+        if (currentUser.getPassword().equals(loggingData.getPassword())) {
             httpSession.setAttribute(CURRENT_USER_KEY, currentUser.getLogin());
             return ResponseEntity.status(HttpStatus.OK).body(ResponseView.SUCCESS_LOGIN);
         }
@@ -53,14 +64,9 @@ public class Controller {
 
     @RequestMapping(method = RequestMethod.POST, path = "users")
     public ResponseEntity register(@Valid @RequestBody UserView registerData) {
-
-        if (dbUsers.getByEmail(registerData.getEmail()) != null || dbUsers.getByLogin(registerData.getLogin()) != null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseView.ERROR_USER_EXIST);
-        }
-
         try {
             dbUsers.addUser(registerData);
-        } catch (IllegalArgumentException e) {
+        } catch (DuplicateKeyException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseView.ERROR_REGISTER);
         }
 
