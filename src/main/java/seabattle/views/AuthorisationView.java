@@ -1,10 +1,10 @@
-package main;
+package seabattle.views;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotNull;
 
-public final class AuthorisationModel {
+public final class AuthorisationView {
 
     @NotNull
     private String loginEmail;
@@ -12,7 +12,7 @@ public final class AuthorisationModel {
     @NotNull
     private String password;
 
-    private AuthorisationModel(@JsonProperty("loginEmail") String loginEmail, @JsonProperty("password")
+    private AuthorisationView(@JsonProperty("loginEmail") String loginEmail, @JsonProperty("password")
             String password) {
         this.loginEmail = loginEmail;
         this.password = password;

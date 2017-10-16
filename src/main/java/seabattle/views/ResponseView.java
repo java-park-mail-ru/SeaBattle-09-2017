@@ -1,15 +1,14 @@
-package response;
-
+package seabattle.views;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-public enum  ObjectResponse {
+public enum ResponseView {
     ERROR_INFO(0, "You are not currently logged in!"),
     SUCCESS_LOGIN(1, "You are successfully logged in!"),
     ERROR_LOGIN(2, "Wrong data!"),
     SUCCESS_LOGOUT(3, "You successfully logged out!"),
-    ERROR_USER_EXIST(4, "User already exists!"),
+    ERROR_USER_EXIST(4, "UserView already exists!"),
     SUCCESS_REGISTER(5, "You are now registered!"),
     ERROR_REGISTER(6, "Wrong data!"),
     SUCCESS_USER_UPDATE(7, "Data is successfully updated!"),
@@ -19,7 +18,7 @@ public enum  ObjectResponse {
     private final Integer status;
     private final String response;
 
-    ObjectResponse(Integer status, String response) {
+    ResponseView(Integer status, String response) {
         this.status = status;
         this.response = response;
     }

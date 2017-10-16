@@ -1,23 +1,24 @@
-package main;
+package seabattle.JdbcDAO;
 
 import org.springframework.stereotype.Service;
-import users.User;
+import seabattle.DAO.UserService;
+import seabattle.views.UserView;
 
 import java.util.LinkedList;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    private LinkedList<User> users = new LinkedList<>();
+    private LinkedList<UserView> users = new LinkedList<>();
 
     @Override
-    public void addUser(User user) {
+    public void addUser(UserView user) {
 
         if (user.getLogin() == null || user.getPassword() == null || user.getEmail() == null) {
             throw new IllegalArgumentException("New user has incompete data!");
         }
 
-        for (User dbUser : users) {
+        for (UserView dbUser : users) {
             if (dbUser.getLogin().equals(user.getLogin())) {
                 throw new IllegalArgumentException("Login is already taken!");
             }
@@ -29,9 +30,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getByLogin(String login) {
+    public UserView getByLogin(String login) {
 
-        for (User dbUser : users) {
+        for (UserView dbUser : users) {
             if (dbUser.getLogin().equals(login)) {
                 return dbUser;
             }
@@ -40,9 +41,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getByEmail(String email) {
+    public UserView getByEmail(String email) {
 
-        for (User dbUser : users) {
+        for (UserView dbUser : users) {
             if (dbUser.getEmail().equals(email)) {
                 return dbUser;
             }
@@ -51,9 +52,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User changeUser(User user) {
+    public UserView changeUser(UserView user) {
 
-        for (User dbUser : users) {
+        for (UserView dbUser : users) {
             if (dbUser.getLogin().equals(user.getLogin())) {
                 if (user.getEmail() != null) {
                     dbUser.setEmail(user.getEmail());

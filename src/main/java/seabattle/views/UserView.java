@@ -1,10 +1,10 @@
-package users;
+package seabattle.views;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.validation.constraints.NotNull;
 
 @SuppressWarnings("unused")
-public final class User {
+public final class UserView {
 
     @NotNull
     private String email;
@@ -15,8 +15,8 @@ public final class User {
     @NotNull
     private String password;
 
-    User(@JsonProperty("email") String email, @JsonProperty("login") String login,
-         @JsonProperty("password") String password) {
+    UserView(@JsonProperty("email") String email, @JsonProperty("login") String login,
+             @JsonProperty("password") String password) {
         this.email = email;
         this.login = login;
         this.password = password;
