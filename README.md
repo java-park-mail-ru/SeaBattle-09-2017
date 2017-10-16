@@ -28,7 +28,7 @@
 ```
 {
   "status": 5,
-  "seabattle.response": "You are now registered!",
+  "response": "You are now registered!",
 }
 ```
 ### Login
@@ -48,7 +48,7 @@
 ```
 {
   "status": 1,
-  "seabattle.response": "You are successfully logged in!",
+  "response": "You are successfully logged in!",
 }
 ```
 
@@ -62,7 +62,7 @@
 ```
 {
   "status": 3,
-  "seabattle.response": "You successfully logged out!",
+  "response": "You successfully logged out!",
 }
 ```
 ### Info
@@ -92,7 +92,7 @@
 ```
 {
   "status": 7,
-  "seabattle.response": "Data is successfully updated!",
+  "response": "Data is successfully updated!",
 }
 ```
  
