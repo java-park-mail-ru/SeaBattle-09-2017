@@ -1,5 +1,6 @@
 package seabattle.controllers;
 
+import org.springframework.validation.annotation.Validated;
 import seabattle.dao.UserService;
 import seabattle.jdbcdao.UserServiceImpl;
 import seabattle.views.AuthorisationView;
@@ -10,10 +11,12 @@ import org.springframework.http.ResponseEntity;
 import seabattle.views.ResponseView;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 
 @RestController
 @CrossOrigin (origins = "https://sea-battle-front.herokuapp.com")
 @RequestMapping(path = "/api")
+@Validated
 public class Controller {
 
     private UserService dbUsers = new UserServiceImpl();
@@ -29,7 +32,7 @@ public class Controller {
     }
 
     @RequestMapping(method = RequestMethod.POST, path = "login")
-    public ResponseEntity login(@RequestBody AuthorisationView loggingData, HttpSession httpSession) {
+    public ResponseEntity login(@Valid @RequestBody AuthorisationView loggingData, HttpSession httpSession) {
         UserView currentUser = dbUsers.getByLogin(loggingData.getLoginEmail());
         if (currentUser == null) {
             currentUser = dbUsers.getByEmail(loggingData.getLoginEmail());
@@ -49,7 +52,7 @@ public class Controller {
     }
 
     @RequestMapping(method = RequestMethod.POST, path = "users")
-    public ResponseEntity register(@RequestBody UserView registerData) {
+    public ResponseEntity register(@Valid @RequestBody UserView registerData) {
 
         if (dbUsers.getByEmail(registerData.getEmail()) != null || dbUsers.getByLogin(registerData.getLogin()) != null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseView.ERROR_USER_EXIST);
@@ -65,7 +68,7 @@ public class Controller {
     }
 
     @RequestMapping(method = RequestMethod.PATCH, path = "users/{changedUser}")
-    public ResponseEntity change(@RequestBody UserView newData, @PathVariable(value = "changedUser") String changedUser,
+    public ResponseEntity change(@Valid @RequestBody UserView newData, @PathVariable(value = "changedUser") String changedUser,
                                  HttpSession httpSession) {
         if (httpSession.getAttribute(CURRENT_USER_KEY).equals(changedUser)) {
             if (dbUsers.changeUser(newData) != null) {

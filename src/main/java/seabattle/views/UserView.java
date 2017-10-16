@@ -1,12 +1,17 @@
 package seabattle.views;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.Email;
+import org.springframework.validation.annotation.Validated;
+
 import javax.validation.constraints.NotNull;
 
 @SuppressWarnings("unused")
+@Validated
 public final class UserView {
 
     @NotNull
+    @Email
     private String email;
 
     @NotNull

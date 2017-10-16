@@ -1,9 +1,11 @@
 package seabattle.views;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotNull;
 
+@Validated
 public final class AuthorisationView {
 
     @NotNull
