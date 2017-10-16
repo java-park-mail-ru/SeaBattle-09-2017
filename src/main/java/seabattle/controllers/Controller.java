@@ -1,7 +1,7 @@
 package seabattle.controllers;
 
-import seabattle.DAO.UserService;
-import seabattle.JdbcDAO.UserServiceImpl;
+import seabattle.dao.UserService;
+import seabattle.jdbcdao.UserServiceImpl;
 import seabattle.views.AuthorisationView;
 import seabattle.views.UserView;
 import org.springframework.http.HttpStatus;

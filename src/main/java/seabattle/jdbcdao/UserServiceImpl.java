@@ -1,7 +1,7 @@
-package seabattle.JdbcDAO;
+package seabattle.jdbcdao;
 
 import org.springframework.stereotype.Service;
-import seabattle.DAO.UserService;
+import seabattle.dao.UserService;
 import seabattle.views.UserView;
 
 import java.util.LinkedList;

@@ -1,4 +1,4 @@
-package seabattle.DAO;
+package seabattle.dao;
 
 import seabattle.views.UserView;
 
