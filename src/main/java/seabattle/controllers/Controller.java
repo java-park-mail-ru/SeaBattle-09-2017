@@ -23,6 +23,7 @@ import java.util.List;
 @Validated
 public class Controller {
 
+    @SuppressWarnings("all")
     @Autowired
     private JdbcUserService dbUsers;
 
@@ -97,10 +98,6 @@ public class Controller {
     @RequestMapping(method = RequestMethod.GET, path = "leaderboard",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getLeaderboard() {
-        List<UserView> leaders1 = dbUsers.getLeaderboard();
-        for (UserView leader : leaders1) {
-            System.out.println(leader);
-        }
         try {
             List<UserView> leaders = dbUsers.getLeaderboard();
             return ResponseEntity.status(HttpStatus.OK).body(leaders);

@@ -35,12 +35,14 @@ public class JdbcUserService extends JdbcDaoSupport implements UserService {
     }
 
     @Override
+    @SuppressWarnings("all")
     public void addUser(UserView user) {
         getJdbcTemplate().update(UserQueries.addUser(),
                 new Object[] {user.getEmail(), user.getLogin(), user.getPassword()});
     }
 
     @Override
+    @SuppressWarnings("all")
     public UserView getByLoginOrEmail(String loginOrEmail) {
         return getJdbcTemplate().queryForObject(UserQueries.getByLoginOrEmail(),
                 new Object[]{loginOrEmail, loginOrEmail},
@@ -48,6 +50,7 @@ public class JdbcUserService extends JdbcDaoSupport implements UserService {
     }
 
     @Override
+    @SuppressWarnings("all")
     public UserView changeUser(UserView user) {
         getJdbcTemplate().update(UserQueries.changeUser(),
                 new Object[] {user.getEmail(), user.getPassword(), user.getLogin()});
@@ -55,6 +58,7 @@ public class JdbcUserService extends JdbcDaoSupport implements UserService {
     }
 
     @Override
+    @SuppressWarnings("all")
     public List<UserView> getLeaderboard() {
         return getJdbcTemplate().query(UserQueries.getLeaderboard(), readUserLoginScore);
     }
