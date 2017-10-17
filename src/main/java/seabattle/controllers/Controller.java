@@ -29,13 +29,20 @@ public class Controller {
 
     private static final String CURRENT_USER_KEY = "currentUser";
 
-    @RequestMapping(method = RequestMethod.GET, path = "info", produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.GET, path = "info")
     public ResponseEntity info(HttpSession httpSession) {
         final String currentUser = (String) httpSession.getAttribute(CURRENT_USER_KEY);
         if (currentUser == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseView.ERROR_INFO);
+            return ResponseEntity.status(HttpStatus.OK).body(ResponseView.ERROR_NOT_LOGGED_IN);
         }
-        return ResponseEntity.status(HttpStatus.OK).body("Current user login: " + currentUser);
+        try {
+            UserView user = dbUsers.getByLoginOrEmail(currentUser);
+            user.setPassword(null);
+            return ResponseEntity.status(HttpStatus.OK).body(user);
+        } catch (DataAccessException ex) {
+            httpSession.setAttribute(CURRENT_USER_KEY, null);
+            return ResponseEntity.status(HttpStatus.OK).body(ResponseView.ERROR_NOT_LOGGED_IN);
+        }
     }
 
     @RequestMapping(method = RequestMethod.POST, path = "login", consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -45,11 +52,12 @@ public class Controller {
             UserView currentUser = dbUsers.getByLoginOrEmail(loggingData.getLoginEmail());
             if (currentUser.getPassword().equals(loggingData.getPassword())) {
                 httpSession.setAttribute(CURRENT_USER_KEY, currentUser.getLogin());
-                return ResponseEntity.status(HttpStatus.OK).body(ResponseView.SUCCESS_LOGIN);
+                currentUser.setPassword(null);
+                return ResponseEntity.status(HttpStatus.OK).body(currentUser);
             }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseView.ERROR_LOGIN);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseView.ERROR_BAD_LOGIN_DATA);
         } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseView.ERROR_LOGIN);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseView.ERROR_BAD_LOGIN_DATA);
         }
     }
 
@@ -65,10 +73,13 @@ public class Controller {
         try {
             dbUsers.addUser(registerData);
         } catch (DuplicateKeyException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseView.ERROR_USER_EXIST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseView.ERROR_USER_ALREADY_EXISTS);
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(ResponseView.SUCCESS_REGISTER);
+        registerData.setPassword(null);
+        registerData.setScore(0);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(registerData);
     }
 
     @RequestMapping(method = RequestMethod.PATCH, path = "users/{changedUser}",
@@ -87,23 +98,18 @@ public class Controller {
                     oldUser.setPassword(newData.getPassword());
                 }
                 dbUsers.changeUser(oldUser);
-                return ResponseEntity.status(HttpStatus.OK).body(ResponseView.SUCCESS_USER_UPDATE);
+                return ResponseEntity.status(HttpStatus.OK).body(oldUser);
             } catch (DataAccessException ex) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseView.ERROR_USER_UPDATE);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseView.ERROR_USER_NOT_FOUND);
             }
         }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResponseView.ERROR_ACCESS);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResponseView.ERROR_NO_RIGHTS_TO_CHANGE_USER);
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "leaderboard",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getLeaderboard() {
-        try {
-            List<UserView> leaders = dbUsers.getLeaderboard();
-            return ResponseEntity.status(HttpStatus.OK).body(leaders);
-        } catch (DataAccessException ex) {
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(null);
-        }
+        List<UserView> leaders = dbUsers.getLeaderboard();
+        return ResponseEntity.status(HttpStatus.OK).body(leaders);
     }
-
 }
