@@ -3,9 +3,7 @@ package seabattle.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.validation.annotation.Validated;
-import seabattle.dao.UserService;
 import seabattle.jdbcdao.JdbcUserService;
 import seabattle.views.AuthorisationView;
 import seabattle.views.UserView;
@@ -18,12 +16,10 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 @RestController
-//@CrossOrigin (origins = "https://sea-battle-front.herokuapp.com")
+@CrossOrigin (origins = "https://sea-battle-front.herokuapp.com")
 @RequestMapping(path = "/api")
 @Validated
 public class Controller {
-
-//    private UserService dbUsers = new JdbcUserService(new JdbcTemplate());
 
     @Autowired
     private JdbcUserService dbUsers;
@@ -41,19 +37,16 @@ public class Controller {
 
     @RequestMapping(method = RequestMethod.POST, path = "login")
     public ResponseEntity login(@Valid @RequestBody AuthorisationView loggingData, HttpSession httpSession) {
-        UserView currentUser;
         try {
-             currentUser = dbUsers.getByLoginOrEmail(loggingData.getLoginEmail());
+            UserView currentUser = dbUsers.getByLoginOrEmail(loggingData.getLoginEmail());
+            if (currentUser.getPassword().equals(loggingData.getPassword())) {
+                httpSession.setAttribute(CURRENT_USER_KEY, currentUser.getLogin());
+                return ResponseEntity.status(HttpStatus.OK).body(ResponseView.SUCCESS_LOGIN);
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseView.ERROR_LOGIN);
         } catch (DataAccessException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseView.ERROR_LOGIN);
         }
-
-        if (currentUser.getPassword().equals(loggingData.getPassword())) {
-            httpSession.setAttribute(CURRENT_USER_KEY, currentUser.getLogin());
-            return ResponseEntity.status(HttpStatus.OK).body(ResponseView.SUCCESS_LOGIN);
-        }
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseView.ERROR_LOGIN);
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "logout")
@@ -67,20 +60,31 @@ public class Controller {
         try {
             dbUsers.addUser(registerData);
         } catch (DuplicateKeyException ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseView.ERROR_REGISTER);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseView.ERROR_USER_EXIST);
         }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseView.SUCCESS_REGISTER);
     }
 
     @RequestMapping(method = RequestMethod.PATCH, path = "users/{changedUser}")
-    public ResponseEntity change(@Valid @RequestBody UserView newData, @PathVariable(value = "changedUser") String changedUser,
+    public ResponseEntity change(@Valid @RequestBody UserView newData,
+                                 @PathVariable(value = "changedUser") String changedUser,
                                  HttpSession httpSession) {
-        if (httpSession.getAttribute(CURRENT_USER_KEY).equals(changedUser)) {
-            if (dbUsers.changeUser(newData) != null) {
+        String currentUser = (String) httpSession.getAttribute(CURRENT_USER_KEY);
+        if (currentUser.equals(changedUser)) {
+            try {
+                UserView oldUser = dbUsers.getByLoginOrEmail(changedUser);
+                if (newData.getEmail() != null) {
+                    oldUser.setEmail(newData.getEmail());
+                }
+                if (newData.getPassword() != null) {
+                    oldUser.setPassword(newData.getPassword());
+                }
+                dbUsers.changeUser(oldUser);
                 return ResponseEntity.status(HttpStatus.OK).body(ResponseView.SUCCESS_USER_UPDATE);
+            } catch (DataAccessException ex) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ResponseView.ERROR_USER_UPDATE);
             }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseView.ERROR_USER_UPDATE);
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResponseView.ERROR_ACCESS);
     }

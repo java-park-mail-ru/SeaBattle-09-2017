@@ -2,29 +2,22 @@ package seabattle.views;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.Email;
-import org.springframework.lang.Nullable;
 import org.springframework.validation.annotation.Validated;
-
-import javax.validation.constraints.NotNull;
 
 @SuppressWarnings("unused")
 @Validated
 public final class UserView {
 
-    @NotNull
     @Email
     private String email;
 
-    @NotNull
     private String login;
 
-    @NotNull
     private String password;
 
-    @Nullable
     private Integer score;
 
-    UserView(@JsonProperty("email") String email, @JsonProperty("login") String login,
+    public UserView(@JsonProperty("email") String email, @JsonProperty("login") String login,
              @JsonProperty("password") String password, @JsonProperty("score") Integer score) {
         this.email = email;
         this.login = login;
@@ -32,22 +25,23 @@ public final class UserView {
         this.score = score;
     }
 
-    @NotNull
+    @Override
+    public String toString() {
+        return "login = " + login + " email = " + email + " password = " + password + " score = " + score;
+    }
+
     public String getEmail() {
         return email;
     }
 
-    @NotNull
     public  String getLogin() {
         return login;
     }
 
-    @NotNull
     public String getPassword() {
         return password;
     }
 
-    @Nullable
     public Integer getScore() {
         return score;
     }
