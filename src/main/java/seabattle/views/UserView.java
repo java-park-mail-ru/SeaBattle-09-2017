@@ -4,42 +4,46 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.Email;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotNull;
-
 @SuppressWarnings("unused")
 @Validated
 public final class UserView {
 
-    @NotNull
     @Email
     private String email;
 
-    @NotNull
     private String login;
 
-    @NotNull
     private String password;
 
+    private Integer score;
+
     public UserView(@JsonProperty("email") String email, @JsonProperty("login") String login,
-             @JsonProperty("password") String password) {
+             @JsonProperty("password") String password, @JsonProperty("score") Integer score) {
         this.email = email;
         this.login = login;
         this.password = password;
+        this.score = score;
     }
 
-    @NotNull
+    @Override
+    public String toString() {
+        return "login = " + login + " email = " + email + " password = " + password + " score = " + score;
+    }
+
     public String getEmail() {
         return email;
     }
 
-    @NotNull
     public  String getLogin() {
         return login;
     }
 
-    @NotNull
     public String getPassword() {
         return password;
+    }
+
+    public Integer getScore() {
+        return score;
     }
 
     public void setEmail(String email) {
@@ -48,5 +52,9 @@ public final class UserView {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setScore(Integer score) {
+        this.score = score;
     }
 }

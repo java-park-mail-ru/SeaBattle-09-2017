@@ -2,14 +2,15 @@ package seabattle.dao;
 
 import seabattle.views.UserView;
 
-public interface UserService {
+import java.util.List;
 
+public interface UserService {
 
     void addUser(UserView user);
 
-    UserView getByLogin(String login);
-
-    UserView getByEmail(String email);
+    UserView getByLoginOrEmail(String loginOrEmail);
     
     UserView changeUser(UserView user);
+
+    List<UserView> getLeaderboard();
 }
