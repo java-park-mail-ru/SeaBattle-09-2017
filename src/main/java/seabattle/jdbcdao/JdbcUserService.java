@@ -4,17 +4,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import seabattle.dao.UserService;
 import seabattle.queries.UserQueries;
 import seabattle.views.UserView;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.List;
+
 
 @Service
 public class JdbcUserService extends JdbcDaoSupport implements UserService {
+
+    private RowMapper<UserView> readUser = (resultSet, rowNumber) ->
+            new UserView(resultSet.getString("email"),
+                    resultSet.getString("login"),
+                    resultSet.getString("password"),
+                    resultSet.getInt("score"));
+
+    private RowMapper<UserView> readUserLoginScore = (resultSet, rowNumber) -> {
+        System.out.println(resultSet);
+        return new UserView(null, resultSet.getString("login"),
+                null, resultSet.getInt("score"));
+    };
+
+
 
     @Autowired
     public JdbcUserService(JdbcTemplate template) {
@@ -31,16 +44,7 @@ public class JdbcUserService extends JdbcDaoSupport implements UserService {
     public UserView getByLoginOrEmail(String loginOrEmail) {
         return getJdbcTemplate().queryForObject(UserQueries.getByLoginOrEmail(),
                 new Object[]{loginOrEmail, loginOrEmail},
-                new RowMapper<UserView>() {
-                    @Nullable
-                    @Override
-                    public UserView mapRow(ResultSet resultSet, int numberOfRows) throws SQLException {
-                        return new UserView(resultSet.getString("email"),
-                                resultSet.getString("login"),
-                                resultSet.getString("password"),
-                                resultSet.getInt("score"));
-                    }
-                });
+                readUser);
     }
 
     @Override
@@ -48,5 +52,10 @@ public class JdbcUserService extends JdbcDaoSupport implements UserService {
         getJdbcTemplate().update(UserQueries.changeUser(),
                 new Object[] {user.getEmail(), user.getPassword(), user.getLogin()});
         return user;
+    }
+
+    @Override
+    public List<UserView> getLeaderboard() {
+        return getJdbcTemplate().query(UserQueries.getLeaderboard(), readUserLoginScore);
     }
 }

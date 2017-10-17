@@ -13,8 +13,7 @@ public class UserQueries {
         return "UPDATE users SET (email, password) = (?, ?) WHERE login = ?;";
     }
 
-    @SuppressWarnings("unused")
     public static String getLeaderboard() {
-        return "SELECT login FROM users ORDER BY score LIMIT 10";
+        return "SELECT login, score FROM users ORDER BY score DESC";
     }
 }

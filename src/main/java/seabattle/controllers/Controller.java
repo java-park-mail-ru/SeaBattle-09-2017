@@ -3,6 +3,7 @@ package seabattle.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import seabattle.jdbcdao.JdbcUserService;
 import seabattle.views.AuthorisationView;
@@ -14,6 +15,7 @@ import seabattle.views.ResponseView;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @CrossOrigin (origins = "https://sea-battle-front.herokuapp.com")
@@ -26,7 +28,7 @@ public class Controller {
 
     private static final String CURRENT_USER_KEY = "currentUser";
 
-    @RequestMapping(method = RequestMethod.GET, path = "info")
+    @RequestMapping(method = RequestMethod.GET, path = "info", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity info(HttpSession httpSession) {
         final String currentUser = (String) httpSession.getAttribute(CURRENT_USER_KEY);
         if (currentUser == null) {
@@ -35,7 +37,8 @@ public class Controller {
         return ResponseEntity.status(HttpStatus.OK).body("Current user login: " + currentUser);
     }
 
-    @RequestMapping(method = RequestMethod.POST, path = "login")
+    @RequestMapping(method = RequestMethod.POST, path = "login", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity login(@Valid @RequestBody AuthorisationView loggingData, HttpSession httpSession) {
         try {
             UserView currentUser = dbUsers.getByLoginOrEmail(loggingData.getLoginEmail());
@@ -55,7 +58,8 @@ public class Controller {
         return ResponseEntity.status(HttpStatus.OK).body(ResponseView.SUCCESS_LOGOUT);
     }
 
-    @RequestMapping(method = RequestMethod.POST, path = "users")
+    @RequestMapping(method = RequestMethod.POST, path = "users", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity register(@Valid @RequestBody UserView registerData) {
         try {
             dbUsers.addUser(registerData);
@@ -66,7 +70,8 @@ public class Controller {
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseView.SUCCESS_REGISTER);
     }
 
-    @RequestMapping(method = RequestMethod.PATCH, path = "users/{changedUser}")
+    @RequestMapping(method = RequestMethod.PATCH, path = "users/{changedUser}",
+            consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity change(@Valid @RequestBody UserView newData,
                                  @PathVariable(value = "changedUser") String changedUser,
                                  HttpSession httpSession) {
@@ -87,6 +92,21 @@ public class Controller {
             }
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResponseView.ERROR_ACCESS);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, path = "leaderboard",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getLeaderboard() {
+        List<UserView> leaders1 = dbUsers.getLeaderboard();
+        for (UserView leader : leaders1) {
+            System.out.println(leader);
+        }
+        try {
+            List<UserView> leaders = dbUsers.getLeaderboard();
+            return ResponseEntity.status(HttpStatus.OK).body(leaders);
+        } catch (DataAccessException ex) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(null);
+        }
     }
 
 }
