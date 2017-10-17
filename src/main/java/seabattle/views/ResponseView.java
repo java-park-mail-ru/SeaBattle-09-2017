@@ -4,16 +4,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum ResponseView {
-    ERROR_INFO(0, "You are not currently logged in!"),
-    SUCCESS_LOGIN(1, "You are successfully logged in!"),
-    ERROR_LOGIN(2, "Wrong data!"),
+    ERROR_NOT_LOGGED_IN(0, "You are not currently logged in!"),
+    ERROR_BAD_LOGIN_DATA(1, "Wrong login/email or password!"),
     SUCCESS_LOGOUT(3, "You successfully logged out!"),
-    ERROR_USER_EXIST(4, "UserView already exists!"),
-    SUCCESS_REGISTER(5, "You are now registered!"),
-    ERROR_REGISTER(6, "Wrong data!"),
-    SUCCESS_USER_UPDATE(7, "Data is successfully updated!"),
-    ERROR_USER_UPDATE(8, "New data is corrupted!"),
-    ERROR_ACCESS(9, "Access error");
+    ERROR_USER_ALREADY_EXISTS(4, "User already exists!"),
+    ERROR_USER_NOT_FOUND(5, "User not found!"),
+    ERROR_NO_RIGHTS_TO_CHANGE_USER(6, "You have no rights to change this user data!");
+
 
     private final Integer status;
     private final String response;
