@@ -28,6 +28,13 @@ public class UserServiceTest {
             assertEquals(ex.getMessage(),"Login is already taken!");
         }
 
+        UserView newUser = new UserView("yaho@bb.com", "bob", "12345");
+        try{
+            userService.addUser(newUser);
+        } catch (IllegalArgumentException ex) {
+            assertEquals(ex.getMessage(),"Email is already taken!");
+        }
+
     }
 
     @Test
