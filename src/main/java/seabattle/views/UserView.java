@@ -20,7 +20,7 @@ public final class UserView {
     @NotNull
     private String password;
 
-    UserView(@JsonProperty("email") String email, @JsonProperty("login") String login,
+    public UserView(@JsonProperty("email") String email, @JsonProperty("login") String login,
              @JsonProperty("password") String password) {
         this.email = email;
         this.login = login;
