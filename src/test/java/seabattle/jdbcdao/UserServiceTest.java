@@ -2,86 +2,76 @@ package seabattle.jdbcdao;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.test.context.junit4.SpringRunner;
 import seabattle.dao.UserService;
 import seabattle.views.UserView;
 
+
 import static org.junit.Assert.*;
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@RunWith(SpringRunner.class)
 public class UserServiceTest {
 
+    @Autowired
     private UserService userService;
+
+
     private UserView testUser;
 
     @Before
-    public void setUp() throws Exception {
-        userService = new UserServiceImpl();
-        testUser = new UserView("yaho@bb.com", "yaho", "qwerty");
-        userService.addUser(testUser);
+    public void setUp(){
+        testUser = new UserView("yaho@bb.com", "yaho", "qwerty", 0);
     }
 
-    @Test
+
+    @SuppressWarnings("all")
+    @Test(expected = DuplicateKeyException.class)
     public void addUser() throws Exception {
-        try {
-            userService.addUser(testUser);
-        } catch (IllegalArgumentException ex)
-        {
-            assertEquals(ex.getMessage(),"Login is already taken!");
-        }
+        userService.addUser(testUser);
 
-        UserView newUser = new UserView("yaho@bb.com", "bob", "12345");
-        try{
-            userService.addUser(newUser);
-        } catch (IllegalArgumentException ex) {
-            assertEquals(ex.getMessage(),"Email is already taken!");
-        }
+        UserView newUser = new UserView("yaho@bb.com", "bob", "12345", 0);
+        userService.addUser(newUser);
 
     }
 
     @Test
-    public void getByLogin() throws Exception {
-        UserView returnUser = userService.getByLogin("yaho");
+    public void getByLogin(){
+        UserView returnUser = userService.getByLoginOrEmail("yaho");
         assertNotNull(returnUser);
         assertEquals(returnUser, testUser);
 
-        returnUser = userService.getByLogin("bob");
+        returnUser = userService.getByLoginOrEmail("bob");
         assertNull(returnUser);
     }
 
     @Test
-    public void getByEmail() throws Exception {
-        UserView returnUser = userService.getByEmail("yaho@bb.com");
+    public void getByEmail(){
+        UserView returnUser = userService.getByLoginOrEmail("yaho@bb.com");
         assertNotNull(returnUser);
         assertEquals(returnUser, testUser);
 
-        returnUser = userService.getByEmail("bob@gmail.com");
+        returnUser = userService.getByLoginOrEmail("bob@gmail.com");
         assertNull(returnUser);
     }
 
     @Test
-    public void changeUser() throws Exception {
-        UserView changeUser = new UserView("bob@bb.com", "bob", "qwerty");
+    public void changeUser(){
+        UserView changeUser = new UserView("bobi@bb.com", "bobi", "qwerty", 2);
         UserView returnUser  = userService.changeUser(changeUser);
         assertNull(returnUser);
 
-        changeUser = new UserView("adaw@bb.com", "yaho", "qwerty");
+        changeUser = new UserView("adaw@bb.com", "Bred", "qwerty123", 2);
         returnUser  = userService.changeUser(changeUser);
         assertNotNull(returnUser);
-        assertEquals(returnUser, changeUser);
+        assertEquals(changeUser, returnUser);
 
-        changeUser = new UserView("yaho@bb.com", "yaho", "12345");
-        returnUser  = userService.changeUser(changeUser);
-        assertNotNull(returnUser);
-        assertEquals(returnUser, changeUser);
-
-        changeUser = new UserView("yaho@bb.com", "yaho", "12345");
-        returnUser  = userService.changeUser(changeUser);
-        assertNotNull(returnUser);
-        assertEquals(returnUser, changeUser);
-
-        changeUser = new UserView("adaw@bb.com", "yaho", "12345");
-        returnUser  = userService.changeUser(changeUser);
-        assertNotNull(returnUser);
-        assertEquals(returnUser, changeUser);
     }
+
+
 
 }
