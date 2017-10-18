@@ -1,6 +1,5 @@
 package seabattle.controllers;
 
-import com.sun.org.apache.regexp.internal.RE;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,7 +14,6 @@ import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import seabattle.views.AuthorisationView;
-import seabattle.views.ResponseView;
 import seabattle.views.UserView;
 
 
@@ -128,9 +126,9 @@ public class ControllerTest {
         final HttpEntity httpEntity = new HttpEntity<>(changeUser, requestHeaders);
         final ResponseEntity<UserView> responseEntity = restTemplate.exchange("/api/users/Bred/",
                 HttpMethod.POST, httpEntity, UserView.class);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(changeUser.getEmail(), responseEntity.getBody().getEmail());
         assertEquals(changeUser.getLogin(), responseEntity.getBody().getLogin());
-        assertEquals(changeUser.getScore(), responseEntity.getBody().getScore());
     }
 
     @Test
@@ -147,7 +145,7 @@ public class ControllerTest {
 
     @SuppressWarnings("all")
     @Test
-    public void liderboard(){
+    public void leaderboard(){
         final ResponseEntity<List<UserView>> responseEntity = restTemplate.exchange("/api/leaderboard/",
                 HttpMethod.GET, null, new ParameterizedTypeReference<List<UserView>>() {});
         assertNotNull(responseEntity.getBody());

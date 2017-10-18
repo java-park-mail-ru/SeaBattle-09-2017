@@ -95,13 +95,12 @@ public class UserServiceTest {
         assertEquals(returnUser.getLogin(), changeUser.getLogin());
         assertEquals(returnUser.getPassword(), changeUser.getPassword());
         assertEquals(returnUser.getScore(), changeUser.getScore());
-
     }
 
 
-    @Test(expected = DataAccessException.class)
+    @Test
     public void changeNotExistUser(){
-        userService.changeUser(new UserView("bobi@bb.com", "bobi", "qwerty", 2));
+        assertEquals(userService.changeUser(new UserView("bobi@bb.com", "bobi", "qwerty", 2)), null);
     }
 
 
@@ -113,7 +112,4 @@ public class UserServiceTest {
             assertSame(userView.getScore(),--i);
         }
     }
-
-
-
 }

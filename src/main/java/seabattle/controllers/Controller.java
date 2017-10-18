@@ -5,7 +5,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-import seabattle.jdbcdao.JdbcUserService;
+import seabattle.dao.UserService;
 import seabattle.views.AuthorisationView;
 import seabattle.views.UserView;
 import org.springframework.http.HttpStatus;
@@ -23,9 +23,8 @@ import java.util.List;
 @Validated
 public class Controller {
 
-    @SuppressWarnings("all")
     @Autowired
-    private JdbcUserService dbUsers;
+    private UserService dbUsers;
 
     private static final String CURRENT_USER_KEY = "currentUser";
 
