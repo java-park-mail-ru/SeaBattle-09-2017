@@ -1,87 +1,119 @@
 package seabattle.jdbcdao;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import seabattle.dao.UserService;
 import seabattle.views.UserView;
 
+
+import java.util.List;
+
 import static org.junit.Assert.*;
 
+@SqlGroup({
+        @Sql("/db/sheme_test_db.sql"),
+        @Sql("/db/test_user.sql"),
+})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@RunWith(SpringRunner.class)
 public class UserServiceTest {
 
+    @Autowired
     private UserService userService;
+
+    @Autowired
+    private JdbcTemplate template;
+
+
     private UserView testUser;
 
     @Before
-    public void setUp() throws Exception {
-        userService = new UserServiceImpl();
-        testUser = new UserView("yaho@bb.com", "yaho", "qwerty");
-        userService.addUser(testUser);
+    public void setUp(){
+        testUser = new UserView("yaho@bb.com", "yaho", "qwerty", 1);
     }
 
-    @Test
+    @After
+    public void tearDown() {
+        JdbcTestUtils.dropTables(template, "users");
+    }
+
+    @Test(expected = DuplicateKeyException.class)
     public void addUser() throws Exception {
-        try {
-            userService.addUser(testUser);
-        } catch (IllegalArgumentException ex)
-        {
-            assertEquals(ex.getMessage(),"Login is already taken!");
+        userService.addUser(testUser);
+
+        final UserView newUser = new UserView("yaho@bb.com", "bob", "12345", 0);
+        userService.addUser(newUser);
+
+    }
+
+    @Test
+    public void getByLogin(){
+        final UserView returnUser = userService.getByLoginOrEmail("yaho");
+        assertNotNull(returnUser);
+        assertEquals(returnUser.getEmail(), testUser.getEmail());
+        assertEquals(returnUser.getLogin(), testUser.getLogin());
+        assertEquals(returnUser.getPassword(), testUser.getPassword());
+        assertEquals(returnUser.getScore(), testUser.getScore());
+
+    }
+
+    @Test
+    public void getByEmail(){
+        final UserView returnUser = userService.getByLoginOrEmail("yaho@bb.com");
+        assertNotNull(returnUser);
+        assertEquals(returnUser.getEmail(), testUser.getEmail());
+        assertEquals(returnUser.getLogin(), testUser.getLogin());
+        assertEquals(returnUser.getPassword(), testUser.getPassword());
+        assertEquals(returnUser.getScore(), testUser.getScore());
+
+    }
+
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void getByNotExistUser(){
+        userService.getByLoginOrEmail("bob");
+        userService.getByLoginOrEmail("bob@gmail.com");
+    }
+
+    @Test
+    public void changeUser(){
+        final UserView changeUser = new UserView("adaw@bb.com", "Bred", "qwerty123", 2);
+        final UserView returnUser  = userService.changeUser(changeUser);
+        assertNotNull(returnUser);
+        assertEquals(returnUser.getEmail(), changeUser.getEmail());
+        assertEquals(returnUser.getLogin(), changeUser.getLogin());
+        assertEquals(returnUser.getPassword(), changeUser.getPassword());
+        assertEquals(returnUser.getScore(), changeUser.getScore());
+
+    }
+
+
+    @Test(expected = DataAccessException.class)
+    public void changeNotExistUser(){
+        userService.changeUser(new UserView("bobi@bb.com", "bobi", "qwerty", 2));
+    }
+
+
+    @Test
+    public void getLeaderboard(){
+        List<UserView> returnedUserList = userService.getLeaderboard();
+        int i = returnedUserList.size();
+        for (UserView userView: returnedUserList) {
+            assertSame(userView.getScore(),--i);
         }
-
-        UserView newUser = new UserView("yaho@bb.com", "bob", "12345");
-        try{
-            userService.addUser(newUser);
-        } catch (IllegalArgumentException ex) {
-            assertEquals(ex.getMessage(),"Email is already taken!");
-        }
-
     }
 
-    @Test
-    public void getByLogin() throws Exception {
-        UserView returnUser = userService.getByLogin("yaho");
-        assertNotNull(returnUser);
-        assertEquals(returnUser, testUser);
 
-        returnUser = userService.getByLogin("bob");
-        assertNull(returnUser);
-    }
-
-    @Test
-    public void getByEmail() throws Exception {
-        UserView returnUser = userService.getByEmail("yaho@bb.com");
-        assertNotNull(returnUser);
-        assertEquals(returnUser, testUser);
-
-        returnUser = userService.getByEmail("bob@gmail.com");
-        assertNull(returnUser);
-    }
-
-    @Test
-    public void changeUser() throws Exception {
-        UserView changeUser = new UserView("bob@bb.com", "bob", "qwerty");
-        UserView returnUser  = userService.changeUser(changeUser);
-        assertNull(returnUser);
-
-        changeUser = new UserView("adaw@bb.com", "yaho", "qwerty");
-        returnUser  = userService.changeUser(changeUser);
-        assertNotNull(returnUser);
-        assertEquals(returnUser, changeUser);
-
-        changeUser = new UserView("yaho@bb.com", "yaho", "12345");
-        returnUser  = userService.changeUser(changeUser);
-        assertNotNull(returnUser);
-        assertEquals(returnUser, changeUser);
-
-        changeUser = new UserView("yaho@bb.com", "yaho", "12345");
-        returnUser  = userService.changeUser(changeUser);
-        assertNotNull(returnUser);
-        assertEquals(returnUser, changeUser);
-
-        changeUser = new UserView("adaw@bb.com", "yaho", "12345");
-        returnUser  = userService.changeUser(changeUser);
-        assertNotNull(returnUser);
-        assertEquals(returnUser, changeUser);
-    }
 
 }

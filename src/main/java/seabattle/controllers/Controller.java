@@ -82,7 +82,7 @@ public class Controller {
         return ResponseEntity.status(HttpStatus.CREATED).body(registerData);
     }
 
-    @RequestMapping(method = RequestMethod.PATCH, path = "users/{changedUser}",
+    @RequestMapping(method = RequestMethod.POST, path = "users/{changedUser}",
             consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity change(@Valid @RequestBody UserView newData,
                                  @PathVariable(value = "changedUser") String changedUser,
