@@ -6,12 +6,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import seabattle.dao.UserService;
@@ -22,10 +20,8 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-@SqlGroup({
-        @Sql("/db/sheme_test_db.sql"),
-        @Sql("/db/test_user.sql"),
-})
+@Sql(scripts = "classpath:schema-test.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = "classpath:data-test.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RunWith(SpringRunner.class)
 public class UserServiceTest {

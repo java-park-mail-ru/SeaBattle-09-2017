@@ -10,7 +10,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import seabattle.views.AuthorisationView;
@@ -22,10 +21,8 @@ import java.util.List;
 import static org.junit.Assert.*;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@SqlGroup({
-        @Sql("/db/sheme_test_db.sql"),
-        @Sql("/db/test_user.sql"),
-})
+@Sql(scripts = "classpath:schema-test.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = "classpath:data-test.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @RunWith(SpringRunner.class)
 public class ControllerTest {
