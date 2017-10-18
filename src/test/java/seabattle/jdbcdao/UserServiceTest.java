@@ -6,14 +6,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Transactional;
 import seabattle.dao.UserService;
 import seabattle.views.UserView;
 
@@ -22,19 +22,13 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-@SqlGroup({
-        @Sql("/db/sheme_test_db.sql"),
-        @Sql("/db/test_user.sql"),
-})
+@Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RunWith(SpringRunner.class)
 public class UserServiceTest {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private JdbcTemplate template;
 
 
     private UserView testUser;
@@ -44,10 +38,6 @@ public class UserServiceTest {
         testUser = new UserView("yaho@bb.com", "yaho", "qwerty", 1);
     }
 
-    @After
-    public void tearDown() {
-        JdbcTestUtils.dropTables(template, "users");
-    }
 
     @Test(expected = DuplicateKeyException.class)
     public void addUser() throws Exception {

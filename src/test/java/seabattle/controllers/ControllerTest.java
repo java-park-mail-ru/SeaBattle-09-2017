@@ -10,9 +10,10 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.transaction.AfterTransaction;
 import org.springframework.test.jdbc.JdbcTestUtils;
+import org.springframework.transaction.annotation.Transactional;
 import seabattle.views.AuthorisationView;
 import seabattle.views.UserView;
 
@@ -22,10 +23,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-@SqlGroup({
-        @Sql("/db/sheme_test_db.sql"),
-        @Sql("/db/test_user.sql"),
-})
+@Transactional
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @RunWith(SpringRunner.class)
 public class ControllerTest {
@@ -33,13 +31,6 @@ public class ControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-    @Autowired
-    private JdbcTemplate template;
-
-    @After
-    public void tearDown() {
-        JdbcTestUtils.dropTables(template, "users");
-    }
 
     @SuppressWarnings("all")
     @Test
