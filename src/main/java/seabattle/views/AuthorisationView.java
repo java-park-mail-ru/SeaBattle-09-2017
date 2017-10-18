@@ -14,7 +14,7 @@ public final class AuthorisationView {
     @NotNull
     private String password;
 
-    private AuthorisationView(@JsonProperty("loginEmail") String loginEmail, @JsonProperty("password")
+    public AuthorisationView(@JsonProperty("loginEmail") String loginEmail, @JsonProperty("password")
             String password) {
         this.loginEmail = loginEmail;
         this.password = password;

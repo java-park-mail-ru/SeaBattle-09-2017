@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,6 +17,8 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 import seabattle.dao.UserService;
 import seabattle.views.UserView;
 
+
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -38,7 +41,7 @@ public class UserServiceTest {
 
     @Before
     public void setUp(){
-        testUser = new UserView("yaho@bb.com", "yaho", "qwerty", 0);
+        testUser = new UserView("yaho@bb.com", "yaho", "qwerty", 1);
     }
 
     @After
@@ -85,18 +88,30 @@ public class UserServiceTest {
 
     @Test
     public void changeUser(){
-        UserView changeUser = new UserView("bobi@bb.com", "bobi", "qwerty", 2);
-        UserView returnUser  = userService.changeUser(changeUser);
-        assertNull(returnUser);
-
-        changeUser = new UserView("adaw@bb.com", "Bred", "qwerty123", 2);
-        returnUser  = userService.changeUser(changeUser);
+        final UserView changeUser = new UserView("adaw@bb.com", "Bred", "qwerty123", 2);
+        final UserView returnUser  = userService.changeUser(changeUser);
         assertNotNull(returnUser);
         assertEquals(returnUser.getEmail(), changeUser.getEmail());
         assertEquals(returnUser.getLogin(), changeUser.getLogin());
         assertEquals(returnUser.getPassword(), changeUser.getPassword());
         assertEquals(returnUser.getScore(), changeUser.getScore());
 
+    }
+
+
+    @Test(expected = DataAccessException.class)
+    public void changeNotExistUser(){
+        userService.changeUser(new UserView("bobi@bb.com", "bobi", "qwerty", 2));
+    }
+
+
+    @Test
+    public void getLeaderboard(){
+        List<UserView> returnedUserList = userService.getLeaderboard();
+        int i = returnedUserList.size();
+        for (UserView userView: returnedUserList) {
+            assertSame(userView.getScore(),--i);
+        }
     }
 
 
