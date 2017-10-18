@@ -23,6 +23,7 @@ import java.util.List;
 @Validated
 public class Controller {
 
+    @SuppressWarnings("all")
     @Autowired
     private UserService dbUsers;
 

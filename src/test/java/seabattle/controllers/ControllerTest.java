@@ -124,7 +124,7 @@ public class ControllerTest {
         requestHeaders.put(HttpHeaders.COOKIE, coockies);
         final UserView changeUser = new UserView("adaw@bb.com", "yaho", "qwerty", 2);
         final HttpEntity httpEntity = new HttpEntity<>(changeUser, requestHeaders);
-        final ResponseEntity<UserView> responseEntity = restTemplate.exchange("/api/users/Bred/",
+        final ResponseEntity<UserView> responseEntity = restTemplate.exchange("/api/users/yaho/",
                 HttpMethod.POST, httpEntity, UserView.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(changeUser.getEmail(), responseEntity.getBody().getEmail());
