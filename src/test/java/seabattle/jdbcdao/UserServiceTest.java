@@ -12,6 +12,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Transactional;
 import seabattle.dao.UserService;
 import seabattle.views.UserView;
 
@@ -20,17 +22,13 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-@Sql(scripts = "classpath:schema-test.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-@Sql(scripts = "classpath:data-test.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RunWith(SpringRunner.class)
 public class UserServiceTest {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private JdbcTemplate template;
 
 
     private UserView testUser;
@@ -40,10 +38,6 @@ public class UserServiceTest {
         testUser = new UserView("yaho@bb.com", "yaho", "qwerty", 1);
     }
 
-    @After
-    public void tearDown() {
-        JdbcTestUtils.dropTables(template, "users");
-    }
 
     @Test(expected = DuplicateKeyException.class)
     public void addUser() throws Exception {
