@@ -52,9 +52,11 @@ public class JdbcUserService extends JdbcDaoSupport implements UserService {
     @Override
     @SuppressWarnings("all")
     public UserView changeUser(UserView user) {
-        getJdbcTemplate().update(UserQueries.changeUser(),
-                new Object[] {user.getEmail(), user.getPassword(), user.getLogin()});
-        return user;
+        if (getJdbcTemplate().update(UserQueries.changeUser(),
+                new Object[] {user.getEmail(), user.getPassword(), user.getLogin()}) != 0) {
+            return user;
+        }
+        return null;
     }
 
     @Override
