@@ -1,1 +1,10 @@
 language: java
+deploy:
+  provider: heroku
+  api_key:
+    secure: NLydDEoxQEUdCPKR06BOo5NIOLzVPKQtPgRufM6vg19J2BXLvt8HMletGtGZXYP3s8LoSY+sqdB8b5HkgiH5+dmsC6n7dUqRs1q/L5AA9TaZ5ZMO0J3k+llS2uzX8404CyCQvdjgDhfhHV0FM3G4cYgxWI/nbDpNPgsZ2igABVkfRwfvUfdDOCTZY6IpTo1PkuQXA08DwZePeL+qzL6cZkglo/A37c0p4WQhuAK24P8351yHEMilCLTySMS83yzANFH6O1/l/KLqie/6RGQeQKFLL9VqBwYe5rT/C8/GKrlIHTNXZf1zWxr8AB1VuCGA6695qiUzRkxOWHvMs8TjPq5qElEty/u2ZAnph/uPDCjFwWR1l7vpY3pqXu+jNzye1mGGD7lIeBT69T2KE94ZveVp+kf9xG/8Jq27cW/0hu6+4UPiVkCF6ikI5z7DQpcoRmde9zhZr1K1UBxgchps0kduv/2UcEKRhNJrgSiMjbZUSmj3nkECdmc2HbaoHW1LpGBNKnNqeVBu5PARwTApHeYa4LVzASPjaJD6roh3GBi4Gn4rjZQIz8HgoqAJiVMvu7TDpethcC43U9ft2O6a9zpsRs5ujMlBfAMcjMCNTj24o6IAmU+lpnmvkoRECSnSJA3HNkvGOUZDrAID6g9ZZAPRKWBzSl4NMMA+YUnvD84=
+  app: sea-battle-back
+  on:
+    repo: java-park-mail-ru/SeaBattle-09-2017
+    branch: develop
+  skip_cleanup: true
