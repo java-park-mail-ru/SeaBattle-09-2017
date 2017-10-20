@@ -25,10 +25,22 @@
 }
 ```
 #### Response
+В случае успеха возвращает данные нового пользователя\
+HttpStatus: 201
 ```
 {
-  "status": 5,
-  "response": "You are now registered!",
+  "login": string,
+  "email": string,
+  "password": null,
+  "score": integer
+}
+```
+В случае, если пользователь с таким логином или почтой уже существует, возвращается вообщение об ошибке\
+HttpStatus: 400
+```
+{
+  "status": 4,
+  "response": "User already exists!"
 }
 ```
 ### Login
@@ -45,13 +57,24 @@
 }
 ```
 #### Response
+В случае успеха возвращаются данные авторизованного пользователя\
+HttpStatus 200
+```
+{
+  "login": string,
+  "email": string,
+  "password": null,
+  "score": integer
+}
+```
+В случае, если логин/почта или пароль неверны возвращается сообщение\
+HttpStatus 400
 ```
 {
   "status": 1,
-  "response": "You are successfully logged in!",
+  "response": "Wrong login/email or password!"
 }
 ```
-
 ### Logout
 Завершение пользовательской сессии
 ##### URL
@@ -59,10 +82,12 @@
 #### Method
 `POST`
 #### Response
+В случае успеха возвращается сообщение\
+HttpStatus: 200
 ```
 {
   "status": 3,
-  "response": "You successfully logged out!",
+  "response": "You successfully logged out!"
 }
 ```
 ### Info
@@ -72,13 +97,30 @@
 #### Method
 `GET`
 #### Response
-В случае успеха, возвращает данные текущего пользователя
-
+В случае успеха, возвращает данные текущего пользователя\
+HttpStatus: 200
+```
+{
+  "login": string,
+  "email": string,
+  "password": null,
+  "score": integer
+}
+```
+В случае, если пользователь не авторизован, выдается сообщение\
+HttpStatus 200
+```
+{
+  "status": 0,
+  "You are not currently logged in!"
+}
+```
 ### Change
 Обновление пользовательских данных
 #### URL
 `/api/users/{changedUser}`
 #### Params
+
 ```
 {
   "login": string
@@ -89,11 +131,53 @@
 #### Method
 `POST`
 #### Response
+В случае успеха возвращает измененные данные пользователя\
+HttpStatus: 200
 ```
 {
-  "status": 7,
-  "response": "Data is successfully updated!",
+  "login": string,
+  "email": string,
+  "password": null,
+  "score": integer
 }
 ```
- 
- 
+В случае, если текущий пользователь не является изменяемым, выдается сообщение\
+HttpStatus: 403
+```
+{
+  "status": 6,
+  "response": "You have no rights to change this user data!"
+}
+```
+В случае, если изменяемого пользователя нет в базе, выдается сообщение\
+HttpStatus: 404
+```
+{
+  "status": 5,
+  "response": "User not found!"
+}
+```
+### Leaderboard
+Вывод таблицы лидеров
+#### URL
+`/api/leaderboard`
+#### Method
+`GET`
+#### Response
+В случае успеха возвращает лист пользователей до 10 человек в порядке убывания их счета\
+HttpStatus: 200
+```
+[{
+  "login": string,
+  "email": null,
+  "password": null,
+  "score": integer
+},
+...
+{
+  "login": string,
+  "email": null,
+  "password": null,
+  "score": integer
+}]
+```
