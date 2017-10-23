@@ -42,8 +42,8 @@ public class ControllerTest {
     @Test
     public void userExistRegister() {
         final UserView newUser = new UserView("Odin@mail.ru", "Odin", "02103452", 0);
-        final HttpEntity httpEntity = new HttpEntity<>(newUser);
-        final ResponseEntity registerResponce = restTemplate.exchange("/api/users/",
+        final HttpEntity<UserView> httpEntity = new HttpEntity<>(newUser);
+        final ResponseEntity<String> registerResponce = restTemplate.exchange("/api/users/",
                 HttpMethod.POST, httpEntity, String.class);
         assertEquals("{\"status\":4,\"response\":\"User already exists!\"}", registerResponce.getBody());
     }
@@ -51,8 +51,8 @@ public class ControllerTest {
     @Test
     public void wrongEmailRegister() {
         final UserView newUser = new UserView("Odinz", "Odin", "02103452", 0);
-        final HttpEntity httpEntity = new HttpEntity<>(newUser);
-        final ResponseEntity registerResponce = restTemplate.exchange("/api/users/",
+        final HttpEntity<UserView> httpEntity = new HttpEntity<>(newUser);
+        final ResponseEntity<String> registerResponce = restTemplate.exchange("/api/users/",
                 HttpMethod.POST, httpEntity, String.class);
         assertEquals(HttpStatus.BAD_REQUEST, registerResponce.getStatusCode());
     }
@@ -64,8 +64,8 @@ public class ControllerTest {
 
     @SuppressWarnings("all")
     private List<String> login() {
-        final AuthorisationView user = new AuthorisationView("yaho", "qwerty");
-        final HttpEntity httpEntity = new HttpEntity<>(user);
+        final AuthorisationView user = new AuthorisationView("Alik", "13213");
+        final HttpEntity<AuthorisationView> httpEntity = new HttpEntity<>(user);
         final ResponseEntity<UserView> responseEntity = restTemplate.exchange("/api/login/",
                 HttpMethod.POST, httpEntity, UserView.class);
         assertEquals(user.getLoginEmail(), responseEntity.getBody().getLogin());
@@ -88,7 +88,7 @@ public class ControllerTest {
         final ResponseEntity<UserView> responseEntity = restTemplate.exchange("/api/info/",
                 HttpMethod.GET, requestEntity, UserView.class);
         assertNotNull(responseEntity.getBody());
-        assertEquals("yaho", responseEntity.getBody().getLogin());
+        assertEquals("Alik", responseEntity.getBody().getLogin());
     }
 
 
@@ -96,8 +96,8 @@ public class ControllerTest {
     @Test
     public void wrongLoginOrEmailLogin() {
         final AuthorisationView user = new AuthorisationView("bobi", "qwerty");
-        final HttpEntity httpEntity = new HttpEntity<>(user);
-        final ResponseEntity responseEntity = restTemplate.exchange("/api/login/",
+        final HttpEntity<AuthorisationView> httpEntity = new HttpEntity<>(user);
+        final ResponseEntity<String> responseEntity = restTemplate.exchange("/api/login/",
                 HttpMethod.POST, httpEntity, String.class);
         assertEquals("{\"status\":1,\"response\":\"Wrong login/email or password!\"}", responseEntity.getBody());
     }
@@ -108,9 +108,9 @@ public class ControllerTest {
         final List<String> coockies = login();
         final HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.put(HttpHeaders.COOKIE, coockies);
-        final UserView changeUser = new UserView("adaw@bb.com", "yaho", "qwerty", 2);
-        final HttpEntity httpEntity = new HttpEntity<>(changeUser, requestHeaders);
-        final ResponseEntity<UserView> responseEntity = restTemplate.exchange("/api/users/yaho/",
+        final UserView changeUser = new UserView("adaw@bb.com", "Alik", "qwerty", 6);
+        final HttpEntity<UserView> httpEntity = new HttpEntity<>(changeUser, requestHeaders);
+        final ResponseEntity<UserView> responseEntity = restTemplate.exchange("/api/users/Alik/",
                 HttpMethod.POST, httpEntity, UserView.class);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(changeUser.getEmail(), responseEntity.getBody().getEmail());
@@ -123,8 +123,8 @@ public class ControllerTest {
         final HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.put(HttpHeaders.COOKIE, coockies);
         final UserView changeUser = new UserView("bobi@bb.com", "bobi", "qwerty", 2);
-        final HttpEntity httpEntity = new HttpEntity<>(changeUser, requestHeaders);
-        final ResponseEntity responseEntity = restTemplate.exchange("/api/users/bobi/",
+        final HttpEntity<UserView> httpEntity = new HttpEntity<>(changeUser, requestHeaders);
+        final ResponseEntity<String> responseEntity = restTemplate.exchange("/api/users/bobi/",
                 HttpMethod.POST, httpEntity, String.class);
         assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
     }

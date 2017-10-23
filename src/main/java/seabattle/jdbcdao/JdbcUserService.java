@@ -15,13 +15,13 @@ import java.util.List;
 @Service
 public class JdbcUserService extends JdbcDaoSupport implements UserService {
 
-    private RowMapper<UserView> readUser = (resultSet, rowNumber) ->
+    private static final RowMapper<UserView> READ_USER_MAPPER = (resultSet, rowNumber) ->
             new UserView(resultSet.getString("email"),
                     resultSet.getString("login"),
                     resultSet.getString("password"),
                     resultSet.getInt("score"));
 
-    private RowMapper<UserView> readUserLoginScore = (resultSet, rowNumber) -> {
+    private static final RowMapper<UserView> READ_USER_LOGIN_SCORE_MAPPER = (resultSet, rowNumber) -> {
         System.out.println(resultSet);
         return new UserView(null, resultSet.getString("login"),
                 null, resultSet.getInt("score"));
@@ -46,7 +46,7 @@ public class JdbcUserService extends JdbcDaoSupport implements UserService {
     public UserView getByLoginOrEmail(String loginOrEmail) {
         return getJdbcTemplate().queryForObject(UserQueries.getByLoginOrEmail(),
                 new Object[]{loginOrEmail, loginOrEmail},
-                readUser);
+                READ_USER_MAPPER);
     }
 
     @Override
@@ -62,6 +62,6 @@ public class JdbcUserService extends JdbcDaoSupport implements UserService {
     @Override
     @SuppressWarnings("all")
     public List<UserView> getLeaderboard() {
-        return getJdbcTemplate().query(UserQueries.getLeaderboard(), readUserLoginScore);
+        return getJdbcTemplate().query(UserQueries.getLeaderboard(), READ_USER_LOGIN_SCORE_MAPPER);
     }
 }

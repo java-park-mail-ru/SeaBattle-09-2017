@@ -73,7 +73,7 @@ public class UserServiceTest {
 
     @Test
     public void changeUser(){
-        final UserView changeUser = new UserView("adaw@bb.com", "Bred", "qwerty123", 2);
+        final UserView changeUser = new UserView("adaw67@bb.com", "Bred", "qwerty123", 2);
         final UserView returnUser  = userService.changeUser(changeUser);
         assertNotNull(returnUser);
         assertEquals(returnUser.getEmail(), changeUser.getEmail());
