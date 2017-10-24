@@ -62,7 +62,7 @@ public class Controller {
     }
 
     @RequestMapping(method = RequestMethod.GET, path = "logout")
-    public ResponseEntity logout(HttpSession httpSession) {
+    public ResponseEntity<ResponseView> logout(HttpSession httpSession) {
         httpSession.setAttribute(CURRENT_USER_KEY, null);
         return ResponseEntity.status(HttpStatus.OK).body(ResponseView.SUCCESS_LOGOUT);
     }
@@ -108,7 +108,7 @@ public class Controller {
 
     @RequestMapping(method = RequestMethod.GET, path = "leaderboard",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity getLeaderboard() {
+    public ResponseEntity<List<UserView>> getLeaderboard() {
         List<UserView> leaders = dbUsers.getLeaderboard();
         return ResponseEntity.status(HttpStatus.OK).body(leaders);
     }
