@@ -58,4 +58,76 @@ public final class UserView {
     public void setScore(Integer score) {
         this.score = score;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        UserView other = (UserView) obj;
+        if (getEmail() == null) {
+            if (other.getEmail() != null) {
+                return false;
+            }
+        } else if (!getEmail().equals(other.getEmail())) {
+            return false;
+        }
+        if (getLogin() == null) {
+            if (other.getLogin() != null) {
+                return false;
+            }
+        } else if (!getLogin().equals(other.getLogin())) {
+            return false;
+        }
+        if (getPassword() == null) {
+            if (other.getPassword() != null) {
+                return false;
+            }
+        } else if (!getPassword().equals(other.getPassword())) {
+            return false;
+        }
+        if (getScore() == null) {
+            if (other.getScore() != null) {
+                return false;
+            }
+        } else if (!getScore().equals(other.getScore())) {
+            return false;
+        }
+        return true;
+    }
+
+
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        if (getEmail() == null) {
+            result = prime * result;
+        } else {
+            result = prime * result + getEmail().hashCode();
+        }
+        if (getLogin() == null) {
+            result = prime * result;
+        } else {
+            result = prime * result + getLogin().hashCode();
+        }
+        if (getPassword() == null) {
+            result = prime * result;
+        } else {
+            result = prime * result + getPassword().hashCode();
+        }
+        if (getScore() == null) {
+            result = prime * result;
+        } else {
+            result = prime * result + getScore().hashCode();
+        }
+        return result;
+    }
 }
