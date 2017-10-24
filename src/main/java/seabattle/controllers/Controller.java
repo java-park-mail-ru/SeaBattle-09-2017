@@ -17,13 +17,13 @@ import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.List;
 
+@SuppressWarnings("SpringAutowiredFieldsWarningInspection")
 @RestController
 //@CrossOrigin (origins = "https://sea-battle-front.herokuapp.com")
 @RequestMapping(path = "/api")
 @Validated
 public class Controller {
 
-    @SuppressWarnings("all")
     @Autowired
     private UserService dbUsers;
 

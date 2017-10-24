@@ -18,6 +18,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
+@SuppressWarnings("ConstantConditions")
 @Transactional
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 @RunWith(SpringRunner.class)
@@ -26,35 +27,33 @@ public class ControllerTest {
     @Autowired
     private TestRestTemplate restTemplate;
 
-
-    @SuppressWarnings("all")
     @Test
     public void successfulRegister() {
         final UserView newUser = new UserView("Bob@mail.ru", "Bob", "02103452", 0);
         final HttpEntity<UserView> httpEntity = new HttpEntity<>(newUser);
-        final ResponseEntity<UserView> registerResponce = restTemplate.exchange("/api/users/",
+        final ResponseEntity<UserView> registerResponse = restTemplate.exchange("/api/users/",
                 HttpMethod.POST, httpEntity, UserView.class);
-        assertEquals(newUser.getEmail(), registerResponce.getBody().getEmail());
-        assertEquals(newUser.getLogin(), registerResponce.getBody().getLogin());
-        assertEquals(newUser.getScore(), registerResponce.getBody().getScore());
+        assertEquals(newUser.getEmail(), registerResponse.getBody().getEmail());
+        assertEquals(newUser.getLogin(), registerResponse.getBody().getLogin());
+        assertEquals(newUser.getScore(), registerResponse.getBody().getScore());
     }
 
     @Test
     public void userExistRegister() {
         final UserView newUser = new UserView("Odin@mail.ru", "Odin", "02103452", 0);
         final HttpEntity<UserView> httpEntity = new HttpEntity<>(newUser);
-        final ResponseEntity<String> registerResponce = restTemplate.exchange("/api/users/",
+        final ResponseEntity<String> registerResponse = restTemplate.exchange("/api/users/",
                 HttpMethod.POST, httpEntity, String.class);
-        assertEquals("{\"status\":4,\"response\":\"User already exists!\"}", registerResponce.getBody());
+        assertEquals("{\"status\":4,\"response\":\"User already exists!\"}", registerResponse.getBody());
     }
 
     @Test
     public void wrongEmailRegister() {
         final UserView newUser = new UserView("Odinz", "Odin", "02103452", 0);
         final HttpEntity<UserView> httpEntity = new HttpEntity<>(newUser);
-        final ResponseEntity<String> registerResponce = restTemplate.exchange("/api/users/",
+        final ResponseEntity<String> registerResponse = restTemplate.exchange("/api/users/",
                 HttpMethod.POST, httpEntity, String.class);
-        assertEquals(HttpStatus.BAD_REQUEST, registerResponce.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, registerResponse.getStatusCode());
     }
 
     @Test
@@ -62,7 +61,6 @@ public class ControllerTest {
             login();
     }
 
-    @SuppressWarnings("all")
     private List<String> login() {
         final AuthorisationView user = new AuthorisationView("Alik", "13213");
         final HttpEntity<AuthorisationView> httpEntity = new HttpEntity<>(user);
@@ -70,19 +68,19 @@ public class ControllerTest {
                 HttpMethod.POST, httpEntity, UserView.class);
         assertEquals(user.getLoginEmail(), responseEntity.getBody().getLogin());
 
-        final List<String> coockies = responseEntity.getHeaders().get("Set-Cookie");
-        assertNotNull(coockies);
-        assertFalse(coockies.isEmpty());
+        final List<String> cookies = responseEntity.getHeaders().get("Set-Cookie");
+        assertNotNull(cookies);
+        assertFalse(cookies.isEmpty());
 
-        return coockies;
+        return cookies;
     }
 
 
     @Test
     public void info() {
-        final List<String> coockies = login();
+        final List<String> cookies = login();
         final HttpHeaders requestHeaders = new HttpHeaders();
-        requestHeaders.put(HttpHeaders.COOKIE, coockies);
+        requestHeaders.put(HttpHeaders.COOKIE, cookies);
         final HttpEntity<Void> requestEntity = new HttpEntity<>(requestHeaders);
 
         final ResponseEntity<UserView> responseEntity = restTemplate.exchange("/api/info/",
@@ -102,12 +100,11 @@ public class ControllerTest {
         assertEquals("{\"status\":1,\"response\":\"Wrong login/email or password!\"}", responseEntity.getBody());
     }
 
-    @SuppressWarnings("all")
     @Test
     public void successfulChangeUser() {
-        final List<String> coockies = login();
+        final List<String> cookies = login();
         final HttpHeaders requestHeaders = new HttpHeaders();
-        requestHeaders.put(HttpHeaders.COOKIE, coockies);
+        requestHeaders.put(HttpHeaders.COOKIE, cookies);
         final UserView changeUser = new UserView("adaw@bb.com", "Alik", "qwerty", 6);
         final HttpEntity<UserView> httpEntity = new HttpEntity<>(changeUser, requestHeaders);
         final ResponseEntity<UserView> responseEntity = restTemplate.exchange("/api/users/Alik/",
@@ -119,9 +116,9 @@ public class ControllerTest {
 
     @Test
     public void unsuccessfulChangeUser(){
-        final List<String> coockies = login();
+        final List<String> cookies = login();
         final HttpHeaders requestHeaders = new HttpHeaders();
-        requestHeaders.put(HttpHeaders.COOKIE, coockies);
+        requestHeaders.put(HttpHeaders.COOKIE, cookies);
         final UserView changeUser = new UserView("bobi@bb.com", "bobi", "qwerty", 2);
         final HttpEntity<UserView> httpEntity = new HttpEntity<>(changeUser, requestHeaders);
         final ResponseEntity<String> responseEntity = restTemplate.exchange("/api/users/bobi/",
@@ -129,7 +126,6 @@ public class ControllerTest {
         assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode());
     }
 
-    @SuppressWarnings("all")
     @Test
     public void leaderboard(){
         final ResponseEntity<List<UserView>> responseEntity = restTemplate.exchange("/api/leaderboard/",

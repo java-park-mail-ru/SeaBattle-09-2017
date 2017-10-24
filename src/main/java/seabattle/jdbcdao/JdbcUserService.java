@@ -1,19 +1,17 @@
 package seabattle.jdbcdao;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Service;
 import seabattle.dao.UserService;
-import seabattle.queries.UserQueries;
 import seabattle.views.UserView;
 
 import java.util.List;
 
 
+@SuppressWarnings("SqlNoDataSourceInspection")
 @Service
-public class JdbcUserService extends JdbcDaoSupport implements UserService {
+public class JdbcUserService implements UserService {
 
     private static final RowMapper<UserView> READ_USER_MAPPER = (resultSet, rowNumber) ->
             new UserView(resultSet.getString("email"),
@@ -27,41 +25,36 @@ public class JdbcUserService extends JdbcDaoSupport implements UserService {
                 null, resultSet.getInt("score"));
     };
 
+    private JdbcTemplate template;
 
-
-    @Autowired
     public JdbcUserService(JdbcTemplate template) {
-        setJdbcTemplate(template);
+        this.template = template;
     }
 
     @Override
-    @SuppressWarnings("all")
     public void addUser(UserView user) {
-        getJdbcTemplate().update(UserQueries.addUser(),
-                new Object[] {user.getEmail(), user.getLogin(), user.getPassword()});
+        String sql = "INSERT INTO users (email, login, password) VALUES (?, ?, ?)";
+        template.update(sql, user.getEmail(), user.getLogin(), user.getPassword());
     }
 
     @Override
-    @SuppressWarnings("all")
-    public UserView getByLoginOrEmail(String loginOrEmail) {
-        return getJdbcTemplate().queryForObject(UserQueries.getByLoginOrEmail(),
-                new Object[]{loginOrEmail, loginOrEmail},
-                READ_USER_MAPPER);
+        public UserView getByLoginOrEmail(String loginOrEmail) {
+        String sql = "SELECT DISTINCT email, login, password, score FROM users WHERE email = ? OR login = ?";
+        return template.queryForObject(sql, READ_USER_MAPPER, loginOrEmail, loginOrEmail);
     }
 
     @Override
-    @SuppressWarnings("all")
     public UserView changeUser(UserView user) {
-        if (getJdbcTemplate().update(UserQueries.changeUser(),
-                new Object[] {user.getEmail(), user.getPassword(), user.getLogin()}) != 0) {
+        String sql = "UPDATE users SET (email, password) = (?, ?) WHERE login = ?";
+        if (template.update(sql, user.getEmail(), user.getPassword(), user.getLogin()) != 0) {
             return user;
         }
         return null;
     }
 
     @Override
-    @SuppressWarnings("all")
     public List<UserView> getLeaderboard() {
-        return getJdbcTemplate().query(UserQueries.getLeaderboard(), READ_USER_LOGIN_SCORE_MAPPER);
+        String sql = "SELECT login, score FROM users ORDER BY score DESC";
+        return template.query(sql, READ_USER_LOGIN_SCORE_MAPPER);
     }
 }
