@@ -19,11 +19,9 @@ public class JdbcUserService implements UserService {
                     resultSet.getString("password"),
                     resultSet.getInt("score"));
 
-    private static final RowMapper<UserView> READ_USER_LOGIN_SCORE_MAPPER = (resultSet, rowNumber) -> {
-        System.out.println(resultSet);
-        return new UserView(null, resultSet.getString("login"),
-                null, resultSet.getInt("score"));
-    };
+    private static final RowMapper<UserView> READ_USER_LOGIN_SCORE_MAPPER = (resultSet, rowNumber) ->
+            new UserView(null, resultSet.getString("login"),
+                    null, resultSet.getInt("score"));
 
     private JdbcTemplate template;
 
