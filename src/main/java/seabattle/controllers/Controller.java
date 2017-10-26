@@ -1,9 +1,12 @@
 package seabattle.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import seabattle.dao.UserService;
 import seabattle.views.AuthorisationView;
@@ -26,6 +29,11 @@ public class Controller {
 
     @Autowired
     private UserService dbUsers;
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     private static final String CURRENT_USER_KEY = "currentUser";
 
@@ -50,7 +58,8 @@ public class Controller {
     public ResponseEntity login(@Valid @RequestBody AuthorisationView loggingData, HttpSession httpSession) {
         try {
             UserView currentUser = dbUsers.getByLoginOrEmail(loggingData.getLoginEmail());
-            if (currentUser.getPassword().equals(loggingData.getPassword())) {
+
+            if (passwordEncoder().matches(loggingData.getPassword(), currentUser.getPassword())) {
                 httpSession.setAttribute(CURRENT_USER_KEY, currentUser.getLogin());
                 currentUser.setPassword(null);
                 return ResponseEntity.status(HttpStatus.OK).body(currentUser);
@@ -71,6 +80,8 @@ public class Controller {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity register(@Valid @RequestBody UserView registerData) {
         try {
+            String encodedPassword = passwordEncoder().encode(registerData.getPassword());
+            registerData.setPassword(encodedPassword);
             dbUsers.addUser(registerData);
         } catch (DuplicateKeyException ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseView.ERROR_USER_ALREADY_EXISTS);
@@ -95,7 +106,8 @@ public class Controller {
                     oldUser.setEmail(newData.getEmail());
                 }
                 if (newData.getPassword() != null) {
-                    oldUser.setPassword(newData.getPassword());
+                    String encodedPassword = passwordEncoder().encode(newData.getPassword());
+                    oldUser.setPassword(encodedPassword);
                 }
                 dbUsers.changeUser(oldUser);
                 return ResponseEntity.status(HttpStatus.OK).body(oldUser);
