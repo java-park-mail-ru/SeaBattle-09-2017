@@ -85,20 +85,6 @@ public final class UserView {
         } else if (!getLogin().equals(other.getLogin())) {
             return false;
         }
-        if (getPassword() == null) {
-            if (other.getPassword() != null) {
-                return false;
-            }
-        } else if (!getPassword().equals(other.getPassword())) {
-            return false;
-        }
-        if (getScore() == null) {
-            if (other.getScore() != null) {
-                return false;
-            }
-        } else if (!getScore().equals(other.getScore())) {
-            return false;
-        }
         return true;
     }
 
