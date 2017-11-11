@@ -1,4 +1,4 @@
-package seabattle.controllers;
+package seabattle.authorization.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -8,13 +8,13 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
-import seabattle.dao.UserService;
-import seabattle.views.AuthorisationView;
-import seabattle.views.UserView;
+import seabattle.authorization.service.UserService;
+import seabattle.authorization.views.AuthorisationView;
+import seabattle.authorization.views.ResponseView;
+import seabattle.authorization.views.UserView;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-import seabattle.views.ResponseView;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;

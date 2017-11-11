@@ -1,6 +1,6 @@
-package seabattle.dao;
+package seabattle.authorization.service;
 
-import seabattle.views.UserView;
+import seabattle.authorization.views.UserView;
 
 import java.util.List;
 

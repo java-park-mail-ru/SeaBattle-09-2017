@@ -12,9 +12,9 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
-import seabattle.dao.UserService;
-import seabattle.views.AuthorisationView;
-import seabattle.views.UserView;
+import seabattle.authorization.service.UserService;
+import seabattle.authorization.views.AuthorisationView;
+import seabattle.authorization.views.UserView;
 
 
 import java.util.List;
