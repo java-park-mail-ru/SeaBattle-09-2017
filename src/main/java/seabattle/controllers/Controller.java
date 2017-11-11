@@ -22,7 +22,7 @@ import java.util.List;
 
 @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
 @RestController
-//@CrossOrigin (origins = "https://sea-battle-front.herokuapp.com")
+@CrossOrigin (origins = "https://sea-battle-front.herokuapp.com")
 @RequestMapping(path = "/api")
 @Validated
 public class Controller {
