@@ -3,7 +3,6 @@ package seabattle.authorization.service;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
-import seabattle.authorization.service.UserService;
 import seabattle.authorization.views.UserView;
 
 import java.util.List;
