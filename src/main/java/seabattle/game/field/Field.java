@@ -35,17 +35,19 @@ public final class Field {
         return fieldSize;
     }
 
-    public CellStatus fire(Integer horizontalPos, Integer verticalPos) {
-        if (horizontalPos < 0 || horizontalPos >= fieldSize || verticalPos < 0 || verticalPos >= fieldSize) {
+    public CellStatus fire(Integer rowPos, Integer colPos) {
+        if (rowPos < 0 || rowPos >= fieldSize || colPos < 0 || colPos >= fieldSize) {
             throw new IllegalArgumentException("Given position is out of bounds!");
         }
-        switch (cells.get(horizontalPos).get(verticalPos)) {
+        switch (cells.get(rowPos).get(colPos)) {
             case FREE:
-                cells.get(horizontalPos).set(verticalPos, CellStatus.BLOCKED);
+                cells.get(rowPos).set(colPos, CellStatus.BLOCKED);
                 return CellStatus.BLOCKED;
             case OCCUPIED:
-                cells.get(verticalPos).set(verticalPos, CellStatus.DESTRUCTED);
+                cells.get(colPos).set(colPos, CellStatus.DESTRUCTED);
                 return CellStatus.DESTRUCTED;
+            case ON_FIRE:
+                throw new IllegalArgumentException("Given position is already checked!");
             case DESTRUCTED:
                 throw new IllegalArgumentException("Given position is already checked!");
             case BLOCKED:
@@ -72,13 +74,13 @@ public final class Field {
     public Boolean shipKilled(Ship ship) {
         if (ship.getOrientation() == ShipOrientation.VERTICAL) {
             for (Integer y = ship.getColPos(); y < ship.getLength(); ++y) {
-                if (getCellStatus(ship.getRowPos(), y) != CellStatus.DESTRUCTED) {
+                if (getCellStatus(ship.getRowPos(), y) != CellStatus.ON_FIRE) {
                     return false;
                 }
             }
         } else {
             for (Integer x = ship.getRowPos(); x < ship.getLength(); ++x) {
-                if (getCellStatus(x, ship.getColPos()) != CellStatus.DESTRUCTED) {
+                if (getCellStatus(x, ship.getColPos()) != CellStatus.ON_FIRE) {
                     return false;
                 }
             }
@@ -127,6 +129,8 @@ public final class Field {
             for (Integer y = colPosMin; y < colPosMax; ++y) {
                 if (cells.get(x).get(y) == CellStatus.FREE) {
                     cells.get(x).set(y, CellStatus.BLOCKED);
+                } else if (cells.get(x).get(y) == CellStatus.ON_FIRE) {
+                    cells.get(x).set(y, CellStatus.DESTRUCTED);
                 }
             }
         }

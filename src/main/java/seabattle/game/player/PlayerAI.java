@@ -1,5 +1,6 @@
 package seabattle.game.player;
 
+import seabattle.game.field.Cell;
 import seabattle.game.field.CellStatus;
 import seabattle.game.field.Field;
 import seabattle.game.ship.Ship;
@@ -114,5 +115,124 @@ public  final class PlayerAI extends Player {
             }
         }
         return generatedShips;
+    }
+
+    @SuppressWarnings("Duplicates")
+    public Cell makeDecision(final Field field) {
+
+        Integer freeCells = 0;
+        final Integer maxDistance = 3;
+
+        for (Integer row =  0; row < field.getFieldSize(); ++row) {
+            for (Integer col = 0; col < field.getFieldSize(); ++col) {
+                CellStatus currentCellStatus = field.getCellStatus(row, col);
+                switch (currentCellStatus) {
+                    case ON_FIRE:
+                        Integer checkRow = row;
+                        Integer checkCol = col;
+
+                        Boolean isHorizontal = shipIsHorizontal(field, row, col);
+                        if (isHorizontal != Boolean.FALSE) {
+                            for (Integer distance = 0; distance < maxDistance; ++distance) {
+                                CellStatus cellStatus = field.getCellStatus(row, col - distance);
+                                if (cellStatus != CellStatus.ON_FIRE) {
+                                    if (cellStatus == CellStatus.BLOCKED) {
+                                        break;
+                                    }
+                                } else {
+                                    return new Cell(row, col - distance);
+                                }
+                            }
+                            for (Integer distance = 0; distance < maxDistance; ++distance) {
+                                CellStatus cellStatus = field.getCellStatus(row, col + distance);
+                                if (cellStatus != CellStatus.ON_FIRE) {
+                                    if (cellStatus == CellStatus.BLOCKED) {
+                                        break;
+                                    }
+                                } else {
+                                    return new Cell(row, col - distance);
+                                }
+                            }
+                        } else {
+                            for (Integer distance = 0; distance < maxDistance; ++distance) {
+                                CellStatus cellStatus = field.getCellStatus(row - distance, col);
+                                if (cellStatus != CellStatus.ON_FIRE) {
+                                    if (cellStatus == CellStatus.BLOCKED) {
+                                        break;
+                                    }
+                                } else {
+                                    return new Cell(row - distance, col);
+                                }
+                            }
+                            for (Integer distance = 0; distance < maxDistance; ++distance) {
+                                CellStatus cellStatus = field.getCellStatus(row + distance, col);
+                                if (cellStatus != CellStatus.ON_FIRE) {
+                                    if (cellStatus == CellStatus.BLOCKED) {
+                                        break;
+                                    }
+                                } else {
+                                    return new Cell(row + distance, col);
+                                }
+                            }
+                        }
+                        break;
+                    case FREE:
+                        ++freeCells;
+                        break;
+                    case OCCUPIED:
+                        ++freeCells;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        Integer randomPosition = ThreadLocalRandom.current().nextInt(0, freeCells);
+
+        for (Integer row =  0; row < field.getFieldSize(); ++row) {
+            for (Integer col = 0; col < field.getFieldSize(); ++col) {
+                CellStatus currentCellStatus = field.getCellStatus(row, col);
+                --freeCells;
+                if (freeCells == 0) {
+                    if (currentCellStatus == CellStatus.FREE || currentCellStatus == CellStatus.OCCUPIED) {
+                        return new Cell(row, col);
+                    }
+                }
+            }
+        }
+        throw new RuntimeException("Wrong field structure!");
+    }
+
+    /**
+     * created by MikeGus on 12.11.17
+     * @param field: game field
+     * @param row: row position
+     * @param col: col position
+     * @return true if horizontal, false if vertical, null if undefined
+     */
+    private Boolean shipIsHorizontal(final Field field, final Integer row, final Integer col) {
+
+        Boolean isHorizontal = null;
+        if (row > 0) {
+            if (field.getCellStatus(row - 1, col) == CellStatus.ON_FIRE) {
+                return true;
+            }
+        }
+        if (row < field.getFieldSize() - 1) {
+            if (field.getCellStatus(row + 1, col) == CellStatus.ON_FIRE) {
+                return true;
+            }
+        }
+        if (col > 0) {
+            if (field.getCellStatus(row, col - 1) == CellStatus.ON_FIRE) {
+                return false;
+            }
+        }
+        if (col < field.getFieldSize() - 1) {
+            return false;
+        }
+
+        return null;
     }
 }
