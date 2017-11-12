@@ -16,8 +16,14 @@ public final class Field {
 
     public Field(List<Ship> ships) {
         ships.forEach(ship -> {
-            for (int i = 0; i < ship.getLength(); ++i) {
-                cells.get(ship.getHorizontalPos()).set(ship.getVerticalPos(), CellStatus.OCCUPIED);
+            if (ship.getOrientation() == ShipOrientation.VERTICAL) {
+                for (int i = 0; i < ship.getLength(); ++i) {
+                    cells.get(ship.getHorizontalPos()).set(ship.getVerticalPos() + i, CellStatus.OCCUPIED);
+                }
+            } else {
+                for (int i = 0; i < ship.getLength(); ++i) {
+                    cells.get(ship.getHorizontalPos() + i).set(ship.getVerticalPos(), CellStatus.OCCUPIED);
+                }
             }
         });
     }
