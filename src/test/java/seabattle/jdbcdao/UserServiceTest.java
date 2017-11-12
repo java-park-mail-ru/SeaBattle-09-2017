@@ -1,6 +1,5 @@
 package seabattle.jdbcdao;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,14 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.jdbc.JdbcTestUtils;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
-import seabattle.dao.UserService;
-import seabattle.views.UserView;
+import seabattle.authorization.service.UserService;
+import seabattle.authorization.views.UserView;
 
 
 import java.util.List;
@@ -78,7 +73,7 @@ public class UserServiceTest {
 
     @Test
     public void changeUser(){
-        final UserView changeUser = new UserView("adaw@bb.com", "Bred", "qwerty123", 2);
+        final UserView changeUser = new UserView("adaw67@bb.com", "Bred", "qwerty123", 2);
         final UserView returnUser  = userService.changeUser(changeUser);
         assertNotNull(returnUser);
         assertEquals(returnUser.getEmail(), changeUser.getEmail());
