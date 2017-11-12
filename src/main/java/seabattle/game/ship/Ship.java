@@ -2,33 +2,33 @@ package seabattle.game.ship;
 
 @SuppressWarnings("unused")
 public final class Ship {
-    private Integer horizontalPos;
-    private Integer verticalPos;
+    private Integer rowPos;
+    private Integer colPos;
     private Integer length;
     private ShipOrientation orientation;
 
-    public Ship(final Integer horizontalPos, final Integer verticalPos, final Integer length,
+    public Ship(final Integer rowPos, final Integer colPos, final Integer length,
                 final ShipOrientation orientation) {
-        this.horizontalPos = horizontalPos;
-        this.verticalPos = verticalPos;
+        this.rowPos = rowPos;
+        this.colPos = colPos;
         this.length = length;
         this.orientation = orientation;
     }
 
-    public Integer getHorizontalPos() {
-        return horizontalPos;
+    public Integer getRowPos() {
+        return rowPos;
     }
 
-    public void setHorizontalPos(Integer horizontalPos) {
-        this.horizontalPos = horizontalPos;
+    public void setRowPos(Integer rowPos) {
+        this.rowPos = rowPos;
     }
 
-    public Integer getVerticalPos() {
-        return verticalPos;
+    public Integer getColPos() {
+        return colPos;
     }
 
-    public void setVerticalPos(Integer verticalPos) {
-        this.verticalPos = verticalPos;
+    public void setColPos(Integer colPos) {
+        this.colPos = colPos;
     }
 
     public Integer getLength() {
@@ -49,9 +49,9 @@ public final class Ship {
 
     public Boolean inShip(Integer horPos, Integer verPos) {
         if (this.orientation == ShipOrientation.HORIZONTAL) {
-            return horPos < this.horizontalPos + this.length;
+            return horPos < this.rowPos + this.length;
         }
-        return verPos < this.verticalPos + this.length;
+        return verPos < this.colPos + this.length;
     }
 }
 

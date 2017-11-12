@@ -14,18 +14,25 @@ public final class Field {
     private List<List<CellStatus>> cells = new ArrayList<>(Collections.nCopies(fieldSize,
             new ArrayList<>(Collections.nCopies(fieldSize, CellStatus.FREE))));
 
+    public Field() {
+    }
+
     public Field(List<Ship> ships) {
         ships.forEach(ship -> {
             if (ship.getOrientation() == ShipOrientation.VERTICAL) {
                 for (int i = 0; i < ship.getLength(); ++i) {
-                    cells.get(ship.getHorizontalPos()).set(ship.getVerticalPos() + i, CellStatus.OCCUPIED);
+                    cells.get(ship.getRowPos()).set(ship.getColPos() + i, CellStatus.OCCUPIED);
                 }
             } else {
                 for (int i = 0; i < ship.getLength(); ++i) {
-                    cells.get(ship.getHorizontalPos() + i).set(ship.getVerticalPos(), CellStatus.OCCUPIED);
+                    cells.get(ship.getRowPos() + i).set(ship.getColPos(), CellStatus.OCCUPIED);
                 }
             }
         });
+    }
+
+    public Integer getFieldSize() {
+        return fieldSize;
     }
 
     public CellStatus fire(Integer horizontalPos, Integer verticalPos) {
@@ -48,23 +55,30 @@ public final class Field {
         }
     }
 
-    private CellStatus getCellStatus(Integer horizontalPos, Integer verticalPos) {
-        if (horizontalPos < 0 || horizontalPos >= fieldSize || verticalPos < 0 || verticalPos >= fieldSize) {
+    public CellStatus getCellStatus(Integer rowPos, Integer colPos) {
+        if (rowPos < 0 || rowPos >= fieldSize || colPos < 0 || colPos >= fieldSize) {
             throw new IllegalArgumentException("Given position is out of bounds!");
         }
-        return cells.get(horizontalPos).get(verticalPos);
+        return cells.get(rowPos).get(colPos);
+    }
+
+    public void setCellStatus(Integer rowPos, Integer colPos, CellStatus status) {
+        if (rowPos < 0 || rowPos >= fieldSize || colPos < 0 || colPos >= fieldSize) {
+            throw new IllegalArgumentException("Given position is out of bounds!");
+        }
+        cells.get(rowPos).set(colPos, status);
     }
 
     public Boolean shipKilled(Ship ship) {
         if (ship.getOrientation() == ShipOrientation.VERTICAL) {
-            for (Integer y = ship.getVerticalPos(); y < ship.getLength(); ++y) {
-                if (getCellStatus(ship.getHorizontalPos(), y) != CellStatus.DESTRUCTED) {
+            for (Integer y = ship.getColPos(); y < ship.getLength(); ++y) {
+                if (getCellStatus(ship.getRowPos(), y) != CellStatus.DESTRUCTED) {
                     return false;
                 }
             }
         } else {
-            for (Integer x = ship.getHorizontalPos(); x < ship.getLength(); ++x) {
-                if (getCellStatus(x, ship.getVerticalPos()) != CellStatus.DESTRUCTED) {
+            for (Integer x = ship.getRowPos(); x < ship.getLength(); ++x) {
+                if (getCellStatus(x, ship.getColPos()) != CellStatus.DESTRUCTED) {
                     return false;
                 }
             }
@@ -74,47 +88,48 @@ public final class Field {
     }
 
     public void fillCellsAroundShip(Ship ship) {
-        Integer horizontalPosMin = 0;
-        if (ship.getHorizontalPos() != 0) {
-            horizontalPosMin = ship.getHorizontalPos() - 1;
+        Integer rowPosMin = 0;
+        if (ship.getRowPos() != 0) {
+            rowPosMin = ship.getRowPos() - 1;
         }
-        Integer verticalPosMin = 0;
-        if (ship.getVerticalPos() != 0) {
-            horizontalPosMin = ship.getVerticalPos() - 1;
+        Integer colPosMin = 0;
+        if (ship.getColPos() != 0) {
+            rowPosMin = ship.getColPos() - 1;
         }
 
-        Integer horizontalPosMax;
-        Integer verticalPosMax;
+        Integer rowPosMax;
+        Integer colPosMax;
         if (ship.getOrientation() == ShipOrientation.VERTICAL) {
-            if (ship.getHorizontalPos() != (fieldSize - 1)) {
-                horizontalPosMax = ship.getHorizontalPos() + 2;
+            if (ship.getRowPos() != (fieldSize - 1)) {
+                rowPosMax = ship.getRowPos() + 2;
             } else {
-                horizontalPosMax = fieldSize;
+                rowPosMax = fieldSize;
             }
-            if ((ship.getVerticalPos() + ship.getLength()) != fieldSize) {
-                verticalPosMax = ship.getVerticalPos() + ship.getLength() + 1;
+            if ((ship.getColPos() + ship.getLength()) != fieldSize) {
+                colPosMax = ship.getColPos() + ship.getLength() + 1;
             } else {
-                verticalPosMax = fieldSize;
+                colPosMax = fieldSize;
             }
         } else {
-            if (ship.getVerticalPos() != (fieldSize - 1)) {
-                verticalPosMax = ship.getVerticalPos() + 2;
+            if (ship.getColPos() != (fieldSize - 1)) {
+                colPosMax = ship.getColPos() + 2;
             } else {
-                verticalPosMax = fieldSize;
+                colPosMax = fieldSize;
             }
-            if ((ship.getHorizontalPos() + ship.getLength()) != fieldSize) {
-                horizontalPosMax = ship.getHorizontalPos() + ship.getLength() + 1;
+            if ((ship.getRowPos() + ship.getLength()) != fieldSize) {
+                rowPosMax = ship.getRowPos() + ship.getLength() + 1;
             } else {
-                horizontalPosMax = fieldSize;
+                rowPosMax = fieldSize;
             }
         }
 
-        for (Integer x = horizontalPosMin; x < horizontalPosMax; ++x) {
-            for (Integer y = verticalPosMin; y < verticalPosMax; ++y) {
+        for (Integer x = rowPosMin; x < rowPosMax; ++x) {
+            for (Integer y = colPosMin; y < colPosMax; ++y) {
                 if (cells.get(x).get(y) == CellStatus.FREE) {
                     cells.get(x).set(y, CellStatus.BLOCKED);
                 }
             }
         }
     }
+
 }
