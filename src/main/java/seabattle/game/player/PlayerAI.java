@@ -23,7 +23,7 @@ public  final class PlayerAI extends Player {
 
         List<Ship> generatedShips = new ArrayList<>();
         final Integer maxShipLength = 4;
-        final ShipOrientation[] orientations = {ShipOrientation.VERTICAL, ShipOrientation.HORIZONTAL};
+        final Boolean[] vertical = {Boolean.TRUE, Boolean.FALSE};
 
         for (Integer shipLength = maxShipLength; shipLength > 0; --shipLength) {
             for (Integer numberOfShips = 0; numberOfShips <= (maxShipLength - shipLength); ++numberOfShips) {
@@ -31,12 +31,12 @@ public  final class PlayerAI extends Player {
                 Integer freeCells = field.getFieldSize() * field.getFieldSize();
                 Integer randomOrientation = ThreadLocalRandom.current().nextInt(0, 2);
 
-                Ship ship = new Ship(0, 0, shipLength, orientations[randomOrientation]);
+                Ship ship = new Ship(0, 0, shipLength, vertical[randomOrientation]);
 
                 /* block bottom right */
                 Integer minBlockedRow;
                 Integer minBlockedCol;
-                if (ship.getOrientation() == ShipOrientation.HORIZONTAL) {
+                if (ship.getIsVertical() == Boolean.FALSE) {
                     minBlockedRow = field.getFieldSize() - 1;
                     minBlockedCol = field.getFieldSize() + 1 - shipLength;
                 } else {
@@ -59,7 +59,7 @@ public  final class PlayerAI extends Player {
                         if (field.getCellStatus(row, col) == CellStatus.OCCUPIED) {
                             --freeCells;
                             for (Integer distance = 2; distance < (shipLength + 2); ++distance) {
-                                if (ship.getOrientation() == ShipOrientation.HORIZONTAL) {
+                                if (ship.getIsVertical() == Boolean.FALSE) {
                                     if (((row - 1) > 0)
                                             && (field.getCellStatus(row - 1, col) == CellStatus.FREE)) {
                                         field.setCellStatus(row - 1, col, CellStatus.BLOCKED);
