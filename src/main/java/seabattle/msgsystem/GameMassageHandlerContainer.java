@@ -1,4 +1,4 @@
-package seabattle.websocket;
+package seabattle.msgsystem;
 
 import org.springframework.stereotype.Service;
 import seabattle.msgsystem.Message;
