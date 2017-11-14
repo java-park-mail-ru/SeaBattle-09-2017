@@ -1,6 +1,9 @@
 package seabattle.game.ship;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import seabattle.game.field.Cell;
+
+import java.util.ArrayList;
 
 @SuppressWarnings("unused")
 public final class Ship {
@@ -49,11 +52,34 @@ public final class Ship {
         this.isVertical = isVertical;
     }
 
-    public Boolean inShip(Integer rowPos, Integer colPos) {
+    public Boolean inShip(Cell cell) {
         if (isVertical == Boolean.TRUE) {
-            return rowPos < this.rowPos + this.length;
+            return cell.getRowPos() < this.rowPos + this.length;
         }
-        return colPos < this.colPos + this.length;
+        return cell.getColPos() < this.colPos + this.length;
+    }
+
+    public ArrayList<Cell> getCells() {
+        ArrayList<Cell> result = new ArrayList<>();
+
+        if (isVertical) {
+            for (Integer i = 0; i < length; ++i) {
+                result.add(Cell.of(rowPos + i, colPos));
+            }
+        } else {
+            for (Integer i = 0; i < length; ++i) {
+                result.add(Cell.of(rowPos, colPos + i));
+            }
+        }
+
+        return result;
+    }
+
+    public Cell getLastCell() {
+        if (isVertical) {
+            return Cell.of(rowPos + length - 1, colPos);
+        }
+        return Cell.of(rowPos, colPos + length - 1);
     }
 }
 

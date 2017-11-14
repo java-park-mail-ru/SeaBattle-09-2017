@@ -4,7 +4,6 @@ import seabattle.game.field.Cell;
 import seabattle.game.field.CellStatus;
 import seabattle.game.field.Field;
 import seabattle.game.ship.Ship;
-import seabattle.game.ship.ShipOrientation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +45,8 @@ public  final class PlayerAI extends Player {
 
                 for (Integer blockedRow = minBlockedRow; blockedRow < field.getFieldSize(); ++blockedRow) {
                     for (Integer blockedCol = minBlockedCol; blockedCol < field.getFieldSize(); ++blockedCol) {
-                        if (field.getCellStatus(blockedRow, blockedCol) == CellStatus.FREE) {
-                            field.setCellStatus(blockedRow, blockedCol, CellStatus.BLOCKED);
+                        if (field.getCellStatus(Cell.of(blockedRow, blockedCol)) == CellStatus.FREE) {
+                            field.setCellStatus(Cell.of(blockedRow, blockedCol), CellStatus.BLOCKED);
                             --freeCells;
                         }
                     }
@@ -56,29 +55,29 @@ public  final class PlayerAI extends Player {
                 /* block field which lead to ship collisions */
                 for (Integer row = 0; row < field.getFieldSize(); ++row) {
                     for (Integer col = 0; col < field.getFieldSize(); ++col) {
-                        if (field.getCellStatus(row, col) == CellStatus.OCCUPIED) {
+                        if (field.getCellStatus(Cell.of(row, col)) == CellStatus.OCCUPIED) {
                             --freeCells;
                             for (Integer distance = 2; distance < (shipLength + 2); ++distance) {
                                 if (ship.getIsVertical() == Boolean.FALSE) {
                                     if (((row - 1) > 0)
-                                            && (field.getCellStatus(row - 1, col) == CellStatus.FREE)) {
-                                        field.setCellStatus(row - 1, col, CellStatus.BLOCKED);
+                                            && (field.getCellStatus(Cell.of(row - 1, col)) == CellStatus.FREE)) {
+                                        field.setCellStatus(Cell.of(row - 1, col), CellStatus.BLOCKED);
                                         --freeCells;
                                     }
                                     if (((col - distance) > 0)
-                                            && (field.getCellStatus(row, col - distance) == CellStatus.FREE)) {
-                                        field.setCellStatus(row, col - distance, CellStatus.BLOCKED);
+                                            && (field.getCellStatus(Cell.of(row, col - distance)) == CellStatus.FREE)) {
+                                        field.setCellStatus(Cell.of(row, col - distance), CellStatus.BLOCKED);
                                         --freeCells;
                                     }
                                 } else {
                                     if (((row - distance) > 0)
-                                            && (field.getCellStatus(row - distance, col) == CellStatus.FREE)) {
-                                        field.setCellStatus(row - distance, col, CellStatus.BLOCKED);
+                                            && (field.getCellStatus(Cell.of(row - distance, col)) == CellStatus.FREE)) {
+                                        field.setCellStatus(Cell.of(row - distance, col), CellStatus.BLOCKED);
                                         --freeCells;
                                     }
                                     if (((col - 1) > 0)
-                                            && (field.getCellStatus(row, col - 1) == CellStatus.FREE)) {
-                                        field.setCellStatus(row, col - 1, CellStatus.BLOCKED);
+                                            && (field.getCellStatus(Cell.of(row, col - 1)) == CellStatus.FREE)) {
+                                        field.setCellStatus(Cell.of(row, col - 1), CellStatus.BLOCKED);
                                         --freeCells;
                                     }
                                 }
@@ -92,7 +91,7 @@ public  final class PlayerAI extends Player {
                 Integer placementIndex = ThreadLocalRandom.current().nextInt(0, freeCells);
                 for (Integer row = 0; row < field.getFieldSize() && placementIndex > 0; ++row) {
                     for (Integer col = 0; col < field.getFieldSize() && placementIndex > 0; ++col) {
-                        if (field.getCellStatus(row, col) == CellStatus.FREE) {
+                        if (field.getCellStatus(Cell.of(row, col)) == CellStatus.FREE) {
                             --placementIndex;
                             if (placementIndex == 0) {
                                 ship.setRowPos(row);
@@ -107,8 +106,8 @@ public  final class PlayerAI extends Player {
                 /* prepare matrix for next iteration */
                 for (Integer row = 0; row < field.getFieldSize(); ++row) {
                     for (Integer col = 0; col < field.getFieldSize(); ++col) {
-                        if (field.getCellStatus(row, col) == CellStatus.BLOCKED) {
-                            field.setCellStatus(row, col, CellStatus.FREE);
+                        if (field.getCellStatus(Cell.of(row, col)) == CellStatus.BLOCKED) {
+                            field.setCellStatus(Cell.of(row, col), CellStatus.FREE);
                         }
                     }
                 }
@@ -125,7 +124,7 @@ public  final class PlayerAI extends Player {
 
         for (Integer row =  0; row < field.getFieldSize(); ++row) {
             for (Integer col = 0; col < field.getFieldSize(); ++col) {
-                CellStatus currentCellStatus = field.getCellStatus(row, col);
+                CellStatus currentCellStatus = field.getCellStatus(Cell.of(row, col));
                 switch (currentCellStatus) {
                     case ON_FIRE:
                         Integer checkRow = row;
@@ -134,7 +133,7 @@ public  final class PlayerAI extends Player {
                         Boolean isHorizontal = shipIsHorizontal(field, row, col);
                         if (isHorizontal != Boolean.FALSE) {
                             for (Integer distance = 0; distance < maxDistance; ++distance) {
-                                CellStatus cellStatus = field.getCellStatus(row, col - distance);
+                                CellStatus cellStatus = field.getCellStatus(Cell.of(row, col - distance));
                                 if (cellStatus != CellStatus.ON_FIRE) {
                                     if (cellStatus == CellStatus.BLOCKED) {
                                         break;
@@ -144,7 +143,7 @@ public  final class PlayerAI extends Player {
                                 }
                             }
                             for (Integer distance = 0; distance < maxDistance; ++distance) {
-                                CellStatus cellStatus = field.getCellStatus(row, col + distance);
+                                CellStatus cellStatus = field.getCellStatus(Cell.of(row, col + distance));
                                 if (cellStatus != CellStatus.ON_FIRE) {
                                     if (cellStatus == CellStatus.BLOCKED) {
                                         break;
@@ -155,7 +154,7 @@ public  final class PlayerAI extends Player {
                             }
                         } else {
                             for (Integer distance = 0; distance < maxDistance; ++distance) {
-                                CellStatus cellStatus = field.getCellStatus(row - distance, col);
+                                CellStatus cellStatus = field.getCellStatus(Cell.of(row - distance, col));
                                 if (cellStatus != CellStatus.ON_FIRE) {
                                     if (cellStatus == CellStatus.BLOCKED) {
                                         break;
@@ -165,7 +164,7 @@ public  final class PlayerAI extends Player {
                                 }
                             }
                             for (Integer distance = 0; distance < maxDistance; ++distance) {
-                                CellStatus cellStatus = field.getCellStatus(row + distance, col);
+                                CellStatus cellStatus = field.getCellStatus(Cell.of(row + distance, col));
                                 if (cellStatus != CellStatus.ON_FIRE) {
                                     if (cellStatus == CellStatus.BLOCKED) {
                                         break;
@@ -192,7 +191,7 @@ public  final class PlayerAI extends Player {
 
         for (Integer row =  0; row < field.getFieldSize(); ++row) {
             for (Integer col = 0; col < field.getFieldSize(); ++col) {
-                CellStatus currentCellStatus = field.getCellStatus(row, col);
+                CellStatus currentCellStatus = field.getCellStatus(Cell.of(row, col));
                 --freeCells;
                 if (freeCells == 0) {
                     if (currentCellStatus == CellStatus.FREE || currentCellStatus == CellStatus.OCCUPIED) {
@@ -215,17 +214,17 @@ public  final class PlayerAI extends Player {
 
         Boolean isHorizontal = null;
         if (row > 0) {
-            if (field.getCellStatus(row - 1, col) == CellStatus.ON_FIRE) {
+            if (field.getCellStatus(Cell.of(row - 1, col)) == CellStatus.ON_FIRE) {
                 return true;
             }
         }
         if (row < field.getFieldSize() - 1) {
-            if (field.getCellStatus(row + 1, col) == CellStatus.ON_FIRE) {
+            if (field.getCellStatus(Cell.of(row + 1, col)) == CellStatus.ON_FIRE) {
                 return true;
             }
         }
         if (col > 0) {
-            if (field.getCellStatus(row, col - 1) == CellStatus.ON_FIRE) {
+            if (field.getCellStatus(Cell.of(row, col - 1)) == CellStatus.ON_FIRE) {
                 return false;
             }
         }

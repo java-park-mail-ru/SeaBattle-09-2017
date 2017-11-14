@@ -32,10 +32,10 @@ public final class Cell {
 
     @Override
     public String toString() {
-        return '{' +
-                "rowPos=" + rowPos +
-                ", colPos=" + colPos +
-                '}';
+        return '{'
+                + "rowPos=" + rowPos
+                + ", colPos=" + colPos
+                + '}';
     }
 
     @NotNull
