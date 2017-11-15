@@ -17,6 +17,7 @@ public class WebSocketService {
     private Map<Long, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper;
 
+
     public WebSocketService(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
@@ -34,7 +35,7 @@ public class WebSocketService {
         sessions.remove(userId);
     }
 
-    public void closeSession (@NotNull Long userId, @NotNull CloseStatus closeStatus) {
+    public void closeSession(@NotNull Long userId, @NotNull CloseStatus closeStatus) {
         final WebSocketSession webSocketSession = sessions.get(userId);
         if (webSocketSession != null && webSocketSession.isOpen()) {
             try {
@@ -44,8 +45,7 @@ public class WebSocketService {
         }
     }
 
-    @SuppressWarnings("")
-    public void sendMessage (@NotNull Long userId, @NotNull Message message) throws IOException {
+    public void sendMessage(@NotNull Long userId, @NotNull Message message) throws IOException {
         final WebSocketSession webSocketSession = sessions.get(userId);
         if (webSocketSession == null) {
             throw new IOException("no game websocket for user " + userId);
@@ -59,7 +59,6 @@ public class WebSocketService {
             throw new IOException("Unnable to send message", e);
         }
     }
-
 }
 
 

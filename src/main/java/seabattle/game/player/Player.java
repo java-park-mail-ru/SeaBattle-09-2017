@@ -43,6 +43,10 @@ public class Player {
         return deadShips;
     }
 
+    public Long getPlayerId() {
+        return PLAYER_ID;
+    }
+
     public Boolean allShipsDead() {
         return aliveShips.isEmpty();
     }

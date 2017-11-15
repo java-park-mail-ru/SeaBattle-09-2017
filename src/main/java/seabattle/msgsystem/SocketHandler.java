@@ -23,7 +23,8 @@ public class SocketHandler extends TextWebSocketHandler {
 
     private final ObjectMapper objectMapper;
 
-    public SocketHandler(@NotNull MessageHandlerContainer messageHandlerContainer, @NotNull WebSocketService webSocketService, ObjectMapper objectMapper) {
+    public SocketHandler(@NotNull MessageHandlerContainer messageHandlerContainer,
+                         @NotNull WebSocketService webSocketService, ObjectMapper objectMapper) {
         this.messageHandlerContainer = messageHandlerContainer;
         this.webSocketService = webSocketService;
         this.objectMapper = objectMapper;

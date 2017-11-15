@@ -9,6 +9,6 @@ public interface GameMechanics {
 
     void deleteUser(@NotNull Long userId);
 
-    boolean isUserAdded (@NotNull Long userId);
+    Boolean isUserAdded (@NotNull Long userId);
 
 }

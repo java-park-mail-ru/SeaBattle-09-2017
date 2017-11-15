@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
-/*@Service
+@Service
 public class GameMechanicsImpl implements GameMechanics{
     private final Map<Long, GameSession> userToLobby = new HashMap<>();
 
@@ -20,18 +20,18 @@ public class GameMechanicsImpl implements GameMechanics{
     }
 
     @Override
-    void addUser(@NotNull Long userId){
-        webSocketService.registerUser(userId,);
+    public void addUser(@NotNull Long userId){
+//        webSocketService.registerUser(userId);
     }
 
     @Override
-    void deleteUser(@NotNull Long userId){
-
+    public void deleteUser(@NotNull Long userId){
+        webSocketService.removeUser(userId);
     }
 
     @Override
-    boolean isUserAdded (@NotNull Long userId){
-
+    public Boolean isUserAdded (@NotNull Long userId){
+        return webSocketService.isConnected(userId);
     }
 
-}*/
+}

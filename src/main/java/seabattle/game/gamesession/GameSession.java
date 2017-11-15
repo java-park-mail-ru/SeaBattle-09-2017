@@ -20,6 +20,22 @@ public class GameSession {
         this.player2 = player2;
     }
 
+    public Player getPlayer1() {
+        return player1;
+    }
+
+    public Player getPlayer2() {
+        return player2;
+    }
+
+    public void setPlayer1() {
+        this.player1 = player1;
+    }
+
+    public void  setPlayer2() {
+        this.player2 = player2;
+    }
+
     public CellStatus makeMove(Cell cell) {
         Field playField;
         Player damagedPlayer;
