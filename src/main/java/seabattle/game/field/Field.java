@@ -1,38 +1,61 @@
 package seabattle.game.field;
 
 import seabattle.game.ship.Ship;
-import seabattle.game.ship.ShipOrientation;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 public final class Field {
 
     private final Integer fieldSize = 10;
     private List<List<CellStatus>> cells = new ArrayList<>(Collections.nCopies(fieldSize,
             new ArrayList<>(Collections.nCopies(fieldSize, CellStatus.FREE))));
 
-    public Field(List<Ship> ships) {
-        ships.forEach(ship -> {
-            for (int i = 0; i < ship.getLength(); ++i) {
-                cells.get(ship.getHorizontalPos()).set(ship.getVerticalPos(), CellStatus.OCCUPIED);
-            }
-        });
+    public Field() {
     }
 
-    public CellStatus fire(Integer horizontalPos, Integer verticalPos) {
-        if (horizontalPos < 0 || horizontalPos >= fieldSize || verticalPos < 0 || verticalPos >= fieldSize) {
+    public Field(List<Ship> ships) {
+        ships.forEach(ship -> ship.getCells().forEach(cell -> setCellStatus(cell, CellStatus.OCCUPIED)));
+    }
+
+    public Integer getFieldSize() {
+        return fieldSize;
+    }
+
+    public CellStatus getCellStatus(Cell cell) {
+        if (cellOutOfBounds(cell)) {
             throw new IllegalArgumentException("Given position is out of bounds!");
         }
-        switch (cells.get(horizontalPos).get(verticalPos)) {
+        return cells.get(cell.getRowPos()).get(cell.getColPos());
+    }
+
+    public void setCellStatus(Cell cell, CellStatus status) {
+        if (!cellOutOfBounds(cell)) {
+            throw new IllegalArgumentException("Given position is out of bounds!");
+        }
+        cells.get(cell.getRowPos()).set(cell.getColPos(), status);
+    }
+
+    private void blockFreeSafeNoExcept(Cell cell) {
+        if (!cellOutOfBounds(cell)) {
+            if (getCellStatus(cell) == CellStatus.FREE) {
+                setCellStatus(cell, CellStatus.BLOCKED);
+            }
+        }
+    }
+
+    public CellStatus fire(Cell cell) {
+        switch (getCellStatus(cell)) {
             case FREE:
-                cells.get(horizontalPos).set(verticalPos, CellStatus.BLOCKED);
+                setCellStatus(cell, CellStatus.BLOCKED);
                 return CellStatus.BLOCKED;
             case OCCUPIED:
-                cells.get(verticalPos).set(verticalPos, CellStatus.DESTRUCTED);
-                return CellStatus.DESTRUCTED;
+                setCellStatus(cell, CellStatus.ON_FIRE);
+                return CellStatus.ON_FIRE;
+            case ON_FIRE:
+                throw new IllegalArgumentException("Given position is already checked!");
             case DESTRUCTED:
                 throw new IllegalArgumentException("Given position is already checked!");
             case BLOCKED:
@@ -42,73 +65,29 @@ public final class Field {
         }
     }
 
-    private CellStatus getCellStatus(Integer horizontalPos, Integer verticalPos) {
-        if (horizontalPos < 0 || horizontalPos >= fieldSize || verticalPos < 0 || verticalPos >= fieldSize) {
-            throw new IllegalArgumentException("Given position is out of bounds!");
-        }
-        return cells.get(horizontalPos).get(verticalPos);
-    }
 
     public Boolean shipKilled(Ship ship) {
-        if (ship.getOrientation() == ShipOrientation.VERTICAL) {
-            for (Integer y = ship.getVerticalPos(); y < ship.getLength(); ++y) {
-                if (getCellStatus(ship.getHorizontalPos(), y) != CellStatus.DESTRUCTED) {
-                    return false;
-                }
-            }
-        } else {
-            for (Integer x = ship.getHorizontalPos(); x < ship.getLength(); ++x) {
-                if (getCellStatus(x, ship.getVerticalPos()) != CellStatus.DESTRUCTED) {
-                    return false;
-                }
+        for (Cell cell : ship.getCells()) {
+            if (getCellStatus(cell) != CellStatus.ON_FIRE) {
+                return Boolean.FALSE;
             }
         }
-
-        return true;
+        return Boolean.TRUE;
     }
 
-    public void fillCellsAroundShip(Ship ship) {
-        Integer horizontalPosMin = 0;
-        if (ship.getHorizontalPos() != 0) {
-            horizontalPosMin = ship.getHorizontalPos() - 1;
-        }
-        Integer verticalPosMin = 0;
-        if (ship.getVerticalPos() != 0) {
-            horizontalPosMin = ship.getVerticalPos() - 1;
-        }
-
-        Integer horizontalPosMax;
-        Integer verticalPosMax;
-        if (ship.getOrientation() == ShipOrientation.VERTICAL) {
-            if (ship.getHorizontalPos() != (fieldSize - 1)) {
-                horizontalPosMax = ship.getHorizontalPos() + 2;
-            } else {
-                horizontalPosMax = fieldSize;
-            }
-            if ((ship.getVerticalPos() + ship.getLength()) != fieldSize) {
-                verticalPosMax = ship.getVerticalPos() + ship.getLength() + 1;
-            } else {
-                verticalPosMax = fieldSize;
-            }
-        } else {
-            if (ship.getVerticalPos() != (fieldSize - 1)) {
-                verticalPosMax = ship.getVerticalPos() + 2;
-            } else {
-                verticalPosMax = fieldSize;
-            }
-            if ((ship.getHorizontalPos() + ship.getLength()) != fieldSize) {
-                horizontalPosMax = ship.getHorizontalPos() + ship.getLength() + 1;
-            } else {
-                horizontalPosMax = fieldSize;
-            }
-        }
-
-        for (Integer x = horizontalPosMin; x < horizontalPosMax; ++x) {
-            for (Integer y = verticalPosMin; y < verticalPosMax; ++y) {
-                if (cells.get(x).get(y) == CellStatus.FREE) {
-                    cells.get(x).set(y, CellStatus.BLOCKED);
+    public void killShip(Ship ship) {
+        for (Integer rowPos = ship.getRowPos() - 1; rowPos < ship.getLastCell().getRowPos() + 1; ++rowPos) {
+            for (Integer colPos = ship.getColPos() - 1; colPos < ship.getLastCell().getColPos() + 1; ++colPos) {
+                if (!cellOutOfBounds(Cell.of(rowPos, colPos))) {
+                    setCellStatus(Cell.of(rowPos, colPos), CellStatus.BLOCKED);
                 }
             }
         }
+        ship.getCells().forEach(cell -> setCellStatus(cell, CellStatus.DESTRUCTED));
+    }
+
+    public Boolean cellOutOfBounds(Cell cell) {
+        return cell.getRowPos() < 0 || cell.getRowPos() >= fieldSize
+                || cell.getColPos() < 0 || cell.getColPos() >= fieldSize;
     }
 }

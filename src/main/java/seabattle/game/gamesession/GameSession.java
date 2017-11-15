@@ -1,5 +1,6 @@
 package seabattle.game.gamesession;
 
+import seabattle.game.field.Cell;
 import seabattle.game.field.CellStatus;
 import seabattle.game.field.Field;
 import seabattle.game.player.Player;
@@ -19,7 +20,7 @@ public class GameSession {
         this.player2 = player2;
     }
 
-    public CellStatus makeMove(Integer horizontalPos, Integer verticalPos) {
+    public CellStatus makeMove(Cell cell) {
         Field playField;
         Player damagedPlayer;
 
@@ -36,42 +37,42 @@ public class GameSession {
                 throw new IllegalStateException("Illegal state of game session!");
         }
 
-        CellStatus cell = playField.fire(horizontalPos, verticalPos);
-
-        switch (cell) {
+        switch (playField.fire(cell)) {
             case BLOCKED:
                 switch (status) {
                     case MOVE_P1:
-                        if (damagedPlayer.allShipsDead()) {
-                            status = GameSessionStatus.WIN_P1;
-                        } else {
-                            status = GameSessionStatus.MOVE_P2;
-                        }
-                        break;
+                        status = GameSessionStatus.MOVE_P2;
+                        return CellStatus.BLOCKED;
                     case MOVE_P2:
-                        if (damagedPlayer.allShipsDead()) {
-                            status = GameSessionStatus.WIN_P2;
-                        } else {
-                            status = GameSessionStatus.MOVE_P1;
-                        }
-                        break;
+                        status = GameSessionStatus.MOVE_P1;
+                        return CellStatus.BLOCKED;
                     default:
                         throw new IllegalStateException("Illegal state!");
                 }
-                break;
-            case DESTRUCTED:
+            case ON_FIRE:
                 for (Ship ship : damagedPlayer.getAliveShips()) {
-                    if (ship.inShip(horizontalPos, verticalPos) && playField.shipKilled(ship)) {
+                    if (ship.inShip(cell) && playField.shipKilled(ship)) {
                         damagedPlayer.getAliveShips().remove(ship);
                         damagedPlayer.getDeadShips().add(ship);
-                        playField.fillCellsAroundShip(ship);
+                        playField.killShip(ship);
+                        if (damagedPlayer.allShipsDead()) {
+                            switch (status) {
+                                case MOVE_P1:
+                                    status = GameSessionStatus.WIN_P1;
+                                    break;
+                                case MOVE_P2:
+                                    status = GameSessionStatus.WIN_P2;
+                                    break;
+                                default:
+                                    throw new IllegalStateException("Illegal state!");
+                            }
+                        }
+                        return CellStatus.DESTRUCTED;
                     }
                 }
-                return cell;
+                return CellStatus.ON_FIRE;
             default:
                 throw new IllegalStateException("Illegal state!");
         }
-        return cell;
     }
-
 }
