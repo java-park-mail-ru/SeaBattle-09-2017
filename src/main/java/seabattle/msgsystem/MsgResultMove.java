@@ -3,12 +3,10 @@ package seabattle.msgsystem;
 import seabattle.game.field.Cell;
 import seabattle.game.field.CellStatus;
 
-
-
 public class MsgResultMove extends Message {
-    String username;
-    Cell cell;
-    CellStatus cellStatus;
+    private String username;
+    private Cell cell;
+    private CellStatus cellStatus;
 
     public MsgResultMove(String username, Cell cell, CellStatus cellStatus) {
         this.username = username;

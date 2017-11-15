@@ -1,7 +1,7 @@
 package seabattle.msgsystem;
 
 public class MsgStartGame extends Message {
-    String usernameEnemy;
+    private String usernameEnemy;
 
     public MsgStartGame(String usernameEnemy) {
         this.usernameEnemy = usernameEnemy;

@@ -1,12 +1,10 @@
 package seabattle.msgsystem;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import seabattle.authorization.service.UserService;
 import seabattle.websocket.WebSocketService;
 import org.springframework.web.socket.*;
 

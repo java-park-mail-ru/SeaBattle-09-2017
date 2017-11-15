@@ -12,7 +12,7 @@ import java.util.Map;
 public class MessageHandlerContainerImpl implements MessageHandlerContainer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MessageHandlerContainerImpl.class);
-    final Map<Class<?>, MessageHandler<?>> handlerMap = new HashMap<>();
+    private final Map<Class<?>, MessageHandler<?>> handlerMap = new HashMap<>();
 
     @Override
     public void handle(@NotNull Message message, @NotNull Long forUser) throws HandleException {

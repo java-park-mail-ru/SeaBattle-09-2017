@@ -17,7 +17,6 @@ public class WebSocketService {
     private Map<Long, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper;
 
-
     public WebSocketService(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
@@ -32,7 +31,6 @@ public class WebSocketService {
 
     public void removeUser(@NotNull Long userId)
     {
-
         sessions.remove(userId);
     }
 

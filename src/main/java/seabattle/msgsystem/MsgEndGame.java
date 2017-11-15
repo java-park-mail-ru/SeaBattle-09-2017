@@ -1,8 +1,8 @@
 package seabattle.msgsystem;
 
 public class MsgEndGame extends Message {
-    String resultGame;
-    Integer score;
+    private String resultGame;
+    private Integer score;
 
     public MsgEndGame(String resultGame, Integer score) {
         this.resultGame = resultGame;
