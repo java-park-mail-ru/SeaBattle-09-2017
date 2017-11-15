@@ -4,23 +4,23 @@ import seabattle.game.field.Cell;
 import seabattle.game.field.CellStatus;
 
 public class MsgResultMove extends Message {
-    private String username;
+    private Long id;
     private Cell cell;
     private CellStatus cellStatus;
 
-    public MsgResultMove(String username, Cell cell, CellStatus cellStatus) {
-        this.username = username;
+    public MsgResultMove(Long id, Cell cell, CellStatus cellStatus) {
+        this.id = id;
         this.cell = cell;
         this.cellStatus = cellStatus;
     }
 
 
-    public String getUsername() {
-        return username;
+    public Long getId() {
+        return id;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Cell getCell() {
