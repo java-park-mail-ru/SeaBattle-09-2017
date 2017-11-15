@@ -46,7 +46,7 @@ public class WebSocketService {
         }
     }
 
-    @SuppressWarnings("OverlyBroadCatchBlock")
+    @SuppressWarnings("")
     public void sendMessage (@NotNull Long userId, @NotNull Message message) throws IOException {
         final WebSocketSession webSocketSession = sessions.get(userId);
         if (webSocketSession == null) {

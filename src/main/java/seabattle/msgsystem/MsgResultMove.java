@@ -1,19 +1,21 @@
 package seabattle.msgsystem;
 
+import seabattle.game.field.Cell;
 import seabattle.game.field.CellStatus;
 
-import java.awt.Point;
+
 
 public class MsgResultMove extends Message {
     String username;
-    Point cellPosition;
+    Cell cell;
     CellStatus cellStatus;
 
-    public MsgResultMove(String username, Point cellPosition, CellStatus cellStatus) {
+    public MsgResultMove(String username, Cell cell, CellStatus cellStatus) {
         this.username = username;
-        this.cellPosition = cellPosition;
+        this.cell = cell;
         this.cellStatus = cellStatus;
     }
+
 
     public String getUsername() {
         return username;
@@ -23,12 +25,12 @@ public class MsgResultMove extends Message {
         this.username = username;
     }
 
-    public Point getCellPosition() {
-        return cellPosition;
+    public Cell getCell() {
+        return cell;
     }
 
-    public void setCellPosition(Point cellPosition) {
-        this.cellPosition = cellPosition;
+    public void setCell(Cell cell) {
+        this.cell = cell;
     }
 
     public CellStatus getCellStatus() {

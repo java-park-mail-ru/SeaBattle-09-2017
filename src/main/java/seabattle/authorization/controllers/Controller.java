@@ -1,11 +1,9 @@
 package seabattle.authorization.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import seabattle.authorization.service.UserService;
@@ -30,10 +28,8 @@ public class Controller {
     @Autowired
     private UserService dbUsers;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private static final String CURRENT_USER_KEY = "currentUser";
 
@@ -59,7 +55,7 @@ public class Controller {
         try {
             UserView currentUser = dbUsers.getByLoginOrEmail(loggingData.getLoginEmail());
 
-            if (passwordEncoder().matches(loggingData.getPassword(), currentUser.getPassword())) {
+            if (passwordEncoder.matches(loggingData.getPassword(), currentUser.getPassword())) {
                 httpSession.setAttribute(CURRENT_USER_KEY, currentUser.getLogin());
                 currentUser.setPassword(null);
                 return ResponseEntity.status(HttpStatus.OK).body(currentUser);
@@ -80,7 +76,7 @@ public class Controller {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity register(@Valid @RequestBody UserView registerData) {
         try {
-            String encodedPassword = passwordEncoder().encode(registerData.getPassword());
+            String encodedPassword = passwordEncoder.encode(registerData.getPassword());
             registerData.setPassword(encodedPassword);
             dbUsers.addUser(registerData);
         } catch (DuplicateKeyException ex) {
@@ -106,7 +102,7 @@ public class Controller {
                     oldUser.setEmail(newData.getEmail());
                 }
                 if (newData.getPassword() != null) {
-                    String encodedPassword = passwordEncoder().encode(newData.getPassword());
+                    String encodedPassword = passwordEncoder.encode(newData.getPassword());
                     oldUser.setPassword(encodedPassword);
                 }
                 dbUsers.changeUser(oldUser);
