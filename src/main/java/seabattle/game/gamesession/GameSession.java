@@ -6,71 +6,118 @@ import seabattle.game.field.Field;
 import seabattle.game.player.Player;
 import seabattle.game.ship.Ship;
 
+import javax.validation.constraints.NotNull;
+import java.util.concurrent.atomic.AtomicLong;
+
 @SuppressWarnings("unused")
 public class GameSession {
-    private GameSessionStatus status;
-    private Player player1;
-    private Player player2;
-    private Field field1;
-    private Field field2;
+    private static final AtomicLong SESSION_ID_GENERATOR = new AtomicLong(0);
 
-    public GameSession(Player player1, Player player2) {
-        this.status = GameSessionStatus.SETUP;
+    @NotNull
+    private GameSessionStatus status;
+    @NotNull
+    private Long sessionId;
+    @NotNull
+    private Player player1;
+    @NotNull
+    private Player player2;
+
+    private Player damagedPlayer;
+    private Field damagedField;
+
+    private Field field1 = null;
+    private Field field2 = null;
+
+    @NotNull
+    private GameSessionService gameSessionService;
+
+
+    public GameSession(@NotNull Player player1, @NotNull Player player2, @NotNull Player damagedPlayer,
+                       @NotNull GameSessionService gameSessionService) {
+        this.sessionId = SESSION_ID_GENERATOR.getAndIncrement();
         this.player1 = player1;
         this.player2 = player2;
+        this.damagedPlayer = damagedPlayer;
+
+        this.gameSessionService = gameSessionService;
+
+        this.status = GameSessionStatus.SETUP;
     }
 
+    @NotNull
     public Player getPlayer1() {
         return player1;
     }
 
+    @NotNull
     public Player getPlayer2() {
         return player2;
     }
 
-    public void setPlayer1() {
+    public void setPlayer1(@NotNull Player player1) {
         this.player1 = player1;
     }
 
-    public void  setPlayer2() {
+    public void  setPlayer2(@NotNull Player player2) {
         this.player2 = player2;
     }
 
-    public CellStatus makeMove(Cell cell) {
-        Field playField;
-        Player damagedPlayer;
+    public void setField1(@NotNull Field field) {
+        this.field1 = field;
+        if (damagedPlayer == player1) {
+            this.damagedField = this.field1;
+        }
+    }
 
-        switch (status) {
-            case MOVE_P1:
-                playField = field2;
-                damagedPlayer = player2;
-                break;
-            case MOVE_P2:
-                playField = field1;
-                damagedPlayer = player1;
-                break;
-            default:
-                throw new IllegalStateException("Illegal state of game session!");
+    public void setField2(@NotNull Field field) {
+        this.field2 = field;
+        if (damagedPlayer == player2) {
+            this.damagedField = this.field2;
+        }
+    }
+
+    public Boolean toGamePhase() {
+        if (this.status != GameSessionStatus.SETUP || this.field1 == null || this.field2 == null) {
+            return Boolean.FALSE;
         }
 
-        switch (playField.fire(cell)) {
+        if (this.damagedPlayer == player1) {
+            this.status = GameSessionStatus.MOVE_P2;
+        } else {
+            this.status = GameSessionStatus.MOVE_P1;
+        }
+
+        return Boolean.TRUE;
+    }
+
+    public CellStatus makeMove(Cell cell) throws IllegalStateException{
+
+        if (this.status != GameSessionStatus.MOVE_P1 && this.status != GameSessionStatus.MOVE_P2) {
+            throw new IllegalStateException("Illegal state for move!");
+        }
+
+        switch (damagedField.fire(cell)) {
             case BLOCKED:
                 switch (status) {
                     case MOVE_P1:
                         status = GameSessionStatus.MOVE_P2;
+                        damagedField = field1;
+                        damagedPlayer = player1;
                         return CellStatus.BLOCKED;
                     case MOVE_P2:
                         status = GameSessionStatus.MOVE_P1;
+                        damagedField = field2;
+                        damagedPlayer = player2;
                         return CellStatus.BLOCKED;
                     default:
                         throw new IllegalStateException("Illegal state!");
                 }
             case ON_FIRE:
                 for (Ship ship : damagedPlayer.getAliveShips()) {
-                    if (ship.inShip(cell) && playField.shipKilled(ship)) {
+                    if (ship.inShip(cell) && damagedField.shipKilled(ship)) {
                         damagedPlayer.getAliveShips().remove(ship);
                         damagedPlayer.getDeadShips().add(ship);
-                        playField.killShip(ship);
+                        damagedField.killShip(ship);
                         if (damagedPlayer.allShipsDead()) {
                             switch (status) {
                                 case MOVE_P1:
