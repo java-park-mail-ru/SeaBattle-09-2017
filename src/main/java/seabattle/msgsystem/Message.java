@@ -2,6 +2,10 @@ package seabattle.msgsystem;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import seabattle.game.messages.MsgEndGame;
+import seabattle.game.messages.MsgResultMove;
+import seabattle.game.messages.MsgShipPosition;
+import seabattle.game.messages.MsgStartGame;
 
 @JsonTypeInfo(use= JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "class")
 @JsonSubTypes({

@@ -1,7 +1,8 @@
-package seabattle.msgsystem;
+package seabattle.game.messages;
 
 import seabattle.game.field.Cell;
 import seabattle.game.field.CellStatus;
+import seabattle.msgsystem.Message;
 
 public class MsgResultMove extends Message {
     private Long id;

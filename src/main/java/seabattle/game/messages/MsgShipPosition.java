@@ -1,6 +1,7 @@
-package seabattle.msgsystem;
+package seabattle.game.messages;
 
 import seabattle.game.ship.Ship;
+import seabattle.msgsystem.Message;
 
 import java.util.ArrayList;
 import java.util.List;

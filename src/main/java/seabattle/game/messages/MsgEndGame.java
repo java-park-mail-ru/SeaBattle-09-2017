@@ -1,4 +1,6 @@
-package seabattle.msgsystem;
+package seabattle.game.messages;
+
+import seabattle.msgsystem.Message;
 
 public class MsgEndGame extends Message {
     private String resultGame;
