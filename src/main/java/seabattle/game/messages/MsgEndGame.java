@@ -2,28 +2,21 @@ package seabattle.game.messages;
 
 import seabattle.msgsystem.Message;
 
+import javax.validation.constraints.NotNull;
+
 public class MsgEndGame extends Message {
-    private String resultGame;
-    private Integer score;
 
-    public MsgEndGame(String resultGame, Integer score) {
-        this.resultGame = resultGame;
-        this.score = score;
+    private Boolean won;
+
+    public MsgEndGame(Boolean won) {
+        this.won = won;
     }
 
-    public String getResultGame() {
-        return resultGame;
+    public Boolean getWon() {
+        return won;
     }
 
-    public void setResultGame(String resultGame) {
-        this.resultGame = resultGame;
-    }
-
-    public Integer getScore() {
-        return score;
-    }
-
-    public void setScore(Integer score) {
-        this.score = score;
+    public void setWon(Boolean won) {
+        this.won = won;
     }
 }

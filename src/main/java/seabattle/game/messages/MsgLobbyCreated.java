@@ -2,14 +2,12 @@ package seabattle.game.messages;
 
 import seabattle.msgsystem.Message;
 
-public class MsgStartGame extends Message {
+public class MsgLobbyCreated extends Message {
 
     private String usernameEnemy;
-    private Boolean first;
 
-    public MsgStartGame(String usernameEnemy, Boolean first) {
+    public MsgLobbyCreated(String usernameEnemy) {
         this.usernameEnemy = usernameEnemy;
-        this.first = first;
     }
 
     public String getUsernameEnemy() {
@@ -20,11 +18,4 @@ public class MsgStartGame extends Message {
         this.usernameEnemy = usernameEnemy;
     }
 
-    public Boolean isFirst() {
-        return first;
-    }
-
-    public void setFirst(Boolean first) {
-        this.first = first;
-    }
 }

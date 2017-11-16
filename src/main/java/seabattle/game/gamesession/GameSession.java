@@ -32,13 +32,11 @@ public class GameSession {
     private GameSessionService gameSessionService;
 
 
-    public GameSession(@NotNull Player player1, @NotNull Player player2, @NotNull Player damagedPlayer,
+    public GameSession(@NotNull Player player1, @NotNull Player player2,
                        @NotNull GameSessionService gameSessionService) {
         this.sessionId = SESSION_ID_GENERATOR.getAndIncrement();
         this.player1 = player1;
         this.player2 = player2;
-        this.damagedPlayer = damagedPlayer;
-
         this.gameSessionService = gameSessionService;
 
         this.status = GameSessionStatus.SETUP;
@@ -49,31 +47,49 @@ public class GameSession {
         return player1;
     }
 
+    public void setPlayer1(@NotNull Player player1) {
+        this.player1 = player1;
+    }
+
     @NotNull
     public Player getPlayer2() {
         return player2;
-    }
-
-    public void setPlayer1(@NotNull Player player1) {
-        this.player1 = player1;
     }
 
     public void  setPlayer2(@NotNull Player player2) {
         this.player2 = player2;
     }
 
+    public Boolean bothFieldsAccepted() {
+        return field1 != null && field2 != null;
+    }
+
+    public Player getWinner() {
+        if (status == GameSessionStatus.WIN_P1) {
+            return player1;
+        } else if (status == GameSessionStatus.WIN_P2){
+            return player2;
+        }
+        throw new IllegalStateException("Game did not end!");
+    }
+
     public void setField1(@NotNull Field field) {
         this.field1 = field;
-        if (damagedPlayer == player1) {
-            this.damagedField = this.field1;
-        }
     }
 
     public void setField2(@NotNull Field field) {
         this.field2 = field;
-        if (damagedPlayer == player2) {
-            this.damagedField = this.field2;
+    }
+
+    public void setDamagedSide(@NotNull Player damagedPlayer) {
+        if (damagedPlayer == player1) {
+            this.damagedField = field1;
+            this.damagedPlayer = damagedPlayer;
+        } else if (damagedPlayer == player2) {
+            this.damagedField = field2;
+            this.damagedPlayer = player2;
         }
+        throw new IllegalArgumentException("Player not in current session!");
     }
 
     public Boolean toGamePhase() {
