@@ -4,6 +4,7 @@ import seabattle.game.field.Cell;
 import seabattle.game.field.CellStatus;
 import seabattle.msgsystem.Message;
 
+@SuppressWarnings("unused")
 public class MsgResultMove extends Message {
     private Long id;
     private Cell cell;

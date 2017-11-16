@@ -9,7 +9,7 @@ import seabattle.game.ship.Ship;
 import javax.validation.constraints.NotNull;
 import java.util.concurrent.atomic.AtomicLong;
 
-@SuppressWarnings("unused")
+@SuppressWarnings("ALL")
 public class GameSession {
     private static final AtomicLong SESSION_ID_GENERATOR = new AtomicLong(0);
 
@@ -32,8 +32,8 @@ public class GameSession {
     private GameSessionService gameSessionService;
 
 
-    public GameSession(@NotNull Player player1, @NotNull Player player2,
-                       @NotNull GameSessionService gameSessionService) {
+    GameSession(@NotNull Player player1, @NotNull Player player2,
+                @NotNull GameSessionService gameSessionService) {
         this.sessionId = SESSION_ID_GENERATOR.getAndIncrement();
         this.player1 = player1;
         this.player2 = player2;
@@ -43,7 +43,7 @@ public class GameSession {
     }
 
     @NotNull
-    public Player getPlayer1() {
+    Player getPlayer1() {
         return player1;
     }
 
@@ -52,7 +52,7 @@ public class GameSession {
     }
 
     @NotNull
-    public Player getPlayer2() {
+    Player getPlayer2() {
         return player2;
     }
 
@@ -60,14 +60,14 @@ public class GameSession {
         this.player2 = player2;
     }
 
-    public Boolean bothFieldsAccepted() {
+    Boolean bothFieldsAccepted() {
         return field1 != null && field2 != null;
     }
 
-    public Player getWinner() {
+    Player getWinner() {
         if (status == GameSessionStatus.WIN_P1) {
             return player1;
-        } else if (status == GameSessionStatus.WIN_P2){
+        } else if (status == GameSessionStatus.WIN_P2) {
             return player2;
         }
         throw new IllegalStateException("Game did not end!");
@@ -81,11 +81,11 @@ public class GameSession {
         this.field2 = field;
     }
 
-    public void setDamagedSide(@NotNull Player damagedPlayer) {
-        if (damagedPlayer == player1) {
+    void setDamagedSide(@NotNull Player player) {
+        if (player == player1) {
             this.damagedField = field1;
-            this.damagedPlayer = damagedPlayer;
-        } else if (damagedPlayer == player2) {
+            this.damagedPlayer = player;
+        } else if (player == player2) {
             this.damagedField = field2;
             this.damagedPlayer = player2;
         }
@@ -106,7 +106,7 @@ public class GameSession {
         return Boolean.TRUE;
     }
 
-    public CellStatus makeMove(Cell cell) throws IllegalStateException{
+    public CellStatus makeMove(Cell cell) throws IllegalStateException {
 
         if (this.status != GameSessionStatus.MOVE_P1 && this.status != GameSessionStatus.MOVE_P2) {
             throw new IllegalStateException("Illegal state for move!");

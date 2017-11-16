@@ -1,8 +1,5 @@
 package seabattle.msgsystem;
 
-import seabattle.msgsystem.Message;
-import seabattle.msgsystem.MessageHandler;
-
 import javax.validation.constraints.NotNull;
 
 public interface MessageHandlerContainer {

@@ -1,6 +1,8 @@
 package seabattle.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -14,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class WebSocketService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketService.class);
     private Map<Long, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper;
 
@@ -22,7 +25,7 @@ public class WebSocketService {
         this.objectMapper = objectMapper;
     }
 
-    public void registerUser(@NotNull Long userId,@NotNull WebSocketSession webSocketSession) {
+    public void registerUser(@NotNull Long userId, @NotNull WebSocketSession webSocketSession) {
         sessions.put(userId, webSocketSession);
     }
 
@@ -30,8 +33,7 @@ public class WebSocketService {
         return sessions.containsKey(userId) && sessions.get(userId).isOpen();
     }
 
-    public void removeUser(@NotNull Long userId)
-    {
+    public void removeUser(@NotNull Long userId) {
         sessions.remove(userId);
     }
 
@@ -41,6 +43,7 @@ public class WebSocketService {
             try {
                 webSocketSession.close(closeStatus);
             } catch (IOException ignore) {
+                LOGGER.warn("Can't close session");
             }
         }
     }

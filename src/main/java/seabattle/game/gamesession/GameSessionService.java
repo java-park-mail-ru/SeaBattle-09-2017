@@ -102,7 +102,7 @@ public class GameSessionService {
     }
 
     private Player chooseDamagedPlayer(@NotNull Player player1, @NotNull Player player2) {
-        final Player[] players = { player1, player2 };
+        final Player[] players = {player1, player2};
         Integer secondPlayerPosition = ThreadLocalRandom.current().nextInt(0, 2);
         return players[secondPlayerPosition];
     }

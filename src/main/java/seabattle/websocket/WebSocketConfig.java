@@ -1,6 +1,5 @@
 package seabattle.websocket;
 
-import org.springframework.lang.NonNullApi;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;

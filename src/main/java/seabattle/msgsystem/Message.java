@@ -7,7 +7,7 @@ import seabattle.game.messages.MsgResultMove;
 import seabattle.game.messages.MsgShipPosition;
 import seabattle.game.messages.MsgLobbyCreated;
 
-@JsonTypeInfo(use= JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "class")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "class")
 @JsonSubTypes({
         @JsonSubTypes.Type(MsgShipPosition.class),
         @JsonSubTypes.Type(MsgLobbyCreated.class),

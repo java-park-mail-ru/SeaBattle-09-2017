@@ -4,6 +4,7 @@ import seabattle.msgsystem.Message;
 
 import javax.validation.constraints.NotNull;
 
+@SuppressWarnings("unused")
 public class MsgGameStarted extends Message {
 
     @NotNull

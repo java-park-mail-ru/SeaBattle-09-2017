@@ -1,9 +1,8 @@
 package seabattle.msgsystem;
 
-import seabattle.msgsystem.Message;
-
 import javax.validation.constraints.NotNull;
 
+@SuppressWarnings("WeakerAccess")
 public abstract class MessageHandler<T extends Message>  {
     @NotNull
     private final Class<T> clazz;

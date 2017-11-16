@@ -37,6 +37,7 @@ public class SocketHandler extends TextWebSocketHandler {
             try {
                 webSocketSession.close();
             } catch (IOException ignore) {
+                LOGGER.warn("Can't close session");
             }
         } else {
             webSocketService.registerUser(id, webSocketSession);
@@ -49,10 +50,11 @@ public class SocketHandler extends TextWebSocketHandler {
             return;
         }
         final Long userId = (Long) webSocketSession.getAttributes().get("userId");
-        if (userId == null ) {
+        if (userId == null) {
             try {
                 webSocketSession.close();
             } catch (IOException ignore) {
+                LOGGER.warn("Can't close session");
             }
         } else {
             handleMessage(userId, message);
