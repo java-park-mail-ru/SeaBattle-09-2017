@@ -19,4 +19,18 @@ public class MsgLobbyCreated extends Message {
         this.usernameEnemy = usernameEnemy;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MsgLobbyCreated that = (MsgLobbyCreated) o;
+
+        return usernameEnemy != null ? usernameEnemy.equals(that.usernameEnemy) : that.usernameEnemy == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return usernameEnemy != null ? usernameEnemy.hashCode() : 0;
+    }
 }

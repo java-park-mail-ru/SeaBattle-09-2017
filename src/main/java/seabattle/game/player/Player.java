@@ -1,19 +1,21 @@
 package seabattle.game.player;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import seabattle.authorization.views.UserView;
+import seabattle.game.IdGenerator;
 import seabattle.game.ship.Ship;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 @SuppressWarnings("unused")
 public class Player {
-    private static final AtomicLong ID_GENERATOR = new AtomicLong();
+
+    private IdGenerator idGenerator = IdGenerator.getInstance();
 
     @NotNull
-    private static final Long PLAYER_ID = ID_GENERATOR.getAndIncrement();
+    private Long playerId;
     @NotNull
     private String username;
     @NotNull
@@ -24,14 +26,26 @@ public class Player {
     private List<Ship> deadShips = new ArrayList<>();
 
     public Player(UserView user, List<Ship> ships) {
+        this.playerId = idGenerator.getId();
         this.user = user;
         this.username = user.getLogin();
         this.aliveShips = ships;
     }
 
-    Player(List<Ship> ships) {
-        this.username = "Unknown username";
+    public Player() {
+        this.playerId = idGenerator.getId();
+        this.username = "Unknown username " + playerId.toString();
         this.user = null;
+    }
+
+    Player(List<Ship> ships) {
+        this.playerId = idGenerator.getId();
+        this.username = "Unknown username " + playerId.toString();
+        this.user = null;
+        aliveShips.addAll(ships);
+    }
+
+    public void setShips(List<Ship> ships) {
         aliveShips.addAll(ships);
     }
 
@@ -44,7 +58,7 @@ public class Player {
     }
 
     public Long getPlayerId() {
-        return PLAYER_ID;
+        return playerId;
     }
 
     public Boolean allShipsDead() {
