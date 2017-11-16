@@ -1,10 +1,13 @@
 package seabattle.game.gamesession;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.socket.CloseStatus;
+import seabattle.game.messages.MsgStartGame;
 import seabattle.game.player.Player;
 import seabattle.websocket.WebSocketService;
 
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -57,6 +60,25 @@ public class GameSessionService {
         gameSessions.put(player1.getPlayerId(), gameSession);
         gameSessions.put(player2.getPlayerId(), gameSession);
 
-        /* TODO MESSAGES */
+
+        try {
+            final MsgStartGame initMessage1 = createMsgStartGame(player2, damagedPlayer);
+            webSocketService.sendMessage(player2.getPlayerId(), initMessage1);
+            final MsgStartGame initMessage2 = createMsgStartGame(player1, damagedPlayer);
+            webSocketService.sendMessage(player1.getPlayerId(), initMessage1);
+        } catch (IOException ex) {
+            webSocketService.closeSession(player1.getPlayerId(), CloseStatus.SERVER_ERROR);
+            webSocketService.closeSession(player2.getPlayerId(), CloseStatus.SERVER_ERROR);
+        }
+    }
+
+    private MsgStartGame createMsgStartGame(@NotNull Player enemy, @NotNull Player damagedPlayer) {
+        Boolean isFirst;
+        if (enemy == damagedPlayer) {
+            isFirst = Boolean.TRUE;
+        } else {
+            isFirst = Boolean.FALSE;
+        }
+        return new MsgStartGame(enemy.getUsername(), isFirst);
     }
 }

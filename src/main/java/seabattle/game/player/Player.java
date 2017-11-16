@@ -50,4 +50,8 @@ public class Player {
     public Boolean allShipsDead() {
         return aliveShips.isEmpty();
     }
+
+    public String getUsername() {
+        return username;
+    }
 }
