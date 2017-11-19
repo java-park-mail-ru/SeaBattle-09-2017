@@ -44,8 +44,18 @@ public class GameSession {
     }
 
     @NotNull
+    public GameSessionStatus getStatus() {
+        return status;
+    }
+
+    @NotNull
     Player getPlayer1() {
         return player1;
+    }
+
+    @NotNull
+    public Long getPlayer1Id() {
+        return player1.getPlayerId();
     }
 
     public void setPlayer1(@NotNull Player player1) {
@@ -55,6 +65,11 @@ public class GameSession {
     @NotNull
     Player getPlayer2() {
         return player2;
+    }
+
+    @NotNull
+    public Long getPlayer2Id() {
+        return player1.getPlayerId();
     }
 
     public void  setPlayer2(@NotNull Player player2) {
