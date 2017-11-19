@@ -7,6 +7,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 import seabattle.authorization.service.UserService;
 import seabattle.authorization.views.UserView;
+import seabattle.game.gamesession.GameSessionService;
 import seabattle.game.player.Player;
 import seabattle.websocket.WebSocketService;
 import org.springframework.web.socket.*;
@@ -24,16 +25,20 @@ public class SocketHandler extends TextWebSocketHandler {
 
     private final UserService userService;
 
+    private final GameSessionService gameSessionService;
+
     private final WebSocketService webSocketService;
 
     private final ObjectMapper objectMapper;
 
     public SocketHandler(@NotNull MessageHandlerContainer messageHandlerContainer,
                          @NotNull UserService userService,
+                         @NotNull GameSessionService gamseSessionService,
                          @NotNull WebSocketService webSocketService,
                          ObjectMapper objectMapper) {
         this.messageHandlerContainer = messageHandlerContainer;
         this.userService = userService;
+        this.gameSessionService = gamseSessionService;
         this.webSocketService = webSocketService;
         this.objectMapper = objectMapper;
     }
@@ -54,9 +59,9 @@ public class SocketHandler extends TextWebSocketHandler {
             if (userView != null) {
                 connectedPlayer.setUser(userView);
             }
-            /* TODO send player to list of active players */
-
             webSocketService.registerUser(connectedPlayer.getPlayerId(), webSocketSession);
+            gameSessionService.addWaitingPlayer(connectedPlayer);
+
         }
     }
 
