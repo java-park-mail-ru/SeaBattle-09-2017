@@ -1,7 +1,7 @@
 package seabattle.game;
 
-public class IdGenerator {
-    private static IdGenerator _instance = null;
+public final class IdGenerator {
+    private static IdGenerator instance = null;
 
     private Long id;
 
@@ -10,9 +10,10 @@ public class IdGenerator {
     }
 
     public static synchronized IdGenerator getInstance() {
-        if (_instance == null)
-            _instance = new IdGenerator();
-        return _instance;
+        if (instance == null) {
+            instance = new IdGenerator();
+        }
+        return instance;
     }
 
 

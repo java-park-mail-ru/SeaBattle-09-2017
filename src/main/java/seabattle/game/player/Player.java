@@ -1,6 +1,5 @@
 package seabattle.game.player;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import seabattle.authorization.views.UserView;
 import seabattle.game.IdGenerator;
 import seabattle.game.ship.Ship;
@@ -12,7 +11,8 @@ import java.util.List;
 @SuppressWarnings("unused")
 public class Player {
 
-    private IdGenerator idGenerator = IdGenerator.getInstance();
+    @NotNull
+    private final IdGenerator idGenerator = IdGenerator.getInstance();
 
     @NotNull
     private Long playerId;

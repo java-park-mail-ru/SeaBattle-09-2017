@@ -12,10 +12,7 @@ import seabattle.websocket.WebSocketService;
 
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @SuppressWarnings("unused")
@@ -25,6 +22,9 @@ public class GameSessionService {
 
     @NotNull
     private final Map<Long, GameSession> gameSessions = new HashMap<>();
+
+    @NotNull
+    private final ArrayDeque<Player> waitingPlayers = new ArrayDeque<>();
 
     @NotNull
     private final WebSocketService webSocketService;
@@ -54,6 +54,14 @@ public class GameSessionService {
 
     public GameSession getGameSession(Long userId) {
         return gameSessions.get(userId);
+    }
+
+    public void addWaitingPlayer(@NotNull Player player) {
+        waitingPlayers.add(player);
+        Integer numberOfPlayersInSession = 2;
+        if (waitingPlayers.size() >= numberOfPlayersInSession) {
+            createSession(waitingPlayers.pollFirst(), waitingPlayers.pollFirst());
+        }
     }
 
     public void createSession(@NotNull Player player1, @NotNull Player player2) {

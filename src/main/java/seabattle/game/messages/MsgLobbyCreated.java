@@ -20,17 +20,27 @@ public class MsgLobbyCreated extends Message {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
 
-        MsgLobbyCreated that = (MsgLobbyCreated) o;
+        MsgLobbyCreated that = (MsgLobbyCreated) obj;
 
-        return usernameEnemy != null ? usernameEnemy.equals(that.usernameEnemy) : that.usernameEnemy == null;
+        if (usernameEnemy == null) {
+            return that.usernameEnemy == null;
+        }
+        return usernameEnemy.equals(that.usernameEnemy);
     }
 
     @Override
     public int hashCode() {
-        return usernameEnemy != null ? usernameEnemy.hashCode() : 0;
+        if (usernameEnemy == null) {
+            return 0;
+        }
+        return usernameEnemy.hashCode();
     }
 }
