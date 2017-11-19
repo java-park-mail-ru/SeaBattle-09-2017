@@ -4,9 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
+import seabattle.game.field.Cell;
+import seabattle.game.field.CellStatus;
 import seabattle.game.messages.MsgEndGame;
 import seabattle.game.messages.MsgGameStarted;
 import seabattle.game.messages.MsgLobbyCreated;
+import seabattle.game.messages.MsgResultMove;
 import seabattle.game.player.Player;
 import seabattle.websocket.WebSocketService;
 
@@ -15,7 +18,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 @Service
 public class GameSessionService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameSessionService.class);
@@ -94,9 +97,9 @@ public class GameSessionService {
             Player damagedPlayer = chooseDamagedPlayer(gameSession.getPlayer1(), gameSession.getPlayer2());
             gameSession.setDamagedSide(damagedPlayer);
             MsgGameStarted gameStarted1 = createGameStartedMessage(gameSession.getPlayer1(), damagedPlayer);
-            webSocketService.sendMessage(gameSession.getPlayer1().getPlayerId(), gameStarted1);
+            webSocketService.sendMessage(gameSession.getPlayer1Id(), gameStarted1);
             MsgGameStarted gameStarted2 = createGameStartedMessage(gameSession.getPlayer2(), damagedPlayer);
-            webSocketService.sendMessage(gameSession.getPlayer2().getPlayerId(), gameStarted2);
+            webSocketService.sendMessage(gameSession.getPlayer2Id(), gameStarted2);
         } catch (IOException ex) {
             LOGGER.warn("Can't start game! " + ex);
         }
@@ -118,10 +121,10 @@ public class GameSessionService {
     public void endSession(@NotNull GameSession gameSession) {
         try {
             MsgEndGame endGame = createMsgEndGame(gameSession, gameSession.getPlayer1());
-            webSocketService.sendMessage(gameSession.getPlayer1().getPlayerId(), endGame);
+            webSocketService.sendMessage(gameSession.getPlayer1Id(), endGame);
 
             endGame = createMsgEndGame(gameSession, gameSession.getPlayer2());
-            webSocketService.sendMessage(gameSession.getPlayer2().getPlayerId(), endGame);
+            webSocketService.sendMessage(gameSession.getPlayer2Id(), endGame);
         } catch (IOException ex) {
             LOGGER.warn("Failed to send MsgEndGame to user " + gameSession.getPlayer1().getPlayerId(), ex);
         } catch (IllegalStateException ex) {
@@ -134,5 +137,23 @@ public class GameSessionService {
             return new MsgEndGame(Boolean.TRUE);
         }
         return new MsgEndGame(Boolean.FALSE);
+    }
+
+    public void makeMove(@NotNull GameSession gameSession, @NotNull Cell cell) {
+        try {
+            CellStatus cellStatus = gameSession.makeMove(cell);
+            if (cellStatus == CellStatus.DESTRUCTED
+                    && (gameSession.getStatus().equals(GameSessionStatus.WIN_P1)
+                    || gameSession.getStatus().equals(GameSessionStatus.WIN_P2))) {
+                endSession(gameSession);
+            }
+            MsgResultMove msgResultMove = new MsgResultMove(cell, cellStatus);
+            webSocketService.sendMessage(gameSession.getPlayer1Id(), msgResultMove);
+            webSocketService.sendMessage(gameSession.getPlayer2Id(), msgResultMove);
+        } catch (IllegalStateException ex) {
+            LOGGER.warn(ex.getMessage());
+        } catch (IOException ex) {
+            LOGGER.warn("Can't send message! ", ex);
+        }
     }
 }
