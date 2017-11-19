@@ -1,16 +1,12 @@
 package seabattle.game;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
-
-
 public class IdGenerator {
     private static IdGenerator _instance = null;
 
     private Long id;
 
     private IdGenerator() {
-        id = new Long(0);
+        id = 0L;
     }
 
     public static synchronized IdGenerator getInstance() {

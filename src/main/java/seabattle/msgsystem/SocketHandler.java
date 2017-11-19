@@ -5,6 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import seabattle.authorization.service.UserService;
+import seabattle.authorization.views.UserView;
+import seabattle.game.player.Player;
 import seabattle.websocket.WebSocketService;
 import org.springframework.web.socket.*;
 
@@ -19,28 +22,41 @@ public class SocketHandler extends TextWebSocketHandler {
 
     private final MessageHandlerContainer messageHandlerContainer;
 
+    private final UserService userService;
+
     private final WebSocketService webSocketService;
 
     private final ObjectMapper objectMapper;
 
     public SocketHandler(@NotNull MessageHandlerContainer messageHandlerContainer,
-                         @NotNull WebSocketService webSocketService, ObjectMapper objectMapper) {
+                         @NotNull UserService userService,
+                         @NotNull WebSocketService webSocketService,
+                         ObjectMapper objectMapper) {
         this.messageHandlerContainer = messageHandlerContainer;
+        this.userService = userService;
         this.webSocketService = webSocketService;
         this.objectMapper = objectMapper;
     }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession webSocketSession) {
-        final Long id = (Long) webSocketSession.getAttributes().get("userId");
-        if (id == null) {
+        final String login = (String) webSocketSession.getAttributes().get("userLogin");
+        if (login == null) {
             try {
                 webSocketSession.close();
             } catch (IOException ignore) {
                 LOGGER.warn("Can't close session");
             }
         } else {
-            webSocketService.registerUser(id, webSocketSession);
+            Player connectedPlayer = new Player();
+            UserView userView = userService.getByLoginOrEmail(login);
+
+            if (userView != null) {
+                connectedPlayer.setUser(userView);
+            }
+            /* TODO send player to list of active players */
+
+            webSocketService.registerUser(connectedPlayer.getPlayerId(), webSocketSession);
         }
     }
 

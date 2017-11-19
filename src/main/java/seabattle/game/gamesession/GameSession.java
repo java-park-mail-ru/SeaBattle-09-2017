@@ -9,7 +9,8 @@ import seabattle.game.ship.Ship;
 import javax.validation.constraints.NotNull;
 import java.util.concurrent.atomic.AtomicLong;
 
-@SuppressWarnings("ALL")
+
+@SuppressWarnings({"FieldCanBeLocal", "unused"})
 public class GameSession {
     private static final AtomicLong SESSION_ID_GENERATOR = new AtomicLong(0);
 

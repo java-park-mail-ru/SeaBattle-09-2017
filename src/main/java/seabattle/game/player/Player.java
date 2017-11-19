@@ -68,4 +68,9 @@ public class Player {
     public String getUsername() {
         return username;
     }
+
+    public void setUser(UserView user) {
+        this.user = user;
+        this.username = user.getLogin();
+    }
 }
