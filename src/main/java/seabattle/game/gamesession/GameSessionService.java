@@ -143,6 +143,9 @@ public class GameSessionService {
     }
 
     public void makeMove(@NotNull GameSession gameSession, @NotNull Cell cell) {
+        if(!gameSession.toGamePhase()){
+            return;
+        }
         try {
             CellStatus cellStatus = gameSession.makeMove(cell);
             if (cellStatus == CellStatus.DESTRUCTED

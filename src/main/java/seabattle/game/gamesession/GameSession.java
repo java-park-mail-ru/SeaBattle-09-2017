@@ -103,10 +103,10 @@ public class GameSession {
 
     void setDamagedSide(@NotNull Player player) {
         if (player == player1) {
-            this.damagedField = field1;
-            this.damagedPlayer = player;
-        } else if (player == player2) {
             this.damagedField = field2;
+            this.damagedPlayer = player1;
+        } else if (player == player2) {
+            this.damagedField = field1;
             this.damagedPlayer = player2;
         } else {
             throw new IllegalArgumentException("Player not in current session!");
@@ -125,6 +125,14 @@ public class GameSession {
         }
 
         return Boolean.TRUE;
+    }
+
+    public Field getField1() {
+        return field1;
+    }
+
+    public Field getField2() {
+        return field2;
     }
 
     public CellStatus makeMove(Cell cell) throws IllegalStateException {
