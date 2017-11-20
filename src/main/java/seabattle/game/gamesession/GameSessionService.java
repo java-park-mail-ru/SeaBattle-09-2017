@@ -143,7 +143,7 @@ public class GameSessionService {
     }
 
     public void makeMove(@NotNull GameSession gameSession, @NotNull Cell cell) {
-        if(!gameSession.toGamePhase()){
+        if (!gameSession.toGamePhase()) {
             return;
         }
         try {
