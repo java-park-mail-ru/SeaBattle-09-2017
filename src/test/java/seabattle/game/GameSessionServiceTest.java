@@ -102,7 +102,7 @@ public class GameSessionServiceTest {
         assertNull(gameSessionService.getGameSession(player1.getPlayerId()).getDamagedPlayer());
     }
 
-    /*@Test
+    @Test
     public void tryStartGameWithShips() {
         createGameSession();
         GameSession gameSession = gameSessionService.getGameSession(player1.getPlayerId());
@@ -115,6 +115,6 @@ public class GameSessionServiceTest {
         } catch (IOException ignore) {
         }
         assertNotNull(gameSession.getDamagedPlayer());
-    }*/
+    }
 
 }

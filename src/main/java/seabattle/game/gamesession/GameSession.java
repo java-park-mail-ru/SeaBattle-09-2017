@@ -73,7 +73,7 @@ public class GameSession {
 
     @NotNull
     public Long getPlayer2Id() {
-        return player1.getPlayerId();
+        return player2.getPlayerId();
     }
 
     public void  setPlayer2(@NotNull Player player2) {
@@ -108,8 +108,9 @@ public class GameSession {
         } else if (player == player2) {
             this.damagedField = field2;
             this.damagedPlayer = player2;
+        } else {
+            throw new IllegalArgumentException("Player not in current session!");
         }
-        throw new IllegalArgumentException("Player not in current session!");
     }
 
     public Boolean toGamePhase() {
