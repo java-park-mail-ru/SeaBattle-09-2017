@@ -26,6 +26,10 @@ public class GameSession {
     private Player damagedPlayer;
     private Field damagedField;
 
+    public Player getDamagedPlayer() {
+        return damagedPlayer;
+    }
+
     private Field field1 = null;
     private Field field2 = null;
 
@@ -33,7 +37,7 @@ public class GameSession {
     private GameSessionService gameSessionService;
 
 
-    GameSession(@NotNull Player player1, @NotNull Player player2,
+    public GameSession(@NotNull Player player1, @NotNull Player player2,
                 @NotNull GameSessionService gameSessionService) {
         this.sessionId = SESSION_ID_GENERATOR.getAndIncrement();
         this.player1 = player1;
