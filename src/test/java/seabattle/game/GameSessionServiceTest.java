@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
+import seabattle.game.field.Field;
 import seabattle.game.gamesession.GameSession;
 import seabattle.game.gamesession.GameSessionService;
 import seabattle.game.messages.MsgGameStarted;
@@ -41,7 +42,7 @@ public class GameSessionServiceTest {
     @MockBean
     private WebSocketService webSocketService;
 
-    private GameSession createGameSession() {
+    private void createGameSession() {
         try {
             doNothing().when(webSocketService).sendMessage(eq(player1.getPlayerId()), any(MsgLobbyCreated.class));
             doNothing().when(webSocketService).sendMessage(eq(player2.getPlayerId()), any(MsgLobbyCreated.class));
@@ -50,7 +51,6 @@ public class GameSessionServiceTest {
         }
         gameSessionService.createSession(player1, player2);
 
-        return new GameSession(player1, player2, gameSessionService);
 
     }
 
@@ -65,6 +65,20 @@ public class GameSessionServiceTest {
 
     }
 
+    private List<Ship> tetsShips () {
+        List<Ship> testShips = new ArrayList<>();
+        testShips.add(new Ship(0, 6, 4, false));
+        testShips.add(new Ship(0, 3, 3, true));
+        testShips.add(new Ship(4, 1, 3, true));
+        testShips.add(new Ship(0, 0, 2, false));
+        testShips.add(new Ship(2, 9, 2, true));
+        testShips.add(new Ship(8, 7, 2, true));
+        testShips.add(new Ship(5, 6, 1, false));
+        testShips.add(new Ship(8, 3, 1, false));
+        testShips.add(new Ship(8, 6, 1, false));
+        testShips.add(new Ship(9, 0, 1, false));
+        return testShips;
+    }
 
     @Test
     public void createSessionTest() {
@@ -78,14 +92,29 @@ public class GameSessionServiceTest {
 
     @Test
     public void tryStartGameWithoutShips() {
-        GameSession gameSession = createGameSession();
-        tryStartGame(gameSession);
+        createGameSession();
+        tryStartGame(gameSessionService.getGameSession(player1.getPlayerId()));
         try {
             verify(webSocketService, never()).sendMessage(eq(player1.getPlayerId()), any(MsgGameStarted.class));
             verify(webSocketService, never()).sendMessage(eq(player2.getPlayerId()), any(MsgGameStarted.class));
         } catch (IOException ignore) {
         }
-        assertNull(gameSession.getDamagedPlayer());
+        assertNull(gameSessionService.getGameSession(player1.getPlayerId()).getDamagedPlayer());
     }
+
+    /*@Test
+    public void tryStartGameWithShips() {
+        createGameSession();
+        GameSession gameSession = gameSessionService.getGameSession(player1.getPlayerId());
+        gameSession.setField1(new Field(tetsShips()));
+        gameSession.setField2(new Field(tetsShips()));
+        tryStartGame(gameSession);
+        try {
+            verify(webSocketService).sendMessage(eq(player1.getPlayerId()), any(MsgGameStarted.class));
+            verify(webSocketService).sendMessage(eq(player2.getPlayerId()), any(MsgGameStarted.class));
+        } catch (IOException ignore) {
+        }
+        assertNotNull(gameSession.getDamagedPlayer());
+    }*/
 
 }

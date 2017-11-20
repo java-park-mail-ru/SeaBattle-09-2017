@@ -32,7 +32,7 @@ public final class Field {
     }
 
     public void setCellStatus(Cell cell, CellStatus status) {
-        if (!cellOutOfBounds(cell)) {
+        if (cellOutOfBounds(cell)) {
             throw new IllegalArgumentException("Given position is out of bounds!");
         }
         cells.get(cell.getRowPos()).set(cell.getColPos(), status);
@@ -87,7 +87,8 @@ public final class Field {
     }
 
     public Boolean cellOutOfBounds(Cell cell) {
-        return cell.getRowPos() < 0 || cell.getRowPos() >= fieldSize
-                || cell.getColPos() < 0 || cell.getColPos() >= fieldSize;
+        final Boolean checkRow = (cell.getRowPos() < 0) || (cell.getRowPos() >= fieldSize);
+        final Boolean checkCol = (cell.getColPos() < 0) || (cell.getColPos() >= fieldSize);
+        return checkCol || checkRow;
     }
 }

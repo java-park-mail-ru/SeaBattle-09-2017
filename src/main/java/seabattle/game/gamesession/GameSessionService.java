@@ -58,6 +58,12 @@ public class GameSessionService {
 
     public void addWaitingPlayer(@NotNull Player player) {
         waitingPlayers.add(player);
+        final MsgYouInQueue msgYouInQueue = new MsgYouInQueue(player.getUsername());
+        try {
+            webSocketService.sendMessage(player.getPlayerId(), msgYouInQueue);
+        } catch (IOException ex) {
+            webSocketService.closeSession(player.getPlayerId(), CloseStatus.SERVER_ERROR);
+        }
         Integer numberOfPlayersInSession = 2;
         if (waitingPlayers.size() >= numberOfPlayersInSession) {
             createSession(waitingPlayers.pollFirst(), waitingPlayers.pollFirst());
