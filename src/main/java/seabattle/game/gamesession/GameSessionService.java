@@ -6,10 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
 import seabattle.game.field.Cell;
 import seabattle.game.field.CellStatus;
-import seabattle.game.messages.MsgEndGame;
-import seabattle.game.messages.MsgGameStarted;
-import seabattle.game.messages.MsgLobbyCreated;
-import seabattle.game.messages.MsgResultMove;
+import seabattle.game.messages.*;
 import seabattle.game.player.Player;
 import seabattle.websocket.WebSocketService;
 

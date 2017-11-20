@@ -46,23 +46,22 @@ public class SocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession webSocketSession) {
         final String login = (String) webSocketSession.getAttributes().get("userLogin");
-        if (login == null) {
-            try {
-                webSocketSession.close();
-            } catch (IOException ignore) {
-                LOGGER.warn("Can't close session");
-            }
-        } else {
-            Player connectedPlayer = new Player();
+        Player connectedPlayer = new Player();
+        if (login != null) {
             UserView userView = userService.getByLoginOrEmail(login);
 
-            if (userView != null) {
+            if (userView == null) {
+                try {
+                    webSocketSession.close();
+                } catch (IOException ignore) {
+                    LOGGER.warn("Can't close session");
+                }
+            } else {
                 connectedPlayer.setUser(userView);
             }
-            webSocketService.registerUser(connectedPlayer.getPlayerId(), webSocketSession);
-            gameSessionService.addWaitingPlayer(connectedPlayer);
-
         }
+        webSocketService.registerUser(connectedPlayer.getPlayerId(), webSocketSession);
+        gameSessionService.addWaitingPlayer(connectedPlayer);
     }
 
     @Override
