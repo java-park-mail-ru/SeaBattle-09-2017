@@ -58,7 +58,7 @@ public class GameSessionService {
 
     public void addWaitingPlayer(@NotNull Player player) {
         waitingPlayers.add(player);
-        final MsgYouInQueue msgYouInQueue = new MsgYouInQueue(player.getUsername());
+        final MsgYouInQueue msgYouInQueue = new MsgYouInQueue(player.getPlayerId(), player.getUsername());
         try {
             webSocketService.sendMessage(player.getPlayerId(), msgYouInQueue);
         } catch (IOException ex) {
