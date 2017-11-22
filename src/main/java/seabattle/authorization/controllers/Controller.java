@@ -114,10 +114,13 @@ public class Controller {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResponseView.ERROR_NO_RIGHTS_TO_CHANGE_USER);
     }
 
+
     @RequestMapping(method = RequestMethod.GET, path = "leaderboard",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<UserView>> getLeaderboard() {
-        List<UserView> leaders = dbUsers.getLeaderboard();
+    public ResponseEntity<List<UserView>> getLeaderboard(
+            @Valid @RequestParam(value = "limit", required = false, defaultValue = "10") Integer limit) {
+        List<UserView> leaders = dbUsers.getLeaderboard(limit);
         return ResponseEntity.status(HttpStatus.OK).body(leaders);
     }
+
 }

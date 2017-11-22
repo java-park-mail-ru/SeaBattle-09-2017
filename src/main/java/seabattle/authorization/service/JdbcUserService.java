@@ -50,8 +50,17 @@ public class JdbcUserService implements UserService {
     }
 
     @Override
-    public List<UserView> getLeaderboard() {
-        String sql = "SELECT login, score FROM users ORDER BY score DESC";
-        return template.query(sql, READ_USER_LOGIN_SCORE_MAPPER);
+    public List<UserView> getLeaderboard(Integer limit) {
+        String sql = "SELECT login, score FROM users ORDER BY score DESC LIMIT ?";
+        return template.query(sql, ps -> ps.setInt(1, limit), READ_USER_LOGIN_SCORE_MAPPER);
+    }
+
+    @Override
+    public UserView setScore(UserView user) {
+        String sql = "UPDATE users SET score = ? WHERE login = ?";
+        if (template.update(sql, user.getScore(), user.getLogin()) != 0) {
+            return user;
+        }
+        return null;
     }
 }

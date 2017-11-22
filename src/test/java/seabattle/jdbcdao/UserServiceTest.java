@@ -91,10 +91,20 @@ public class UserServiceTest {
 
     @Test
     public void getLeaderboard(){
-        List<UserView> returnedUserList = userService.getLeaderboard();
+        final Integer limit = 11;
+        final List<UserView> returnedUserList = userService.getLeaderboard(limit);
         int i = returnedUserList.size();
         for (UserView userView: returnedUserList) {
             assertSame(userView.getScore(),--i);
         }
+    }
+
+    @Test
+    public void setScore(){
+        final Integer testScore = 20;
+        testUser.setScore(testScore);
+        userService.setScore(testUser);
+        final UserView changeUser = userService.getByLoginOrEmail(testUser.getLogin());
+        assertEquals(changeUser, testUser);
     }
 }

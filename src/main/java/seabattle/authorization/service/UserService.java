@@ -12,5 +12,7 @@ public interface UserService {
     
     UserView changeUser(UserView user);
 
-    List<UserView> getLeaderboard();
+    List<UserView> getLeaderboard(Integer limit);
+
+    UserView setScore(UserView user);
 }
