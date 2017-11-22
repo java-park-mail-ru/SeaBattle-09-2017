@@ -12,7 +12,7 @@ import seabattle.game.messages.*;
         @JsonSubTypes.Type(MsgEndGame.class),
         @JsonSubTypes.Type(MsgGameStarted.class),
         @JsonSubTypes.Type(MsgYouInQueue.class),
-        @JsonSubTypes.Type(MsgFireCoordinates.class)
+        @JsonSubTypes.Type(MsgFireCoordinates.class),
 })
 public abstract class Message {
 }

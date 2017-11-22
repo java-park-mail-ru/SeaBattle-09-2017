@@ -10,10 +10,6 @@ public class MsgFireCoordinates extends Message {
     @NotNull
     private Cell coordinates;
 
-    public MsgFireCoordinates(@NotNull Cell coordinates) {
-        this.coordinates = coordinates;
-    }
-
     public Cell getCoordinates() {
         return coordinates;
     }

@@ -1,5 +1,6 @@
 package seabattle.game.field;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.validation.constraints.NotNull;
@@ -9,6 +10,7 @@ public final class Cell {
     private Integer rowPos;
     private Integer colPos;
 
+    @JsonCreator
     public Cell(@JsonProperty("rowPos") Integer rowPos, @JsonProperty("colPos") Integer colPos) {
         this.rowPos = rowPos;
         this.colPos = colPos;

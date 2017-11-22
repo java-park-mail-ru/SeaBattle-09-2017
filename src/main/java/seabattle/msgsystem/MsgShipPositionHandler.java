@@ -1,5 +1,6 @@
 package seabattle.msgsystem;
 
+import org.springframework.stereotype.Component;
 import seabattle.game.field.Field;
 import seabattle.game.gamesession.GameSession;
 import seabattle.game.gamesession.GameSessionService;
@@ -10,6 +11,7 @@ import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
 @SuppressWarnings("unused")
+@Component
 public class MsgShipPositionHandler extends MessageHandler<MsgShipPosition> {
 
     @NotNull

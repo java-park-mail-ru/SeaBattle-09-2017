@@ -1,5 +1,7 @@
 package seabattle.game.ship;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import seabattle.game.field.Cell;
 
@@ -12,6 +14,7 @@ public final class Ship {
     private Integer length;
     private Boolean isVertical;
 
+    @JsonCreator
     public Ship(@JsonProperty("rowPos") Integer rowPos, @JsonProperty("colPos") Integer colPos,
                 @JsonProperty("length") Integer length, @JsonProperty("isVertical") Boolean isVertical) {
         this.rowPos = rowPos;
@@ -59,6 +62,7 @@ public final class Ship {
         return cell.getColPos() < this.colPos + this.length;
     }
 
+    @JsonIgnoreProperties
     public ArrayList<Cell> getCells() {
         ArrayList<Cell> result = new ArrayList<>();
 
@@ -75,6 +79,7 @@ public final class Ship {
         return result;
     }
 
+    @JsonIgnoreProperties
     public Cell getLastCell() {
         if (isVertical) {
             return Cell.of(rowPos + length - 1, colPos);
