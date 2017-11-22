@@ -12,7 +12,7 @@ import java.util.concurrent.ThreadLocalRandom;
 @SuppressWarnings("unused")
 public  final class PlayerAI extends Player {
 
-    public PlayerAI(Field field) {
+    public PlayerAI() {
         super(generateShips());
     }
 

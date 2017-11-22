@@ -1,18 +1,18 @@
 package seabattle.game.player;
 
 import seabattle.authorization.views.UserView;
-import seabattle.game.IdGenerator;
 import seabattle.game.ship.Ship;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 @SuppressWarnings("unused")
 public class Player {
 
     @NotNull
-    private final IdGenerator idGenerator = IdGenerator.getInstance();
+    private static final AtomicLong PLAYER_ID_GENERATOR = new AtomicLong(0);
 
     @NotNull
     private Long playerId;
@@ -26,20 +26,20 @@ public class Player {
     private List<Ship> deadShips = new ArrayList<>();
 
     public Player(UserView user, List<Ship> ships) {
-        this.playerId = idGenerator.getId();
+        this.playerId = PLAYER_ID_GENERATOR.getAndIncrement();
         this.user = user;
         this.username = user.getLogin();
         this.aliveShips = ships;
     }
 
     public Player() {
-        this.playerId = idGenerator.getId();
+        this.playerId = PLAYER_ID_GENERATOR.getAndIncrement();
         this.username = "Unknown username " + playerId.toString();
         this.user = null;
     }
 
     Player(List<Ship> ships) {
-        this.playerId = idGenerator.getId();
+        this.playerId = PLAYER_ID_GENERATOR.getAndIncrement();
         this.username = "Unknown username " + playerId.toString();
         this.user = null;
         aliveShips.addAll(ships);

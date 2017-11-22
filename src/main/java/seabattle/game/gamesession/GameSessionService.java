@@ -23,6 +23,7 @@ public class GameSessionService {
     @NotNull
     private final Map<Long, GameSession> gameSessions = new HashMap<>();
 
+
     @NotNull
     private final ArrayDeque<Player> waitingPlayers = new ArrayDeque<>();
 
@@ -58,7 +59,7 @@ public class GameSessionService {
 
     public void addWaitingPlayer(@NotNull Player player) {
         waitingPlayers.add(player);
-        final MsgYouInQueue msgYouInQueue = new MsgYouInQueue(player.getPlayerId(), player.getUsername());
+        final MsgYouInQueue msgYouInQueue = new MsgYouInQueue(player.getUsername());
         try {
             webSocketService.sendMessage(player.getPlayerId(), msgYouInQueue);
         } catch (IOException ex) {
@@ -69,6 +70,7 @@ public class GameSessionService {
             createSession(waitingPlayers.pollFirst(), waitingPlayers.pollFirst());
         }
     }
+
 
     public void createSession(@NotNull Player player1, @NotNull Player player2) {
 
@@ -161,5 +163,11 @@ public class GameSessionService {
         } catch (IOException ex) {
             LOGGER.warn("Can't send message! ", ex);
         }
+    }
+
+    public void dellWaitingPlayer(Player player) {
+       if (waitingPlayers.contains(player)) {
+           waitingPlayers.remove(player);
+       }
     }
 }

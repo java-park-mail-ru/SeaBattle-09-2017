@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import seabattle.game.player.Player;
 import seabattle.msgsystem.Message;
 
 import javax.validation.constraints.NotNull;
@@ -18,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketService {
     private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketService.class);
     private Map<Long, WebSocketSession> sessions = new ConcurrentHashMap<>();
+    private Map<String, Player> players = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper;
 
 
@@ -25,16 +27,32 @@ public class WebSocketService {
         this.objectMapper = objectMapper;
     }
 
-    public void registerUser(@NotNull Long userId, @NotNull WebSocketSession webSocketSession) {
-        sessions.put(userId, webSocketSession);
+    public void registerUser(@NotNull Player player, @NotNull WebSocketSession webSocketSession) {
+        sessions.put(player.getPlayerId(), webSocketSession);
+        players.put(webSocketSession.getId(), player);
     }
 
     public boolean isConnected(@NotNull Long userId) {
         return sessions.containsKey(userId) && sessions.get(userId).isOpen();
     }
 
+
+    public boolean isConnected(@NotNull String sessionId) {
+        return players.containsKey(sessionId);
+    }
+
+    public Long getUserId(@NotNull String sessionId) {
+        return players.get(sessionId).getPlayerId();
+    }
+
+    public Player removeUser(@NotNull String sessionId) {
+        final Player player = players.remove(sessionId);
+        sessions.remove(player.getPlayerId());
+        return player;
+    }
+
     public void removeUser(@NotNull Long userId) {
-        sessions.remove(userId);
+        players.remove(sessions.remove(userId).getId());
     }
 
     public void closeSession(@NotNull Long userId, @NotNull CloseStatus closeStatus) {

@@ -45,10 +45,10 @@ public class SocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionEstablished(WebSocketSession webSocketSession) {
-        final String login = (String) webSocketSession.getAttributes().get("userLogin");
-        Player connectedPlayer = new Player();
+        final String login = (String) webSocketSession.getAttributes().get("currentUser");
+        final Player connectedPlayer = new Player();
         if (login != null) {
-            UserView userView = userService.getByLoginOrEmail(login);
+            final UserView userView = userService.getByLoginOrEmail(login);
 
             if (userView == null) {
                 try {
@@ -60,7 +60,7 @@ public class SocketHandler extends TextWebSocketHandler {
                 connectedPlayer.setUser(userView);
             }
         }
-        webSocketService.registerUser(connectedPlayer.getPlayerId(), webSocketSession);
+        webSocketService.registerUser(connectedPlayer, webSocketSession);
         gameSessionService.addWaitingPlayer(connectedPlayer);
     }
 
@@ -69,15 +69,14 @@ public class SocketHandler extends TextWebSocketHandler {
         if (!webSocketSession.isOpen()) {
             return;
         }
-        final Long userId = (Long) webSocketSession.getAttributes().get("userId");
-        if (userId == null) {
+        if (!webSocketService.isConnected(webSocketSession.getId())) {
             try {
                 webSocketSession.close();
             } catch (IOException ignore) {
                 LOGGER.warn("Can't close session");
             }
         } else {
-            handleMessage(userId, message);
+            handleMessage(webSocketService.getUserId(webSocketSession.getId()), message);
         }
     }
 
@@ -96,4 +95,8 @@ public class SocketHandler extends TextWebSocketHandler {
         }
     }
 
+    @Override
+    public void afterConnectionClosed(WebSocketSession webSocketSession, CloseStatus status) throws Exception {
+        gameSessionService.dellWaitingPlayer(webSocketService.removeUser(webSocketSession.getId()));
+    }
 }
