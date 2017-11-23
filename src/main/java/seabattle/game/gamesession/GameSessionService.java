@@ -69,6 +69,11 @@ public class GameSessionService {
         try {
             webSocketService.sendMessage(player.getPlayerId(), msgYouInQueue);
         } catch (IOException ex) {
+            try {
+                webSocketService.sendMessage(player.getPlayerId(), new MsgError("Could not get in the queue "));
+            } catch (IOException sendEx) {
+                LOGGER.warn("Unnable to send message");
+            }
             webSocketService.closeSession(player.getPlayerId(), CloseStatus.SERVER_ERROR);
         }
         Integer numberOfPlayersInSession = 2;
@@ -92,10 +97,18 @@ public class GameSessionService {
             final MsgLobbyCreated initMessage2 = new MsgLobbyCreated(player2.getUsername());
             webSocketService.sendMessage(player1.getPlayerId(), initMessage2);
         } catch (IOException ex) {
+            final String error = "Failed to create session with " + player1.getPlayerId()
+                    + " and " + player2.getPlayerId();
+            try {
+                webSocketService.sendMessage(player1.getPlayerId(), new MsgError(error));
+                webSocketService.sendMessage(player2.getPlayerId(), new MsgError(error));
+            } catch (IOException sendEx) {
+                LOGGER.warn("Unnable to send message");
+            }
             webSocketService.closeSession(player1.getPlayerId(), CloseStatus.SERVER_ERROR);
             webSocketService.closeSession(player2.getPlayerId(), CloseStatus.SERVER_ERROR);
 
-            LOGGER.warn("Failed to create session with " + player1.getPlayerId() + " and " + player2.getPlayerId(), ex);
+            LOGGER.warn(error, ex);
         }
     }
 

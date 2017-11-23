@@ -74,6 +74,8 @@ public class SocketHandler extends TextWebSocketHandler {
         }
         if (!webSocketService.isConnected(webSocketSession.getId())) {
             try {
+                webSocketSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(
+                        new MsgError("Non-in-game WebSocketSession "))));
                 webSocketSession.close();
             } catch (IOException ignore) {
                 LOGGER.warn("Can't close session");
