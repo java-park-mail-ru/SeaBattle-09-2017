@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import seabattle.game.gamesession.GameSession;
 import seabattle.game.gamesession.GameSessionService;
-import seabattle.game.gamesession.GameSessionStatus;
 import seabattle.game.messages.MsgError;
 import seabattle.game.messages.MsgFireCoordinates;
 import seabattle.websocket.WebSocketService;
@@ -46,19 +45,17 @@ public class MsgFireCoordinatesHandler extends MessageHandler<MsgFireCoordinates
     public void handle(MsgFireCoordinates cast, Long id) {
         if (gameSessionService.isPlaying(id)) {
             GameSession gameSession = gameSessionService.getGameSession(id);
-            if (gameSession.getPlayer1Id().equals(id)) {
-                if (gameSession.getStatus().equals(GameSessionStatus.MOVE_P1)
-                        || gameSession.getPlayer2Id().equals(id)) {
-                    gameSession.makeMove(cast.getCoordinates());
-                } else {
-                    try {
-                        webSocketService.sendMessage(id, new MsgError("It's not currently this player's move!"
-                        + gameSession.getStatus().toString()));
-                    } catch (IOException ex) {
+            if (gameSession.getDamagedPlayer().getPlayerId().equals(id)) {
+                gameSession.makeMove(cast.getCoordinates());
+            } else {
+                try {
+                    webSocketService.sendMessage(id, new MsgError("It's not currently this player's move!"
+                            + gameSession.getStatus().toString()));
+                } catch (IOException ex) {
                         LOGGER.warn("Unnable to send message");
-                    }
+                }
 
-                    throw new IllegalStateException("It's not currently this player's move!");
+                throw new IllegalStateException("It's not currently this player's move!");
                 }
             } else {
                 try {
@@ -68,6 +65,6 @@ public class MsgFireCoordinatesHandler extends MessageHandler<MsgFireCoordinates
                 }
                 throw new IllegalArgumentException("Player is not currently playing!");
             }
-        }
+
     }
 }
