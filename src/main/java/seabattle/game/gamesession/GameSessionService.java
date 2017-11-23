@@ -2,8 +2,11 @@ package seabattle.game.gamesession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
+import seabattle.authorization.service.UserService;
+import seabattle.authorization.views.UserView;
 import seabattle.game.field.Cell;
 import seabattle.game.field.CellStatus;
 import seabattle.game.messages.*;
@@ -29,6 +32,9 @@ public class GameSessionService {
 
     @NotNull
     private final WebSocketService webSocketService;
+
+    @Autowired
+    private UserService dbUsers;
 
     public GameSessionService(@NotNull WebSocketService webSocketService) {
         this.webSocketService = webSocketService;
@@ -125,6 +131,11 @@ public class GameSessionService {
 
     public void endSession(@NotNull GameSession gameSession) {
         try {
+            calculationScore(gameSession);
+        } catch (IllegalStateException ex) {
+            LOGGER.warn(ex.getMessage());
+        }
+        try {
             MsgEndGame endGame = createMsgEndGame(gameSession, gameSession.getPlayer1());
             webSocketService.sendMessage(gameSession.getPlayer1Id(), endGame);
 
@@ -135,13 +146,60 @@ public class GameSessionService {
         } catch (IllegalStateException ex) {
             LOGGER.warn(ex.getMessage());
         }
+        gameSessions.remove(gameSession.getPlayer1Id());
+        gameSessions.remove(gameSession.getPlayer2Id());
+    }
+
+    private void calculationScore(@NotNull GameSession gameSession) throws IllegalStateException {
+        Player winnerPlayer = gameSession.getWinner();
+        Player loserPlayer = null;
+        if (winnerPlayer.equals(gameSession.getPlayer1())) {
+            loserPlayer = gameSession.getPlayer2();
+        } else {
+            loserPlayer = gameSession.getPlayer1();
+        }
+
+        if (winnerPlayer.getUser() == null) {
+            return;
+        }
+
+        final Integer standartScoreInc = 100;
+        Integer scoreInc = null;
+        Integer newScore = null;
+
+        if (loserPlayer.getUser() == null
+                || loserPlayer.getScore() < winnerPlayer.getScore()) {
+            scoreInc = standartScoreInc;
+        } else {
+            final float lossFactor = (float) 0.1;
+            scoreInc = Math.round(loserPlayer.getScore() * lossFactor);
+            newScore = loserPlayer.getScore() - scoreInc;
+            final UserView userView = loserPlayer.getUser();
+            userView.setScore(newScore);
+            if (dbUsers.setScore(userView) != null) {
+                loserPlayer.setScore(newScore);
+            } else {
+                throw new IllegalStateException("Could not add an score! ");
+            }
+            scoreInc += standartScoreInc;
+        }
+
+        newScore = winnerPlayer.getScore() + scoreInc;
+        final UserView userView = winnerPlayer.getUser();
+        userView.setScore(newScore);
+        if (dbUsers.setScore(userView) != null) {
+            winnerPlayer.setScore(newScore);
+        } else {
+            throw new IllegalStateException("Could not add an score! ");
+        }
+
     }
 
     private MsgEndGame createMsgEndGame(@NotNull GameSession gameSession, @NotNull Player current) {
         if (current == gameSession.getWinner()) {
-            return new MsgEndGame(Boolean.TRUE);
+            return new MsgEndGame(Boolean.TRUE, current.getScore());
         }
-        return new MsgEndGame(Boolean.FALSE);
+        return new MsgEndGame(Boolean.FALSE, current.getScore());
     }
 
     public void makeMove(@NotNull GameSession gameSession, @NotNull Cell cell) {

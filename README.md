@@ -80,7 +80,7 @@ HttpStatus 400
 ##### URL
 `/api/logout`
 #### Method
-`POST`
+`GET`
 #### Response
 В случае успеха возвращается сообщение\
 HttpStatus: 200
@@ -163,6 +163,8 @@ HttpStatus: 404
 `/api/leaderboard`
 #### Method
 `GET`
+#### Params
+Integer limit
 #### Response
 В случае успеха возвращает лист пользователей до 10 человек в порядке убывания их счета\
 HttpStatus: 200

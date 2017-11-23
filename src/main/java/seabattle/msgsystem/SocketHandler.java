@@ -58,6 +58,8 @@ public class SocketHandler extends TextWebSocketHandler {
                 }
             } else {
                 connectedPlayer.setUser(userView);
+                connectedPlayer.setUsername(userView.getLogin());
+                connectedPlayer.setScore(userView.getScore());
             }
         }
         webSocketService.registerUser(connectedPlayer, webSocketSession);

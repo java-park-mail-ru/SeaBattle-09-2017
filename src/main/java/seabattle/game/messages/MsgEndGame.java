@@ -6,9 +6,19 @@ import seabattle.msgsystem.Message;
 public class MsgEndGame extends Message {
 
     private Boolean won;
+    private Integer score;
 
-    public MsgEndGame(Boolean won) {
+    public Integer getScore() {
+        return score;
+    }
+
+    public void setScore(Integer score) {
+        this.score = score;
+    }
+
+    public MsgEndGame(Boolean won, Integer score) {
         this.won = won;
+        this.score = score;
     }
 
     public Boolean getWon() {

@@ -20,6 +20,7 @@ public class Player {
     private String username;
     @NotNull
     private UserView user;
+    private Integer score = 0;
 
 
     private List<Ship> aliveShips = new ArrayList<>();
@@ -32,10 +33,26 @@ public class Player {
         this.aliveShips = ships;
     }
 
+    public Integer getScore() {
+        return score;
+    }
+
     public Player() {
         this.playerId = PLAYER_ID_GENERATOR.getAndIncrement();
         this.username = "Unknown username " + playerId.toString();
         this.user = null;
+    }
+
+    public UserView getUser() {
+        return user;
+    }
+
+    public void setScore(Integer score) {
+        this.score = score;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     Player(List<Ship> ships) {
