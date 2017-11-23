@@ -105,9 +105,11 @@ public class GameSession {
         if (player == player1) {
             this.damagedField = field2;
             this.damagedPlayer = player1;
+            this.status = GameSessionStatus.MOVE_P1;
         } else if (player == player2) {
             this.damagedField = field1;
             this.damagedPlayer = player2;
+            this.status = GameSessionStatus.MOVE_P2;
         } else {
             throw new IllegalArgumentException("Player not in current session!");
         }
