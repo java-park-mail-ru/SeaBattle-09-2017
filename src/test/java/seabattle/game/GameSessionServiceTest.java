@@ -136,9 +136,9 @@ public class GameSessionServiceTest {
         gameSessionService.makeMove(gameSession, cell);
         assertEquals(damagePlayerId, gameSession.getDamagedPlayer().getPlayerId());
         if (damagePlayerId.equals(player1.getPlayerId())) {
-            assertEquals(gameSession.getField2().getCellStatus(cell), CellStatus.ON_FIRE);
-        } else {
             assertEquals(gameSession.getField1().getCellStatus(cell), CellStatus.ON_FIRE);
+        } else {
+            assertEquals(gameSession.getField2().getCellStatus(cell), CellStatus.ON_FIRE);
         }
     }
 
@@ -156,10 +156,10 @@ public class GameSessionServiceTest {
         gameSessionService.makeMove(gameSession, cell);
         if (damagePlayerId.equals(player1.getPlayerId())) {
             assertEquals(player2.getPlayerId(), gameSession.getDamagedPlayer().getPlayerId());
-            assertEquals(gameSession.getField2().getCellStatus(cell), CellStatus.BLOCKED);
+            assertEquals(gameSession.getField1().getCellStatus(cell), CellStatus.BLOCKED);
         } else {
             assertEquals(player1.getPlayerId(), gameSession.getDamagedPlayer().getPlayerId());
-            assertEquals(gameSession.getField1().getCellStatus(cell), CellStatus.BLOCKED);
+            assertEquals(gameSession.getField2().getCellStatus(cell), CellStatus.BLOCKED);
         }
     }
 

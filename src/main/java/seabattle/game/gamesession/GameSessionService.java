@@ -130,7 +130,7 @@ public class GameSessionService {
     }
 
     private MsgGameStarted createGameStartedMessage(@NotNull Player currentPlayer, @NotNull Player damagedPlayer) {
-        if (currentPlayer != damagedPlayer) {
+        if (!currentPlayer.equals(damagedPlayer)) {
             return new MsgGameStarted(Boolean.TRUE);
         }
         return new MsgGameStarted(Boolean.FALSE);

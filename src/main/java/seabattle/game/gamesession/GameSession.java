@@ -103,10 +103,10 @@ public class GameSession {
 
     void setDamagedSide(@NotNull Player player) {
         if (player == player1) {
-            this.damagedField = field2;
+            this.damagedField = field1;
             this.damagedPlayer = player1;
         } else if (player == player2) {
-            this.damagedField = field1;
+            this.damagedField = field2;
             this.damagedPlayer = player2;
         } else {
             throw new IllegalArgumentException("Player not in current session!");
