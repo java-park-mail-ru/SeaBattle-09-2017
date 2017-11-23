@@ -8,6 +8,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import seabattle.authorization.service.UserService;
 import seabattle.authorization.views.UserView;
 import seabattle.game.gamesession.GameSessionService;
+import seabattle.game.messages.MsgError;
 import seabattle.game.player.Player;
 import seabattle.websocket.WebSocketService;
 import org.springframework.web.socket.*;
@@ -87,12 +88,23 @@ public class SocketHandler extends TextWebSocketHandler {
         try {
             message = objectMapper.readValue(text.getPayload(), Message.class);
         } catch (IOException ex) {
+            try {
+                webSocketService.sendMessage(userId, new MsgError("wrong json format at game response"));
+            } catch (IOException sendEx) {
+                LOGGER.warn("Unnable to send message");
+            }
             LOGGER.error("wrong json format at game response", ex);
             return;
         }
         try {
             messageHandlerContainer.handle(message, userId);
         } catch (HandleException e) {
+            try {
+                webSocketService.sendMessage(userId, new MsgError("Can't handle message of type "
+                        + message.getClass().getName() + "with content: " + text));
+            } catch (IOException sendEx) {
+                LOGGER.warn("Unnable to send message");
+            }
             LOGGER.error("Can't handle message of type " + message.getClass().getName() + " with content: " + text, e);
         }
     }

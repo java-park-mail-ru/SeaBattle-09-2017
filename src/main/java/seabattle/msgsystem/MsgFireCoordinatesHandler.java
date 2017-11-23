@@ -52,7 +52,8 @@ public class MsgFireCoordinatesHandler extends MessageHandler<MsgFireCoordinates
                     gameSession.makeMove(cast.getCoordinates());
                 } else {
                     try {
-                        webSocketService.sendMessage(id, new MsgError("It's not currently this player's move!"));
+                        webSocketService.sendMessage(id, new MsgError("It's not currently this player's move!"
+                        + gameSession.getStatus().toString()));
                     } catch (IOException ex) {
                         LOGGER.warn("Unnable to send message");
                     }
