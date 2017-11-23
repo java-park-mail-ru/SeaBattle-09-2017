@@ -90,7 +90,7 @@ public class GameSessionService {
             final MsgLobbyCreated initMessage1 = new MsgLobbyCreated(player2.getUsername());
             webSocketService.sendMessage(player2.getPlayerId(), initMessage1);
             final MsgLobbyCreated initMessage2 = new MsgLobbyCreated(player1.getUsername());
-            webSocketService.sendMessage(player1.getPlayerId(), initMessage1);
+            webSocketService.sendMessage(player1.getPlayerId(), initMessage2);
         } catch (IOException ex) {
             webSocketService.closeSession(player1.getPlayerId(), CloseStatus.SERVER_ERROR);
             webSocketService.closeSession(player2.getPlayerId(), CloseStatus.SERVER_ERROR);
