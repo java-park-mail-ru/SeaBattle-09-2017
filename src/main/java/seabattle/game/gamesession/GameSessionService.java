@@ -204,6 +204,14 @@ public class GameSessionService {
 
     public void makeMove(@NotNull GameSession gameSession, @NotNull Cell cell) {
         if (!gameSession.toGamePhase()) {
+            try {
+                webSocketService.sendMessage(gameSession.getPlayer1Id(),
+                        new MsgError("Not Game phase! "));
+                webSocketService.sendMessage(gameSession.getPlayer2Id(),
+                        new MsgError("Not Game phase! "));
+            } catch (IOException ex) {
+                LOGGER.warn("Can't send message! ", ex);
+            }
             return;
         }
         try {
