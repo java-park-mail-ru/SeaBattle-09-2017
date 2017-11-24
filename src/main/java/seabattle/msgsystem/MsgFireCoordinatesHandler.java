@@ -14,7 +14,7 @@ import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "SpringAutowiredFieldsWarningInspection"})
 @Component
 public class MsgFireCoordinatesHandler extends MessageHandler<MsgFireCoordinates> {
 
