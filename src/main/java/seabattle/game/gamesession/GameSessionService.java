@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-@SuppressWarnings({"unused", "WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess", "SpringAutowiredFieldsWarningInspection"})
 @Service
 public class GameSessionService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameSessionService.class);
@@ -164,11 +164,13 @@ public class GameSessionService {
         }
         gameSessions.remove(gameSession.getPlayer1Id());
         gameSessions.remove(gameSession.getPlayer2Id());
+        webSocketService.closeSession(gameSession.getPlayer1Id(), CloseStatus.NORMAL);
+        webSocketService.closeSession(gameSession.getPlayer2Id(), CloseStatus.NORMAL);
     }
 
     private void calculationScore(@NotNull GameSession gameSession) throws IllegalStateException {
         Player winnerPlayer = gameSession.getWinner();
-        Player loserPlayer = null;
+        Player loserPlayer;
         if (winnerPlayer.equals(gameSession.getPlayer1())) {
             loserPlayer = gameSession.getPlayer2();
         } else {
@@ -180,8 +182,8 @@ public class GameSessionService {
         }
 
         final Integer standartScoreInc = 100;
-        Integer scoreInc = null;
-        Integer newScore = null;
+        Integer scoreInc;
+        Integer newScore;
 
         if (loserPlayer.getUser() == null
                 || loserPlayer.getScore() < winnerPlayer.getScore()) {
