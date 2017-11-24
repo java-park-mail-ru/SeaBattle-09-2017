@@ -124,6 +124,7 @@ public class GameSessionService {
             webSocketService.sendMessage(gameSession.getPlayer1Id(), gameStarted1);
             MsgGameStarted gameStarted2 = createGameStartedMessage(gameSession.getPlayer2(), damagedPlayer);
             webSocketService.sendMessage(gameSession.getPlayer2Id(), gameStarted2);
+            gameSession.toGamePhase();
         } catch (IOException ex) {
             LOGGER.warn("Can't start game! " + ex);
         }
@@ -216,7 +217,7 @@ public class GameSessionService {
     }
 
     public void makeMove(@NotNull GameSession gameSession, @NotNull Cell cell) {
-        if (!gameSession.toGamePhase()) {
+        if (gameSession.toGamePhase()) {
             try {
                 webSocketService.sendMessage(gameSession.getPlayer1Id(),
                         new MsgError("Not Game phase! "));
@@ -234,7 +235,12 @@ public class GameSessionService {
                     || gameSession.getStatus().equals(GameSessionStatus.WIN_P2))) {
                 endSession(gameSession);
             }
-            MsgResultMove msgResultMove = new MsgResultMove(cell, cellStatus);
+            MsgResultMove msgResultMove;
+            if (gameSession.getStatus().equals(GameSessionStatus.MOVE_P1)) {
+                msgResultMove = new MsgResultMove(cell, cellStatus, gameSession.getPlayer1().getUsername());
+            } else {
+                msgResultMove = new MsgResultMove(cell, cellStatus, gameSession.getPlayer2().getUsername());
+            }
             webSocketService.sendMessage(gameSession.getPlayer1Id(), msgResultMove);
             webSocketService.sendMessage(gameSession.getPlayer2Id(), msgResultMove);
         } catch (IllegalStateException ex) {

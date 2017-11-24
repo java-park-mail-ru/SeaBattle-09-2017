@@ -45,18 +45,9 @@ public class MsgFireCoordinatesHandler extends MessageHandler<MsgFireCoordinates
     public void handle(MsgFireCoordinates cast, Long id) {
         if (gameSessionService.isPlaying(id)) {
             GameSession gameSession = gameSessionService.getGameSession(id);
-            if (!gameSession.toGamePhase()) {
-                try {
-                    webSocketService.sendMessage(id, new MsgError("The player does not play yet! "));
-                } catch (IOException ex) {
-                    LOGGER.warn("Unnable to send message");
-                }
-
-                throw new IllegalStateException("It's not currently this player's move!");
-            }
             if (!gameSession.getDamagedPlayer().getPlayerId().equals(id)
                     && (gameSession.getPlayer1Id().equals(id) || gameSession.getPlayer2Id().equals(id))) {
-                gameSession.makeMove(cast.getCoordinates());
+                gameSessionService.makeMove(gameSession, cast.getCoordinates());
             } else {
                 try {
                     webSocketService.sendMessage(id, new MsgError("It's not currently this player's move! "));

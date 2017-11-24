@@ -8,10 +8,20 @@ import seabattle.msgsystem.Message;
 public class MsgResultMove extends Message {
     private Cell cell;
     private CellStatus cellStatus;
+    private String playerMove;
 
-    public MsgResultMove(Cell cell, CellStatus cellStatus) {
+    public MsgResultMove(Cell cell, CellStatus cellStatus, String playerMove) {
         this.cell = cell;
         this.cellStatus = cellStatus;
+        this.playerMove = playerMove;
+    }
+
+    public String getPlayerMove() {
+        return playerMove;
+    }
+
+    public void setPlayerMove(String playerMove) {
+        this.playerMove = playerMove;
     }
 
     public Cell getCell() {
