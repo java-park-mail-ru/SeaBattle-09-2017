@@ -10,13 +10,20 @@ import java.util.List;
 public final class Field {
 
     private final Integer fieldSize = 10;
-    private List<List<CellStatus>> cells = new ArrayList<>(Collections.nCopies(fieldSize,
-            new ArrayList<>(Collections.nCopies(fieldSize, CellStatus.FREE))));
+    private List<List<CellStatus>> cells = new ArrayList<>();
 
     public Field() {
+        for (int i = 0; i < fieldSize; i++) {
+            List<CellStatus> line = new ArrayList<>(Collections.nCopies(fieldSize, CellStatus.FREE));
+            cells.add(line);
+        }
     }
 
     public Field(List<Ship> ships) {
+        for (int i = 0; i < fieldSize; i++) {
+            List<CellStatus> line = new ArrayList<>(Collections.nCopies(fieldSize, CellStatus.FREE));
+            cells.add(line);
+        }
         ships.forEach(ship -> ship.getCells().forEach(cell -> setCellStatus(cell, CellStatus.OCCUPIED)));
     }
 

@@ -11,6 +11,8 @@ import seabattle.game.field.Cell;
 import seabattle.game.field.CellStatus;
 import seabattle.game.messages.*;
 import seabattle.game.player.Player;
+import seabattle.game.ship.Ship;
+import seabattle.msgsystem.Message;
 import seabattle.websocket.WebSocketService;
 
 import javax.validation.constraints.NotNull;
@@ -235,18 +237,43 @@ public class GameSessionService {
                     || gameSession.getStatus().equals(GameSessionStatus.WIN_P2))) {
                 endSession(gameSession);
             }
-            MsgResultMove msgResultMove;
-            if (gameSession.getStatus().equals(GameSessionStatus.MOVE_P1)) {
-                msgResultMove = new MsgResultMove(cell, cellStatus, gameSession.getPlayer1().getUsername());
+            Message resultMove = null;
+            if (cellStatus == CellStatus.DESTRUCTED) {
+                for (Ship ship: gameSession.getDamagedPlayer().getDeadShips()) {
+                    if (ship.inShip(cell)) {
+                        resultMove = new MsgShipIsDestroyed(ship, gameSession.getDamagedPlayer().getUsername());
+                    }
+                }
             } else {
-                msgResultMove = new MsgResultMove(cell, cellStatus, gameSession.getPlayer2().getUsername());
+                if (gameSession.getStatus().equals(GameSessionStatus.MOVE_P1)) {
+                    resultMove = new MsgResultMove(cell, cellStatus, gameSession.getPlayer1().getUsername());
+                } else {
+                    resultMove = new MsgResultMove(cell, cellStatus, gameSession.getPlayer2().getUsername());
+                }
             }
-            webSocketService.sendMessage(gameSession.getPlayer1Id(), msgResultMove);
-            webSocketService.sendMessage(gameSession.getPlayer2Id(), msgResultMove);
-        } catch (IllegalStateException ex) {
+            try {
+                webSocketService.sendMessage(gameSession.getPlayer1Id(), resultMove);
+                webSocketService.sendMessage(gameSession.getPlayer2Id(), resultMove);
+            } catch (IOException ex) {
+                LOGGER.warn("Can't send message! ", ex);
+            }
+
+        } catch (IllegalArgumentException ex) {
+            if (gameSession.getStatus().equals(GameSessionStatus.MOVE_P1)) {
+                try {
+                    webSocketService.sendMessage(gameSession.getPlayer1Id(), new MsgError("unacceptable move "));
+                } catch (IOException sendEx) {
+                    LOGGER.warn("Can't send message! ", ex);
+                }
+
+            } else {
+                try {
+                    webSocketService.sendMessage(gameSession.getPlayer2Id(), new MsgError("unacceptable move "));
+                } catch (IOException sendEx) {
+                    LOGGER.warn("Can't send message! ", ex);
+                }
+            }
             LOGGER.warn(ex.getMessage());
-        } catch (IOException ex) {
-            LOGGER.warn("Can't send message! ", ex);
         }
     }
 

@@ -53,7 +53,7 @@ public class GameSession {
     }
 
     @NotNull
-    Player getPlayer1() {
+    public Player getPlayer1() {
         return player1;
     }
 
@@ -67,7 +67,7 @@ public class GameSession {
     }
 
     @NotNull
-    Player getPlayer2() {
+    public Player getPlayer2() {
         return player2;
     }
 
@@ -183,4 +183,5 @@ public class GameSession {
                 throw new IllegalStateException("Illegal state!");
         }
     }
+
 }

@@ -62,7 +62,7 @@ public final class Ship {
         return cell.getColPos() < this.colPos + this.length;
     }
 
-    @JsonIgnoreProperties
+
     public ArrayList<Cell> getCells() {
         ArrayList<Cell> result = new ArrayList<>();
 
