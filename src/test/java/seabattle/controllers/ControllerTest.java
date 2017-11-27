@@ -17,7 +17,6 @@ import seabattle.authorization.views.AuthorisationView;
 import seabattle.authorization.views.UserView;
 
 
-
 import java.util.List;
 
 import static org.junit.Assert.*;

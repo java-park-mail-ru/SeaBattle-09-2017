@@ -163,7 +163,6 @@ HttpStatus: 404
 `/api/leaderboard`
 #### Method
 `GET`
-
 #### Params
 Integer limit
 #### Response
