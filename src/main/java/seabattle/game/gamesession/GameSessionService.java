@@ -169,8 +169,8 @@ public class GameSessionService {
     }
 
     private void calculationScore(@NotNull GameSession gameSession) throws IllegalStateException {
-        Player winnerPlayer = gameSession.getWinner();
-        Player loserPlayer;
+        final Player winnerPlayer = gameSession.getWinner();
+        final Player loserPlayer;
         if (winnerPlayer.equals(gameSession.getPlayer1())) {
             loserPlayer = gameSession.getPlayer2();
         } else {

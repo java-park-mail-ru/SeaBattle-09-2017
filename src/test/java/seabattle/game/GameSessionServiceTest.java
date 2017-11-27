@@ -1,5 +1,6 @@
 package seabattle.game;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,24 +12,22 @@ import seabattle.game.field.CellStatus;
 import seabattle.game.field.Field;
 import seabattle.game.gamesession.GameSession;
 import seabattle.game.gamesession.GameSessionService;
-import seabattle.game.messages.MsgGameStarted;
-import seabattle.game.messages.MsgLobbyCreated;
-import seabattle.game.messages.MsgResultMove;
+import seabattle.game.messages.*;
 import seabattle.game.player.Player;
 import seabattle.game.player.PlayerAI;
 import seabattle.game.ship.Ship;
+import seabattle.msgsystem.Message;
 import seabattle.websocket.WebSocketService;
 
 import java.io.IOException;
+import java.security.acl.LastOwnerException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RunWith(SpringRunner.class)
@@ -42,26 +41,11 @@ public class GameSessionServiceTest {
     private WebSocketService webSocketService;
 
     private void createGameSession(Player player1, Player player2) {
-        try {
-            doNothing().when(webSocketService).sendMessage(eq(player1.getPlayerId()), any(MsgLobbyCreated.class));
-            doNothing().when(webSocketService).sendMessage(eq(player2.getPlayerId()), any(MsgLobbyCreated.class));
-        } catch (IOException ignore) {
-
-        }
         gameSessionService.createSession(player1, player2);
-
-
     }
 
     private void tryStartGame(GameSession gameSession, Player player1, Player player2) {
-        try {
-            doNothing().when(webSocketService).sendMessage(eq(player1.getPlayerId()), any(MsgGameStarted.class));
-            doNothing().when(webSocketService).sendMessage(eq(player2.getPlayerId()), any(MsgGameStarted.class));
-        } catch (IOException ignore) {
-
-        }
         gameSessionService.tryStartGame(gameSession);
-
     }
 
     private List<Ship> tetsShips () {
@@ -74,7 +58,7 @@ public class GameSessionServiceTest {
         testShips.add(new Ship(8, 7, 2, true));
         testShips.add(new Ship(5, 6, 1, false));
         testShips.add(new Ship(8, 3, 1, false));
-        testShips.add(new Ship(8, 6, 1, false));
+        testShips.add(new Ship(8, 5, 1, false));
         testShips.add(new Ship(9, 0, 1, false));
         return testShips;
     }
@@ -85,8 +69,10 @@ public class GameSessionServiceTest {
         Player player2 = new Player();
         createGameSession(player1, player2);
         try {
-            verify(webSocketService).sendMessage(eq(player2.getPlayerId()), any(MsgLobbyCreated.class));
-            verify(webSocketService).sendMessage(eq(player1.getPlayerId()), any(MsgLobbyCreated.class));
+            verify(webSocketService).sendMessage(eq(player2.getPlayerId()),
+                    eq(new MsgLobbyCreated(player1.getUsername())));
+            verify(webSocketService).sendMessage(eq(player1.getPlayerId()),
+                    eq(new MsgLobbyCreated(player2.getUsername())));
         } catch (IOException ignore) {
         }
     }
@@ -98,8 +84,10 @@ public class GameSessionServiceTest {
         createGameSession(player1, player2);
         tryStartGame(gameSessionService.getGameSession(player1.getPlayerId()), player1, player2);
         try {
-            verify(webSocketService, never()).sendMessage(eq(player1.getPlayerId()), any(MsgGameStarted.class));
-            verify(webSocketService, never()).sendMessage(eq(player2.getPlayerId()), any(MsgGameStarted.class));
+            verify(webSocketService, never()).sendMessage(eq(player1.getPlayerId()),
+                    any(MsgGameStarted.class));
+            verify(webSocketService, never()).sendMessage(eq(player2.getPlayerId()),
+                    any(MsgGameStarted.class));
         } catch (IOException ignore) {
         }
         assertNull(gameSessionService.getGameSession(player1.getPlayerId()).getDamagedPlayer());
@@ -114,55 +102,195 @@ public class GameSessionServiceTest {
         gameSession.setField1(new Field(tetsShips()));
         gameSession.setField2(new Field(tetsShips()));
         tryStartGame(gameSession, player1, player2);
+        final Long damagedPlayerId = gameSession.getDamagedPlayer().getPlayerId();
+        final Long attackingPlayerId;
+        if (damagedPlayerId.equals(player1.getPlayerId())) {
+            attackingPlayerId = player2.getPlayerId();
+        } else {
+            attackingPlayerId = player1.getPlayerId();
+        }
         try {
-            verify(webSocketService).sendMessage(eq(player1.getPlayerId()), any(MsgGameStarted.class));
-            verify(webSocketService).sendMessage(eq(player2.getPlayerId()), any(MsgGameStarted.class));
+            verify(webSocketService).sendMessage(eq(damagedPlayerId),
+                    eq(new MsgGameStarted(false)));
+            verify(webSocketService).sendMessage(eq(attackingPlayerId),
+                    eq(new MsgGameStarted(true)));
         } catch (IOException ignore) {
         }
         assertNotNull(gameSession.getDamagedPlayer());
     }
 
-    @Test
-    public void makeSuccessMove (){
+
+    private GameSession makeMoveInit() {
         Player player1 = new Player();
         Player player2 = new Player();
+        player1.setShips(tetsShips());
+        player2.setShips(tetsShips());
         createGameSession(player1, player2);
         GameSession gameSession = gameSessionService.getGameSession(player1.getPlayerId());
         gameSession.setField1(new Field(tetsShips()));
         gameSession.setField2(new Field(tetsShips()));
         tryStartGame(gameSession, player1, player2);
+        return gameSession;
+    }
+
+    @Test
+    public void makeSuccessMove (){
         Cell cell = new Cell(0,6);
-        final Long damagePlayerId = gameSession.getDamagedPlayer().getPlayerId();
+        GameSession gameSession = makeMoveInit();
+        final Long damagedPlayerId = gameSession.getDamagedPlayer().getPlayerId();
+        final String futureAttacPlayerNick;
         gameSessionService.makeMove(gameSession, cell);
-        assertEquals(damagePlayerId, gameSession.getDamagedPlayer().getPlayerId());
-        if (damagePlayerId.equals(player1.getPlayerId())) {
+        assertEquals(damagedPlayerId, gameSession.getDamagedPlayer().getPlayerId());
+        if (damagedPlayerId.equals(gameSession.getPlayer1Id())) {
             assertEquals(gameSession.getField1().getCellStatus(cell), CellStatus.ON_FIRE);
+            assertEquals(gameSession.getDamagedPlayer().getPlayerId(), gameSession.getPlayer1Id());
+            futureAttacPlayerNick = gameSession.getPlayer2().getUsername();
         } else {
             assertEquals(gameSession.getField2().getCellStatus(cell), CellStatus.ON_FIRE);
+            assertEquals(gameSession.getDamagedPlayer().getPlayerId(), gameSession.getPlayer2Id());
+            futureAttacPlayerNick = gameSession.getPlayer1().getUsername();
+        }
+        try {
+            verify(webSocketService).sendMessage(eq(gameSession.getPlayer1Id()),
+                    eq(new MsgResultMove(cell, CellStatus.ON_FIRE, futureAttacPlayerNick)));
+            verify(webSocketService).sendMessage(eq(gameSession.getPlayer2Id()),
+                    eq(new MsgResultMove(cell, CellStatus.ON_FIRE, futureAttacPlayerNick)));
+        } catch (IOException ignore) {
         }
     }
 
     @Test
     public void makeUnsuccessMove() {
-        Player player1 = new Player();
-        Player player2 = new Player();
-        createGameSession(player1, player2);
-        GameSession gameSession = gameSessionService.getGameSession(player1.getPlayerId());
-        gameSession.setField1(new Field(tetsShips()));
-        gameSession.setField2(new Field(tetsShips()));
-        tryStartGame(gameSession, player1, player2);
         Cell cell = new Cell(2,5);
+        GameSession gameSession = makeMoveInit();
         final Long damagePlayerId = gameSession.getDamagedPlayer().getPlayerId();
+        final String attacPlayerNick = gameSession.getDamagedPlayer().getUsername();
         gameSessionService.makeMove(gameSession, cell);
-        if (damagePlayerId.equals(player1.getPlayerId())) {
-            assertEquals(player2.getPlayerId(), gameSession.getDamagedPlayer().getPlayerId());
+        if (damagePlayerId.equals(gameSession.getPlayer1Id())) {
+            assertEquals(gameSession.getPlayer2Id(), gameSession.getDamagedPlayer().getPlayerId());
             assertEquals(gameSession.getField1().getCellStatus(cell), CellStatus.BLOCKED);
         } else {
-            assertEquals(player1.getPlayerId(), gameSession.getDamagedPlayer().getPlayerId());
+            assertEquals(gameSession.getPlayer1Id(), gameSession.getDamagedPlayer().getPlayerId());
             assertEquals(gameSession.getField2().getCellStatus(cell), CellStatus.BLOCKED);
+        }
+        try {
+            verify(webSocketService).sendMessage(eq(gameSession.getPlayer1Id()),
+                    eq(new MsgResultMove(cell, CellStatus.BLOCKED, attacPlayerNick)));
+            verify(webSocketService).sendMessage(eq(gameSession.getPlayer2Id()),
+                    eq(new MsgResultMove(cell, CellStatus.BLOCKED, attacPlayerNick)));
+        } catch (IOException ignore) {
         }
     }
 
+
+    @Test
+    public void makeFireInOnFireCell () {
+        GameSession gameSession = makeMoveInit();
+        Cell cell = new Cell(0,6);
+        gameSessionService.makeMove(gameSession, cell);
+        final Long damagePlayerId = gameSession.getDamagedPlayer().getPlayerId();
+        gameSessionService.makeMove(gameSession, cell);
+        if (damagePlayerId.equals(gameSession.getPlayer1Id())) {
+            assertEquals(gameSession.getField1().getCellStatus(cell), CellStatus.ON_FIRE);
+            try {
+                verify(webSocketService).sendMessage(eq(gameSession.getPlayer2Id()),
+                        eq(new MsgError("unacceptable move ")));
+            } catch (IOException ignore) {
+            }
+        } else {
+            assertEquals(gameSession.getField2().getCellStatus(cell), CellStatus.ON_FIRE);
+            try {
+                verify(webSocketService).sendMessage(eq(gameSession.getPlayer1Id()),
+                        eq(new MsgError("unacceptable move ")));
+            } catch (IOException ignore) {
+            }
+        }
+    }
+
+    @Test
+    public void makeFireInBlockedCell () {
+        GameSession gameSession = makeMoveInit();
+        Cell cell = new Cell(2,5);
+        final Long damagePlayerId = gameSession.getDamagedPlayer().getPlayerId();
+        gameSessionService.makeMove(gameSession, cell);
+        gameSessionService.makeMove(gameSession, cell);
+        gameSessionService.makeMove(gameSession, cell);
+        if (damagePlayerId.equals(gameSession.getPlayer1Id())) {
+            assertEquals(gameSession.getField1().getCellStatus(cell), CellStatus.BLOCKED);
+            try {
+                verify(webSocketService).sendMessage(eq(gameSession.getPlayer2Id()),
+                        eq(new MsgError("unacceptable move ")));
+            } catch (IOException ignore) {
+            }
+        } else {
+            assertEquals(gameSession.getField2().getCellStatus(cell), CellStatus.BLOCKED);
+            try {
+                verify(webSocketService).sendMessage(eq(gameSession.getPlayer1Id()),
+                        eq(new MsgError("unacceptable move ")));
+            } catch (IOException ignore) {
+            }
+        }
+    }
+
+
+    @Test
+    public void shipWasDestroyed () {
+        final GameSession gameSession = makeMoveInit();
+        gameSessionService.makeMove(gameSession, new Cell(4,1));
+        gameSessionService.makeMove(gameSession, new Cell(5,1));
+        gameSessionService.makeMove(gameSession, new Cell(6,1));
+        assertFalse(gameSession.getDamagedPlayer().getDeadShips().isEmpty());
+        final Player damagedPlayer = gameSession.getDamagedPlayer();
+        final Field damagedField;
+        if (damagedPlayer.equals(gameSession.getPlayer1())) {
+            damagedField = gameSession.getField1();
+        } else {
+            damagedField = gameSession.getField2();
+        }
+        for (int i = damagedPlayer.getDeadShips().get(0).getRowPos() - 1;
+             i <= damagedPlayer.getDeadShips().get(0).getRowPos() + 1; i++) {
+            for (int j = damagedPlayer.getDeadShips().get(0).getColPos() - 1;
+                 j <= damagedPlayer.getDeadShips().get(0).getColPos() + 1; j++) {
+                final Cell cell = new Cell(i, j);
+                if (!damagedPlayer.getDeadShips().get(0).getCells().contains(cell)) {
+                    assertEquals(damagedField.getCellStatus(cell), CellStatus.BLOCKED);
+                } else {
+                    assertEquals(damagedField.getCellStatus(cell), CellStatus.DESTRUCTED);
+                }
+            }
+        }
+
+        final Ship destroyShip = new Ship(4, 1, 3, true);
+        try {
+            verify(webSocketService).sendMessage(eq(gameSession.getPlayer1Id()),
+                    eq(new MsgShipIsDestroyed(destroyShip, damagedPlayer.getUsername())));
+            verify(webSocketService).sendMessage(eq(gameSession.getPlayer2Id()),
+                    eq(new MsgShipIsDestroyed(destroyShip, damagedPlayer.getUsername())));
+        } catch (IOException ignore) {
+        }
+
+    }
+
+    @Test
+    public void endGame() {
+        final GameSession gameSession = makeMoveInit();
+        final List<Ship> testShips = tetsShips();
+        for (Ship ship: testShips ) {
+            for (Cell cell: ship.getCells()) {
+                gameSessionService.makeMove(gameSession, cell);
+            }
+        }
+        assertTrue(gameSession.getDamagedPlayer().getAliveShips().isEmpty());
+        try {
+            verify(webSocketService).sendMessage(eq(gameSession.getWinner().getPlayerId()),
+                    eq(new MsgEndGame(true, 0)));
+            verify(webSocketService).sendMessage(eq(gameSession.getDamagedPlayer().getPlayerId()),
+                    eq(new MsgEndGame(false, 0)));
+        } catch (IOException ignore) {
+        }
+
+
+    }
 
 
 
@@ -170,3 +298,4 @@ public class GameSessionServiceTest {
 
 
 }
+

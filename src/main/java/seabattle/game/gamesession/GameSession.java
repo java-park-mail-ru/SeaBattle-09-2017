@@ -84,7 +84,7 @@ public class GameSession {
         return field1 != null && field2 != null;
     }
 
-    Player getWinner() {
+    public Player getWinner() {
         if (status == GameSessionStatus.WIN_P1) {
             return player1;
         } else if (status == GameSessionStatus.WIN_P2) {

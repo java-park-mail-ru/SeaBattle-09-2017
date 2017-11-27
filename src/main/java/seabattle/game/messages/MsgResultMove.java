@@ -39,4 +39,55 @@ public class MsgResultMove extends Message {
     public void setCellStatus(CellStatus cellStatus) {
         this.cellStatus = cellStatus;
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
+
+        MsgResultMove that = (MsgResultMove) object;
+
+        if (cell != null) {
+            if (!cell.equals(that.cell)) {
+                return false;
+            }
+        } else {
+            if (that.cell != null) {
+                return false;
+            }
+        }
+        if (cellStatus != that.cellStatus) {
+            return false;
+        }
+        if (playerMove != null) {
+            return playerMove.equals(that.playerMove);
+        } else {
+            return that.playerMove == null;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 0;
+        final int sizeInt = 31;
+        if (cell != null) {
+            result = cell.hashCode();
+        }
+        if (cellStatus != null) {
+            result = sizeInt * result + cellStatus.hashCode();
+        } else {
+            result = sizeInt * result;
+        }
+        if (playerMove != null) {
+            result = sizeInt * result + playerMove.hashCode();
+        } else {
+            result = sizeInt * result;
+        }
+
+        return result;
+    }
 }
