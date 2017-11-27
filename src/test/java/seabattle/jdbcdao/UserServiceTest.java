@@ -13,6 +13,7 @@ import seabattle.authorization.service.UserService;
 import seabattle.authorization.views.UserView;
 
 
+
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -93,6 +94,7 @@ public class UserServiceTest {
     public void getLeaderboard(){
         final Integer limit = 11;
         final List<UserView> returnedUserList = userService.getLeaderboard(limit);
+
         int i = returnedUserList.size();
         for (UserView userView: returnedUserList) {
             assertSame(userView.getScore(),--i);
@@ -107,4 +109,5 @@ public class UserServiceTest {
         final UserView changeUser = userService.getByLoginOrEmail(testUser.getLogin());
         assertEquals(changeUser, testUser);
     }
+
 }
