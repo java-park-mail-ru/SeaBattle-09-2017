@@ -14,7 +14,8 @@ import seabattle.game.messages.*;
         @JsonSubTypes.Type(MsgYouInQueue.class),
         @JsonSubTypes.Type(MsgFireCoordinates.class),
         @JsonSubTypes.Type(MsgError.class),
-        @JsonSubTypes.Type(MsgShipIsDestroyed.class)
+        @JsonSubTypes.Type(MsgShipIsDestroyed.class),
+        @JsonSubTypes.Type(MsgPing.class)
 })
 public abstract class Message {
 }
