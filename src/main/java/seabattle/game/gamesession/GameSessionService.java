@@ -284,4 +284,12 @@ public class GameSessionService {
            waitingPlayers.remove(player);
        }
     }
+
+    public void sendPingMessage(@NotNull Long playerId) {
+        try {
+            webSocketService.sendMessage(playerId, new MsgPing());
+        } catch (IOException ex) {
+            LOGGER.warn("Can't send message! ", ex);
+        }
+    }
 }
