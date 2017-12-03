@@ -1,5 +1,6 @@
 package seabattle.msgsystem;
 
+import org.springframework.stereotype.Component;
 import seabattle.game.gamesession.GameSessionService;
 import seabattle.game.messages.MsgPing;
 
@@ -7,6 +8,7 @@ import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 
 @SuppressWarnings("unused")
+@Component
 public class MsgPingHandler extends MessageHandler<MsgPing> {
 
     @NotNull

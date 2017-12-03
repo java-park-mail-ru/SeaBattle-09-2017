@@ -103,7 +103,7 @@ public class SocketHandler extends TextWebSocketHandler {
         } catch (HandleException e) {
             try {
                 webSocketService.sendMessage(userId, new MsgError("Can't handle message of type "
-                        + message.getClass().getName() + "with content: " + text));
+                        + message.getClass().getName() + " with content: " + text));
             } catch (IOException sendEx) {
                 LOGGER.warn("Unnable to send message");
             }
