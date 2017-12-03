@@ -31,10 +31,6 @@ public class MsgPingHandler extends MessageHandler<MsgPing> {
 
     @Override
     public void handle(MsgPing cast, Long id) {
-        if (!gameSessionService.isPlaying(id)) {
-            throw new IllegalArgumentException("Player is not currently playing!");
-        } else {
-            gameSessionService.sendPingMessage(id);
-        }
+        gameSessionService.sendPingMessage(id);
     }
 }
