@@ -9,26 +9,26 @@ import java.util.List;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public final class Field {
 
-    private final Integer fieldSize = 10;
+    private static final Integer FIELD_SIZE = 10;
     private List<List<CellStatus>> cells = new ArrayList<>();
 
     public Field() {
-        for (int i = 0; i < fieldSize; i++) {
-            List<CellStatus> line = new ArrayList<>(Collections.nCopies(fieldSize, CellStatus.FREE));
+        for (int i = 0; i < FIELD_SIZE; i++) {
+            List<CellStatus> line = new ArrayList<>(Collections.nCopies(FIELD_SIZE, CellStatus.FREE));
             cells.add(line);
         }
     }
 
     public Field(List<Ship> ships) {
-        for (int i = 0; i < fieldSize; i++) {
-            List<CellStatus> line = new ArrayList<>(Collections.nCopies(fieldSize, CellStatus.FREE));
+        for (int i = 0; i < FIELD_SIZE; i++) {
+            List<CellStatus> line = new ArrayList<>(Collections.nCopies(FIELD_SIZE, CellStatus.FREE));
             cells.add(line);
         }
         ships.forEach(ship -> ship.getCells().forEach(cell -> setCellStatus(cell, CellStatus.OCCUPIED)));
     }
 
     public Integer getFieldSize() {
-        return fieldSize;
+        return FIELD_SIZE;
     }
 
     public CellStatus getCellStatus(Cell cell) {
@@ -94,8 +94,8 @@ public final class Field {
     }
 
     public Boolean cellOutOfBounds(Cell cell) {
-        final Boolean checkRow = (cell.getRowPos() < 0) || (cell.getRowPos() >= fieldSize);
-        final Boolean checkCol = (cell.getColPos() < 0) || (cell.getColPos() >= fieldSize);
+        final Boolean checkRow = (cell.getRowPos() < 0) || (cell.getRowPos() >= FIELD_SIZE);
+        final Boolean checkCol = (cell.getColPos() < 0) || (cell.getColPos() >= FIELD_SIZE);
         return checkCol || checkRow;
     }
 }
