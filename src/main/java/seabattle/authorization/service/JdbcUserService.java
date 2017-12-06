@@ -3,6 +3,7 @@ package seabattle.authorization.service;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
+import seabattle.authorization.views.LeaderboardView;
 import seabattle.authorization.views.UserView;
 
 import java.util.List;
@@ -18,9 +19,12 @@ public class JdbcUserService implements UserService {
                     resultSet.getString("password"),
                     resultSet.getInt("score"));
 
-    private static final RowMapper<UserView> READ_USER_LOGIN_SCORE_MAPPER = (resultSet, rowNumber) ->
-            new UserView(null, resultSet.getString("login"),
-                    null, resultSet.getInt("score"));
+    private static final RowMapper<LeaderboardView> READ_USER_LOGIN_SCORE_MAPPER = (resultSet, rowNumber) ->
+            new LeaderboardView(null, resultSet.getString("login"),
+                    resultSet.getInt("score"));
+
+    private static final RowMapper<Integer> READ_POSITION_MAPPER = (resultSet, rowNumber) ->
+            resultSet.getInt("position");
 
     private JdbcTemplate template;
 
@@ -50,7 +54,7 @@ public class JdbcUserService implements UserService {
     }
 
     @Override
-    public List<UserView> getLeaderboard(Integer limit) {
+    public List<LeaderboardView> getLeaderboard(Integer limit) {
         String sql = "SELECT login, score FROM users ORDER BY score DESC LIMIT ?";
         return template.query(sql, ps -> ps.setInt(1, limit), READ_USER_LOGIN_SCORE_MAPPER);
     }
@@ -62,5 +66,12 @@ public class JdbcUserService implements UserService {
             return user;
         }
         return null;
+    }
+
+    @Override
+    public Integer getPosition(Integer score) {
+        String sql = "SELECT count(*) as position FROM users WHERE score < ?";
+        return template.query(sql, ps -> ps.setInt(1, score),
+                READ_POSITION_MAPPER).get(0) + 1;
     }
 }

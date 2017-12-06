@@ -10,6 +10,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import seabattle.authorization.service.UserService;
+import seabattle.authorization.views.LeaderboardView;
 import seabattle.authorization.views.UserView;
 
 
@@ -92,10 +93,10 @@ public class UserServiceTest {
     @Test
     public void getLeaderboard(){
         final Integer limit = 11;
-        final List<UserView> returnedUserList = userService.getLeaderboard(limit);
+        final List<LeaderboardView> returnedUserList = userService.getLeaderboard(limit);
         int i = returnedUserList.size();
-        for (UserView userView: returnedUserList) {
-            assertSame(userView.getScore(),--i);
+        for (LeaderboardView leaderboardView: returnedUserList) {
+            assertSame(leaderboardView.getScore(),--i);
         }
     }
 

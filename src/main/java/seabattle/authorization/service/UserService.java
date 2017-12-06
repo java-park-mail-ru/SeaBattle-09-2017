@@ -1,5 +1,6 @@
 package seabattle.authorization.service;
 
+import seabattle.authorization.views.LeaderboardView;
 import seabattle.authorization.views.UserView;
 
 import java.util.List;
@@ -12,7 +13,9 @@ public interface UserService {
     
     UserView changeUser(UserView user);
 
-    List<UserView> getLeaderboard(Integer limit);
+    List<LeaderboardView> getLeaderboard(Integer limit);
 
     UserView setScore(UserView user);
+
+    Integer getPosition(Integer score);
 }

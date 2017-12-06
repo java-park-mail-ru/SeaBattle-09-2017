@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import seabattle.authorization.service.UserService;
 import seabattle.authorization.views.AuthorisationView;
+import seabattle.authorization.views.LeaderboardView;
 import seabattle.authorization.views.ResponseView;
 import seabattle.authorization.views.UserView;
 import org.springframework.http.HttpStatus;
@@ -117,9 +118,31 @@ public class Controller {
 
     @RequestMapping(method = RequestMethod.GET, path = "leaderboard",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<UserView>> getLeaderboard(
-            @Valid @RequestParam(value = "limit", required = false, defaultValue = "10") Integer limit) {
-        List<UserView> leaders = dbUsers.getLeaderboard(limit);
+    public ResponseEntity<List<LeaderboardView>> getLeaderboard(
+            @Valid @RequestParam(value = "limit", required = false, defaultValue = "10") Integer limit,
+            HttpSession httpSession) {
+        List<LeaderboardView> leaders = dbUsers.getLeaderboard(limit);
+        final String currentUser = (String) httpSession.getAttribute(CURRENT_USER_KEY);
+        int iter = 1;
+        boolean isLeaderUser = false;
+        for (LeaderboardView leaderboardView: leaders) {
+            leaderboardView.setPosition(iter);
+            iter++;
+            if (leaderboardView.getLogin().equals(currentUser)) {
+                isLeaderUser = true;
+            }
+        }
+
+        if (currentUser == null || isLeaderUser) {
+            return ResponseEntity.status(HttpStatus.OK).body(leaders);
+        } else {
+            final UserView currentUserView = dbUsers.getByLoginOrEmail(currentUser);
+            if (currentUserView != null) {
+                leaders.add(new LeaderboardView(dbUsers.getPosition(currentUserView.getScore()),
+                        currentUserView.getLogin(), currentUserView.getScore()));
+            }
+        }
+
         return ResponseEntity.status(HttpStatus.OK).body(leaders);
     }
 

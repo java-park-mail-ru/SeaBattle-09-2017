@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 import seabattle.authorization.service.UserService;
 import seabattle.authorization.views.AuthorisationView;
+import seabattle.authorization.views.LeaderboardView;
 import seabattle.authorization.views.UserView;
 
 
@@ -166,8 +167,8 @@ public class ControllerTest {
     @SuppressWarnings("all")
     @Test
     public void leaderboard(){
-        final ResponseEntity<List<UserView>> responseEntity = restTemplate.exchange("/api/leaderboard/",
-                HttpMethod.GET, null, new ParameterizedTypeReference<List<UserView>>() {});
+        final ResponseEntity<List<LeaderboardView>> responseEntity = restTemplate.exchange("/api/leaderboard/",
+                HttpMethod.GET, null, new ParameterizedTypeReference<List<LeaderboardView>>() {});
         assertNotNull(responseEntity.getBody());
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
     }

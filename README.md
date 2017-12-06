@@ -166,20 +166,19 @@ HttpStatus: 404
 #### Params
 Integer limit
 #### Response
-В случае успеха возвращает лист пользователей до 10 человек в порядке убывания их счета\
+В случае успеха возвращает лист пользователей  в порядке убывания их счета,
+а также текущего пользователя и его позицию в рейтинге\
 HttpStatus: 200
 ```
 [{
+  "position": integer,
   "login": string,
-  "email": null,
-  "password": null,
   "score": integer
 },
 ...
 {
+  "position": integer,
   "login": string,
-  "email": null,
-  "password": null,
   "score": integer
 }]
 ```
