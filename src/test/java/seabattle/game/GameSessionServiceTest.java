@@ -288,14 +288,7 @@ public class GameSessionServiceTest {
                     eq(new MsgEndGame(false, 0)));
         } catch (IOException ignore) {
         }
-
-
     }
-
-
-
-
-
 
 }
 

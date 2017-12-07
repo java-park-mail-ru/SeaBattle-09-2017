@@ -276,6 +276,8 @@ public class GameSessionService {
                 }
             }
             LOGGER.warn(ex.getMessage());
+        } catch (IllegalStateException sEx) {
+            LOGGER.warn(sEx.getMessage());
         }
     }
 
