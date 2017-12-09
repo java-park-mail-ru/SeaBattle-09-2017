@@ -1,6 +1,5 @@
 package seabattle.game;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +13,10 @@ import seabattle.game.gamesession.GameSession;
 import seabattle.game.gamesession.GameSessionService;
 import seabattle.game.messages.*;
 import seabattle.game.player.Player;
-import seabattle.game.player.PlayerAI;
 import seabattle.game.ship.Ship;
-import seabattle.msgsystem.Message;
 import seabattle.websocket.WebSocketService;
 
 import java.io.IOException;
-import java.security.acl.LastOwnerException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -275,8 +271,8 @@ public class GameSessionServiceTest {
     public void endGame() {
         final GameSession gameSession = makeMoveInit();
         final List<Ship> testShips = tetsShips();
-        for (Ship ship: testShips ) {
-            for (Cell cell: ship.getCells()) {
+        for (Ship ship : testShips) {
+            for (Cell cell : ship.getCells()) {
                 gameSessionService.makeMove(gameSession, cell);
             }
         }

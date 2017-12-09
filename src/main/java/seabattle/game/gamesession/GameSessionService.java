@@ -11,6 +11,7 @@ import seabattle.game.field.Cell;
 import seabattle.game.field.CellStatus;
 import seabattle.game.messages.*;
 import seabattle.game.player.Player;
+import seabattle.game.player.PlayerAI;
 import seabattle.game.ship.Ship;
 import seabattle.msgsystem.Message;
 import seabattle.websocket.WebSocketService;
@@ -290,6 +291,16 @@ public class GameSessionService {
     public void sendPingMessage(@NotNull Long playerId) {
         try {
             webSocketService.sendMessage(playerId, new MsgPing());
+        } catch (IOException ex) {
+            LOGGER.warn("Can't send message! ", ex);
+        }
+    }
+
+    public void sendGeneretedShips(@NotNull Long playerId) {
+        MsgShipPosition shipsPosition = new MsgShipPosition();
+        shipsPosition.setShips(PlayerAI.generateShips());
+        try {
+            webSocketService.sendMessage(playerId, shipsPosition);
         } catch (IOException ex) {
             LOGGER.warn("Can't send message! ", ex);
         }

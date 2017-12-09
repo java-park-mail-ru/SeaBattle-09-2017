@@ -16,7 +16,7 @@ public  final class PlayerAI extends Player {
         super(generateShips());
     }
 
-    private static List<Ship> generateShips() {
+    public static List<Ship> generateShips() {
 
         Field field = new Field();
 
@@ -35,7 +35,7 @@ public  final class PlayerAI extends Player {
                 /* block bottom right */
                 Integer minBlockedRow;
                 Integer minBlockedCol;
-                if (ship.getIsVertical() == Boolean.FALSE) {
+                if (ship.getIsVertical().equals(Boolean.FALSE)) {
                     minBlockedRow = field.getFieldSize() - 1;
                     minBlockedCol = field.getFieldSize() + 1 - shipLength;
                 } else {
