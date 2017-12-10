@@ -37,9 +37,9 @@ public  final class PlayerAI extends Player {
                 Integer minBlockedCol;
                 if (ship.getIsVertical().equals(Boolean.FALSE)) {
                     minBlockedRow = field.getFieldSize() - 1;
-                    minBlockedCol = field.getFieldSize() + 1 - shipLength;
+                    minBlockedCol = field.getFieldSize() - shipLength;
                 } else {
-                    minBlockedRow = field.getFieldSize() + 1 - shipLength;
+                    minBlockedRow = field.getFieldSize() - shipLength;
                     minBlockedCol = field.getFieldSize() - 1;
                 }
 

@@ -106,7 +106,7 @@ public class GameSessionService {
                 webSocketService.sendMessage(player1.getPlayerId(), new MsgError(error));
                 webSocketService.sendMessage(player2.getPlayerId(), new MsgError(error));
             } catch (IOException sendEx) {
-                LOGGER.warn("Unnable to send message");
+                LOGGER.warn("Unable to send message");
             }
             webSocketService.closeSession(player1.getPlayerId(), CloseStatus.SERVER_ERROR);
             webSocketService.closeSession(player2.getPlayerId(), CloseStatus.SERVER_ERROR);
