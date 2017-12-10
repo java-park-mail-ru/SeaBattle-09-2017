@@ -93,7 +93,7 @@ public class SocketHandler extends TextWebSocketHandler {
             try {
                 webSocketService.sendMessage(userId, new MsgError("wrong json format at game response"));
             } catch (IOException sendEx) {
-                LOGGER.warn("Unnable to send message");
+                LOGGER.warn("Unable to send message");
             }
             LOGGER.error("wrong json format at game response", ex);
             return;
@@ -105,7 +105,7 @@ public class SocketHandler extends TextWebSocketHandler {
                 webSocketService.sendMessage(userId, new MsgError("Can't handle message of type "
                         + message.getClass().getName() + " with content: " + text));
             } catch (IOException sendEx) {
-                LOGGER.warn("Unnable to send message");
+                LOGGER.warn("Unable to send message");
             }
             LOGGER.error("Can't handle message of type " + message.getClass().getName() + " with content: " + text, e);
         }
