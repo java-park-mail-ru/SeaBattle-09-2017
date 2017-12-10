@@ -52,7 +52,7 @@ public class MsgFireCoordinatesHandler extends MessageHandler<MsgFireCoordinates
                 try {
                     webSocketService.sendMessage(id, new MsgError("It's not currently this player's move! "));
                 } catch (IOException ex) {
-                    LOGGER.warn("Unnable to send message");
+                    LOGGER.warn("Unable to send message");
                 }
 
                 throw new IllegalStateException("It's not currently this player's move!");
@@ -61,7 +61,7 @@ public class MsgFireCoordinatesHandler extends MessageHandler<MsgFireCoordinates
             try {
                     webSocketService.sendMessage(id, new MsgError("Player is not currently playing!"));
             } catch (IOException ex) {
-                    LOGGER.warn("Unnable to send message");
+                    LOGGER.warn("Unable to send message");
             }
             throw new IllegalArgumentException("Player is not currently playing!");
         }

@@ -296,7 +296,7 @@ public class GameSessionService {
         }
     }
 
-    public void sendGeneretedShips(@NotNull Long playerId) {
+    public void sendGeneratedShips(@NotNull Long playerId) {
         MsgShipPosition shipsPosition = new MsgShipPosition();
         shipsPosition.setShips(PlayerAI.generateShips());
         try {

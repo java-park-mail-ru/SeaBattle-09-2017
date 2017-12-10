@@ -29,6 +29,6 @@ public class MsgGeneratedShipsHandler extends MessageHandler<MsgGeneratedShips> 
 
     @Override
     public void handle(MsgGeneratedShips cast, Long id) {
-        gameSessionService.sendGeneretedShips(id);
+        gameSessionService.sendGeneratedShips(id);
     }
 }
