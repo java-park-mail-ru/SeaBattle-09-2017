@@ -66,7 +66,7 @@ public final class Ship {
     public ArrayList<Cell> getCells() {
         ArrayList<Cell> result = new ArrayList<>();
 
-        if (isVertical) {
+        if (isVertical.equals(Boolean.TRUE)) {
             for (Integer i = 0; i < length; ++i) {
                 result.add(Cell.of(rowPos + i, colPos));
             }

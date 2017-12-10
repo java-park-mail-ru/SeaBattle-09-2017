@@ -36,16 +36,16 @@ public  final class PlayerAI extends Player {
                 Integer minBlockedRow;
                 Integer minBlockedCol;
                 if (ship.getIsVertical().equals(Boolean.FALSE)) {
-                    minBlockedRow = field.getFieldSize() - 1;
-                    minBlockedCol = field.getFieldSize() - shipLength;
+                    minBlockedRow = 0;
+                    minBlockedCol = field.getFieldSize() - shipLength + 1;
                 } else {
-                    minBlockedRow = field.getFieldSize() - shipLength;
-                    minBlockedCol = field.getFieldSize() - 1;
+                    minBlockedRow = field.getFieldSize() - shipLength + 1;
+                    minBlockedCol = 0;
                 }
 
                 for (Integer blockedRow = minBlockedRow; blockedRow < field.getFieldSize(); ++blockedRow) {
                     for (Integer blockedCol = minBlockedCol; blockedCol < field.getFieldSize(); ++blockedCol) {
-                        if (field.getCellStatus(Cell.of(blockedRow, blockedCol)) == CellStatus.FREE) {
+                        if (field.getCellStatus(Cell.of(blockedRow, blockedCol)).equals(CellStatus.FREE)) {
                             field.setCellStatus(Cell.of(blockedRow, blockedCol), CellStatus.BLOCKED);
                             --freeCells;
                         }
@@ -57,56 +57,69 @@ public  final class PlayerAI extends Player {
                     for (Integer col = 0; col < field.getFieldSize(); ++col) {
                         if (field.getCellStatus(Cell.of(row, col)) == CellStatus.OCCUPIED) {
                             --freeCells;
-                            for (Integer distance = 2; distance < (shipLength + 2); ++distance) {
-                                if (ship.getIsVertical() == Boolean.FALSE) {
-                                    if (((row - 1) > 0)
-                                            && (field.getCellStatus(Cell.of(row - 1, col)) == CellStatus.FREE)) {
-                                        field.setCellStatus(Cell.of(row - 1, col), CellStatus.BLOCKED);
+                            minBlockedRow = row - 1;
+                            if (ship.getIsVertical().equals(Boolean.TRUE)) {
+                                minBlockedRow -= shipLength - 1;
+                            }
+                            if (minBlockedRow < 0) {
+                                minBlockedRow = 0;
+                            }
+                            Integer maxBlockedRow = row + 1;
+                            if (maxBlockedRow >= field.getFieldSize()) {
+                                maxBlockedRow = field.getFieldSize() - 1;
+                            }
+
+                            minBlockedCol = col - 1;
+                            if (ship.getIsVertical().equals(Boolean.FALSE)) {
+                                minBlockedCol -= shipLength - 1;
+                            }
+                            if (minBlockedCol < 0) {
+                                minBlockedCol = 0;
+                            }
+                            Integer maxBlockedCol = col + 1;
+                            if (maxBlockedCol >= field.getFieldSize()) {
+                                maxBlockedCol = field.getFieldSize() - 1;
+                            }
+
+                            for (Integer idxRow = minBlockedRow; idxRow <= maxBlockedRow; ++idxRow) {
+                                for (Integer idxCol = minBlockedCol; idxCol <= maxBlockedCol; ++idxCol) {
+                                    if (field.getCellStatus(Cell.of(idxRow, idxCol)).equals(CellStatus.FREE)) {
                                         --freeCells;
-                                    }
-                                    if (((col - distance) > 0)
-                                            && (field.getCellStatus(Cell.of(row, col - distance)) == CellStatus.FREE)) {
-                                        field.setCellStatus(Cell.of(row, col - distance), CellStatus.BLOCKED);
-                                        --freeCells;
-                                    }
-                                } else {
-                                    if (((row - distance) > 0)
-                                            && (field.getCellStatus(Cell.of(row - distance, col)) == CellStatus.FREE)) {
-                                        field.setCellStatus(Cell.of(row - distance, col), CellStatus.BLOCKED);
-                                        --freeCells;
-                                    }
-                                    if (((col - 1) > 0)
-                                            && (field.getCellStatus(Cell.of(row, col - 1)) == CellStatus.FREE)) {
-                                        field.setCellStatus(Cell.of(row, col - 1), CellStatus.BLOCKED);
-                                        --freeCells;
+                                        field.setCellStatus(Cell.of(idxRow, idxCol), CellStatus.BLOCKED);
                                     }
                                 }
-
                             }
-                        }
+                         }
                     }
                 }
 
                 /* generation */
                 Integer placementIndex = ThreadLocalRandom.current().nextInt(0, freeCells);
+                Cell taken = new Cell(0, 0);
+
                 for (Integer row = 0; row < field.getFieldSize() && placementIndex > 0; ++row) {
                     for (Integer col = 0; col < field.getFieldSize() && placementIndex > 0; ++col) {
-                        if (field.getCellStatus(Cell.of(row, col)) == CellStatus.FREE) {
+                        if (field.getCellStatus(Cell.of(row, col)).equals(CellStatus.FREE)) {
                             --placementIndex;
                             if (placementIndex == 0) {
-                                ship.setRowPos(row);
-                                ship.setColPos(col);
-                                generatedShips.add(ship);
+                                taken.setRowPos(row);
+                                taken.setColPos(col);
                             }
                         }
                     }
                 }
+                ship.setRowPos(taken.getRowPos());
+                ship.setColPos(taken.getColPos());
+                generatedShips.add(ship);
 
+                for (Cell cell : ship.getCells()) {
+                    field.setCellStatus(cell, CellStatus.OCCUPIED);
+                }
 
                 /* prepare matrix for next iteration */
                 for (Integer row = 0; row < field.getFieldSize(); ++row) {
                     for (Integer col = 0; col < field.getFieldSize(); ++col) {
-                        if (field.getCellStatus(Cell.of(row, col)) == CellStatus.BLOCKED) {
+                        if (field.getCellStatus(Cell.of(row, col)).equals(CellStatus.BLOCKED)) {
                             field.setCellStatus(Cell.of(row, col), CellStatus.FREE);
                         }
                     }
