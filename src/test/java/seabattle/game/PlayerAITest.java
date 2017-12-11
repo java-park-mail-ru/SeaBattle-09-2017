@@ -17,8 +17,9 @@ public class PlayerAITest {
 
     @Test
     public void generatedShips() {
-        assertTrue(shipsValidator.isValidShips( PlayerAI.generateShips()));
-        assertTrue(shipsValidator.isValidShips( PlayerAI.generateShips()));
-        assertTrue(shipsValidator.isValidShips( PlayerAI.generateShips()));
+        final int testGenerateShipsCount = 400;
+        for (int i = 0; i < testGenerateShipsCount; i++) {
+            assertTrue(shipsValidator.isValidShips( PlayerAI.generateShips()));
+        }
     }
 }
