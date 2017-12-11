@@ -94,7 +94,7 @@ public  final class PlayerAI extends Player {
                 }
 
                 /* generation */
-                Integer placementIndex = ThreadLocalRandom.current().nextInt(0, freeCells);
+                Integer placementIndex = ThreadLocalRandom.current().nextInt(1, freeCells + 1);
                 Cell taken = new Cell(0, 0);
 
                 for (Integer row = 0; row < field.getFieldSize() && placementIndex > 0; ++row) {
