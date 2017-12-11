@@ -54,8 +54,6 @@ public class MsgFireCoordinatesHandler extends MessageHandler<MsgFireCoordinates
                 } catch (IOException ex) {
                     LOGGER.warn("Unable to send message");
                 }
-
-                throw new IllegalStateException("It's not currently this player's move!");
             }
         } else {
             try {
@@ -63,7 +61,6 @@ public class MsgFireCoordinatesHandler extends MessageHandler<MsgFireCoordinates
             } catch (IOException ex) {
                     LOGGER.warn("Unable to send message");
             }
-            throw new IllegalArgumentException("Player is not currently playing!");
         }
 
     }
