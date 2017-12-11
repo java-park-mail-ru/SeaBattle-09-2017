@@ -26,10 +26,12 @@ public class MsgShipPositionHandler extends MessageHandler<MsgShipPosition> {
 
 
     public MsgShipPositionHandler(@NotNull GameSessionService gameSessionService,
-                                  @NotNull MessageHandlerContainer messageHandlerContainer) {
+                                  @NotNull MessageHandlerContainer messageHandlerContainer,
+                                  @NotNull ShipsValidator shipsValidator) {
         super(MsgShipPosition.class);
         this.gameSessionService = gameSessionService;
         this.messageHandlerContainer = messageHandlerContainer;
+        this.shipsValidator = shipsValidator;
     }
 
     @PostConstruct
@@ -40,7 +42,7 @@ public class MsgShipPositionHandler extends MessageHandler<MsgShipPosition> {
     @Override
     public void handle(MsgShipPosition cast, Long id) {
         if (!shipsValidator.isValidShips(cast.getShips())) {
-            throw new IllegalArgumentException("Ships isn't vaild!");
+            throw new IllegalArgumentException("Ships isn't valid!");
         }
         if (gameSessionService.isPlaying(id)) {
             GameSession gameSession = gameSessionService.getGameSession(id);
