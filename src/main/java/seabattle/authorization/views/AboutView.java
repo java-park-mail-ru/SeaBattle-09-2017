@@ -6,18 +6,18 @@ import javax.validation.constraints.NotNull;
 
 public class AboutView {
     @NotNull
-    private String about;
+    private String text;
 
-    public AboutView(@JsonProperty("about") String about) {
-        this.about = about;
+    public AboutView(@JsonProperty("text") String text) {
+        this.text = text;
     }
 
     @NotNull
     public String getAbout() {
-        return about;
+        return text;
     }
 
     public void setAbout(String about) {
-        this.about = about;
+        this.text = about;
     }
 }
