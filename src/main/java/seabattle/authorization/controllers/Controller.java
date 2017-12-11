@@ -18,7 +18,8 @@ import java.util.List;
 
 @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
 @RestController
-@CrossOrigin
+@CrossOrigin(origins = {"http://localhost", "http://sea-battle-front.herokuapp.com",
+                        "http://top-sea-battle.herokuapp.com", "https://sbattle.ru"})
 @RequestMapping(path = "/api")
 @Validated
 public class Controller {
