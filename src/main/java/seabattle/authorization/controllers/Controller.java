@@ -7,10 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import seabattle.authorization.service.UserService;
-import seabattle.authorization.views.AuthorisationView;
-import seabattle.authorization.views.LeaderboardView;
-import seabattle.authorization.views.ResponseView;
-import seabattle.authorization.views.UserView;
+import seabattle.authorization.views.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
@@ -148,7 +145,8 @@ public class Controller {
 
     @RequestMapping(method = RequestMethod.GET, path = "about",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getAbout() {
-        return ResponseEntity.status(HttpStatus.OK).body("Game by Technopark students.\nRelease date: winter 2017");
+    public ResponseEntity<AboutView> getAbout() {
+        String about = "Sea battle by Technopark students.\nRelease date: winter 2017";
+        return ResponseEntity.status(HttpStatus.OK).body(new AboutView(about));
     }
 }
