@@ -146,4 +146,9 @@ public class Controller {
         return ResponseEntity.status(HttpStatus.OK).body(leaders);
     }
 
+    @RequestMapping(method = RequestMethod.GET, path = "about",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getAbout() {
+        return ResponseEntity.status(HttpStatus.OK).body("Game by Technopark students.\nRelease date: winter 2017");
+    }
 }
