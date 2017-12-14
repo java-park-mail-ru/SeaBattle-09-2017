@@ -83,13 +83,7 @@ public final class Field {
     }
 
     public void killShip(Ship ship) {
-        for (Integer rowPos = ship.getRowPos() - 1; rowPos <= ship.getLastCell().getRowPos() + 1; ++rowPos) {
-            for (Integer colPos = ship.getColPos() - 1; colPos <= ship.getLastCell().getColPos() + 1; ++colPos) {
-                if (cellOutOfBounds(Cell.of(rowPos, colPos)) == Boolean.FALSE) {
-                    setCellStatus(Cell.of(rowPos, colPos), CellStatus.BLOCKED);
-                }
-            }
-        }
+        ship.getCellsAroundShip().forEach(cell -> setCellStatus(cell, CellStatus.BLOCKED));
         ship.getCells().forEach(cell -> setCellStatus(cell, CellStatus.DESTRUCTED));
     }
 

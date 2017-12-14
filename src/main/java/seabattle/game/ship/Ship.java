@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import seabattle.game.field.Cell;
+import seabattle.game.field.Field;
 
 import java.util.ArrayList;
 
@@ -76,6 +77,22 @@ public final class Ship {
             }
         }
 
+        return result;
+    }
+
+    public ArrayList<Cell> getCellsAroundShip() {
+
+        final Field field = new Field();
+        ArrayList<Cell> result = new ArrayList<>();
+
+        for (int i = rowPos - 1; i <= getLastCell().getRowPos() + 1; i++) {
+            for (int j = colPos - 1; j <= getLastCell().getColPos() + 1; j++) {
+                final Cell cell = new Cell(i, j);
+                if (!field.cellOutOfBounds(cell)  && !getCells().contains(cell)) {
+                    result.add(cell);
+                }
+            }
+        }
         return result;
     }
 

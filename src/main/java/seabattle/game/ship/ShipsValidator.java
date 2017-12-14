@@ -58,15 +58,9 @@ public class ShipsValidator {
                 field.setCellStatus(cell, CellStatus.OCCUPIED);
             }
 
-            for (int i = ship.getRowPos() - 1; i <= ship.getLastCell().getRowPos() + 1; i++) {
-                for (int j = ship.getColPos() - 1; j <= ship.getLastCell().getColPos() + 1; j++) {
-                        final Cell checkCell = new Cell(i, j);
-                        if (!field.cellOutOfBounds(checkCell)) {
-                            if (field.getCellStatus(checkCell) == CellStatus.OCCUPIED
-                                    && !ship.getCells().contains(checkCell)) {
-                                return false;
-                            }
-                        }
+            for (Cell cell : ship.getCellsAroundShip()) {
+                if (field.getCellStatus(cell) == CellStatus.OCCUPIED) {
+                    return false;
                 }
             }
 
