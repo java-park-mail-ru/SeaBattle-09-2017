@@ -1,22 +1,91 @@
 package seabattle.game.player;
 
+import seabattle.authorization.views.UserView;
 import seabattle.game.field.Cell;
 import seabattle.game.field.CellStatus;
 import seabattle.game.field.Field;
 import seabattle.game.ship.Ship;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-@SuppressWarnings("unused")
-public  final class PlayerAI extends Player {
+@SuppressWarnings({"unused", "FieldCanBeLocal"})
+public  final class AIPlayer implements Player {
 
-    public PlayerAI() {
-        super(generateShips());
+    @NotNull
+    private Long playerId;
+    @NotNull
+    private String username;
+    @NotNull
+    private Integer score = 0;
+
+    private List<Ship> aliveShips;
+    private List<Ship> deadShips = new ArrayList<>();
+
+    public AIPlayer() {
+        playerId = (long) -1;
+        username = "John Doe";
+        aliveShips = generateShips();
     }
 
-    public static List<Ship> generateShips() {
+    @Override
+    public UserView getUser() {
+        return null;
+    }
+
+    @Override
+    public void setUser(UserView user) {
+
+    }
+
+    @Override
+    public Integer getScore() {
+        return null;
+    }
+
+    @Override
+    public void setScore(Integer score) {
+        this.score = score;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    @Override
+    public void setShips(List<Ship> ships) {
+        aliveShips = ships;
+    }
+
+    @Override
+    public List<Ship> getAliveShips() {
+        return aliveShips;
+    }
+
+    @Override
+    public List<Ship> getDeadShips() {
+        return deadShips;
+    }
+
+    @Override
+    public Boolean allShipsDead() {
+        return aliveShips.isEmpty();
+    }
+
+    @Override
+    public Long getPlayerId() {
+        return playerId;
+    }
+
+    public List<Ship> generateShips() {
 
         Field field = new Field();
 

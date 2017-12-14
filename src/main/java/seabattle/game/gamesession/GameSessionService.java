@@ -11,7 +11,8 @@ import seabattle.game.field.Cell;
 import seabattle.game.field.CellStatus;
 import seabattle.game.messages.*;
 import seabattle.game.player.Player;
-import seabattle.game.player.PlayerAI;
+import seabattle.game.player.UserPlayer;
+import seabattle.game.player.AIPlayer;
 import seabattle.game.ship.Ship;
 import seabattle.msgsystem.Message;
 import seabattle.websocket.WebSocketService;
@@ -31,7 +32,7 @@ public class GameSessionService {
 
 
     @NotNull
-    private final ArrayDeque<Player> waitingPlayers = new ArrayDeque<>();
+    private final ArrayDeque<UserPlayer> waitingPlayers = new ArrayDeque<>();
 
     @NotNull
     private final WebSocketService webSocketService;
@@ -66,7 +67,7 @@ public class GameSessionService {
         return gameSessions.get(userId);
     }
 
-    public void addWaitingPlayer(@NotNull Player player) {
+    public void addWaitingPlayer(@NotNull UserPlayer player) {
         waitingPlayers.add(player);
         final MsgYouInQueue msgYouInQueue = new MsgYouInQueue(player.getUsername());
         try {
@@ -75,7 +76,7 @@ public class GameSessionService {
             try {
                 webSocketService.sendMessage(player.getPlayerId(), new MsgError("Could not get in the queue "));
             } catch (IOException sendEx) {
-                LOGGER.warn("Unnable to send message");
+                LOGGER.warn("Unable to send message");
             }
             webSocketService.closeSession(player.getPlayerId(), CloseStatus.SERVER_ERROR);
         }
@@ -86,13 +87,12 @@ public class GameSessionService {
     }
 
 
-    public void createSession(@NotNull Player player1, @NotNull Player player2) {
+    public void createSession(Player player1, Player player2) {
 
         final GameSession gameSession = new GameSession(player1, player2, this);
 
         gameSessions.put(player1.getPlayerId(), gameSession);
         gameSessions.put(player2.getPlayerId(), gameSession);
-
 
         try {
             final MsgLobbyCreated initMessage1 = new MsgLobbyCreated(player1.getUsername());
@@ -133,7 +133,7 @@ public class GameSessionService {
         }
     }
 
-    private MsgGameStarted createGameStartedMessage(@NotNull Player currentPlayer, @NotNull Player damagedPlayer) {
+    private MsgGameStarted createGameStartedMessage(Player currentPlayer, Player damagedPlayer) {
         if (!currentPlayer.equals(damagedPlayer)) {
             return new MsgGameStarted(Boolean.TRUE);
         }
@@ -214,7 +214,7 @@ public class GameSessionService {
 
     }
 
-    private MsgEndGame createMsgEndGame(@NotNull GameSession gameSession, @NotNull Player current) {
+    private MsgEndGame createMsgEndGame(@NotNull GameSession gameSession, Player current) {
         if (current == gameSession.getWinner()) {
             return new MsgEndGame(Boolean.TRUE, current.getScore());
         }
@@ -282,7 +282,7 @@ public class GameSessionService {
         }
     }
 
-    public void dellWaitingPlayer(Player player) {
+    public void deleteWaitingPlayer(@NotNull UserPlayer player) {
        if (waitingPlayers.contains(player)) {
            waitingPlayers.remove(player);
        }
@@ -298,7 +298,8 @@ public class GameSessionService {
 
     public void sendGeneratedShips(@NotNull Long playerId) {
         MsgShipPosition shipsPosition = new MsgShipPosition();
-        shipsPosition.setShips(PlayerAI.generateShips());
+        Player generator = new AIPlayer();
+        shipsPosition.setShips(generator.generateShips());
         try {
             webSocketService.sendMessage(playerId, shipsPosition);
         } catch (IOException ex) {

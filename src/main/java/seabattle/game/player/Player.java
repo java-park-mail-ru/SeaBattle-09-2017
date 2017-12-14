@@ -1,93 +1,37 @@
 package seabattle.game.player;
 
 import seabattle.authorization.views.UserView;
+import seabattle.game.field.Cell;
+import seabattle.game.field.Field;
 import seabattle.game.ship.Ship;
 
-import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
-@SuppressWarnings("unused")
-public class Player {
+public interface Player {
 
-    @NotNull
-    private static final AtomicLong PLAYER_ID_GENERATOR = new AtomicLong(0);
+    UserView getUser();
 
-    @NotNull
-    private Long playerId;
-    @NotNull
-    private String username;
-    @NotNull
-    private UserView user;
-    private Integer score = 0;
+    void setUser(UserView user);
 
+    Integer getScore();
 
-    private List<Ship> aliveShips = new ArrayList<>();
-    private List<Ship> deadShips = new ArrayList<>();
+    void setScore(Integer score);
 
-    public Player(UserView user, List<Ship> ships) {
-        this.playerId = PLAYER_ID_GENERATOR.getAndIncrement();
-        this.user = user;
-        this.username = user.getLogin();
-        this.aliveShips = ships;
-    }
+    String getUsername();
 
-    public Integer getScore() {
-        return score;
-    }
+    void setUsername(String username);
 
-    public Player() {
-        this.playerId = PLAYER_ID_GENERATOR.getAndIncrement();
-        this.username = "Unknown username " + playerId.toString();
-        this.user = null;
-    }
+    void setShips(List<Ship> ships);
 
-    public UserView getUser() {
-        return user;
-    }
+    List<Ship> getAliveShips();
 
-    public void setScore(Integer score) {
-        this.score = score;
-    }
+    List<Ship> getDeadShips();
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
+    Boolean allShipsDead();
 
-    Player(List<Ship> ships) {
-        this.playerId = PLAYER_ID_GENERATOR.getAndIncrement();
-        this.username = "Unknown username " + playerId.toString();
-        this.user = null;
-        aliveShips.addAll(ships);
-    }
+    Long getPlayerId();
 
-    public void setShips(List<Ship> ships) {
-        aliveShips.addAll(ships);
-    }
+    List<Ship> generateShips();
 
-    public List<Ship> getAliveShips() {
-        return aliveShips;
-    }
-
-    public List<Ship> getDeadShips() {
-        return deadShips;
-    }
-
-    public Long getPlayerId() {
-        return playerId;
-    }
-
-    public Boolean allShipsDead() {
-        return aliveShips.isEmpty();
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUser(UserView user) {
-        this.user = user;
-        this.username = user.getLogin();
-    }
+    Cell makeDecision(final Field field);
 }

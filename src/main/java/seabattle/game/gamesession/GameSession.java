@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 import java.util.concurrent.atomic.AtomicLong;
 
 
-@SuppressWarnings({"FieldCanBeLocal", "unused"})
+@SuppressWarnings({"unused", "FieldCanBeLocal"})
 public class GameSession {
     private static final AtomicLong SESSION_ID_GENERATOR = new AtomicLong(0);
 
@@ -37,8 +37,8 @@ public class GameSession {
     private GameSessionService gameSessionService;
 
 
-    public GameSession(@NotNull Player player1, @NotNull Player player2,
-                @NotNull GameSessionService gameSessionService) {
+    GameSession(@NotNull Player player1, @NotNull Player player2,
+                       @NotNull GameSessionService gameSessionService) {
         this.sessionId = SESSION_ID_GENERATOR.getAndIncrement();
         this.player1 = player1;
         this.player2 = player2;
@@ -113,7 +113,7 @@ public class GameSession {
         }
     }
 
-    public Boolean toGamePhase() {
+    Boolean toGamePhase() {
         if (this.status != GameSessionStatus.SETUP || this.field1 == null || this.field2 == null) {
             return Boolean.FALSE;
         }
@@ -135,7 +135,7 @@ public class GameSession {
         return field2;
     }
 
-    public CellStatus makeMove(Cell cell) throws IllegalStateException {
+    CellStatus makeMove(Cell cell) throws IllegalStateException {
 
         if (this.status != GameSessionStatus.MOVE_P1 && this.status != GameSessionStatus.MOVE_P2) {
             throw new IllegalStateException("Illegal state for move!");

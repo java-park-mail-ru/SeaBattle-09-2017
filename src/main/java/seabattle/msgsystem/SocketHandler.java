@@ -9,7 +9,7 @@ import seabattle.authorization.service.UserService;
 import seabattle.authorization.views.UserView;
 import seabattle.game.gamesession.GameSessionService;
 import seabattle.game.messages.MsgError;
-import seabattle.game.player.Player;
+import seabattle.game.player.UserPlayer;
 import seabattle.websocket.WebSocketService;
 import org.springframework.web.socket.*;
 
@@ -47,7 +47,7 @@ public class SocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession webSocketSession) {
         final String login = (String) webSocketSession.getAttributes().get("currentUser");
-        final Player connectedPlayer = new Player();
+        final UserPlayer connectedPlayer = new UserPlayer();
         if (login != null) {
             final UserView userView = userService.getByLoginOrEmail(login);
 
@@ -113,6 +113,6 @@ public class SocketHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession webSocketSession, CloseStatus status) throws Exception {
-        gameSessionService.dellWaitingPlayer(webSocketService.removeUser(webSocketSession.getId()));
+        gameSessionService.deleteWaitingPlayer(webSocketService.removeUser(webSocketSession.getId()));
     }
 }

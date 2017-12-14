@@ -13,6 +13,7 @@ import seabattle.game.gamesession.GameSession;
 import seabattle.game.gamesession.GameSessionService;
 import seabattle.game.messages.*;
 import seabattle.game.player.Player;
+import seabattle.game.player.UserPlayer;
 import seabattle.game.ship.Ship;
 import seabattle.websocket.WebSocketService;
 
@@ -61,8 +62,8 @@ public class GameSessionServiceTest {
 
     @Test
     public void createSessionTest() {
-        Player player1 = new Player();
-        Player player2 = new Player();
+        UserPlayer player1 = new UserPlayer();
+        UserPlayer player2 = new UserPlayer();
         createGameSession(player1, player2);
         try {
             verify(webSocketService).sendMessage(eq(player2.getPlayerId()),
@@ -75,8 +76,8 @@ public class GameSessionServiceTest {
 
     @Test
     public void tryStartGameWithoutShips() {
-        Player player1 = new Player();
-        Player player2 = new Player();
+        UserPlayer player1 = new UserPlayer();
+        UserPlayer player2 = new UserPlayer();
         createGameSession(player1, player2);
         tryStartGame(gameSessionService.getGameSession(player1.getPlayerId()), player1, player2);
         try {
@@ -91,8 +92,8 @@ public class GameSessionServiceTest {
 
     @Test
     public void tryStartGameWithShips() {
-        Player player1 = new Player();
-        Player player2 = new Player();
+        UserPlayer player1 = new UserPlayer();
+        UserPlayer player2 = new UserPlayer();
         createGameSession(player1, player2);
         GameSession gameSession = gameSessionService.getGameSession(player1.getPlayerId());
         gameSession.setField1(new Field(tetsShips()));
@@ -117,8 +118,8 @@ public class GameSessionServiceTest {
 
 
     private GameSession makeMoveInit() {
-        Player player1 = new Player();
-        Player player2 = new Player();
+        UserPlayer player1 = new UserPlayer();
+        UserPlayer player2 = new UserPlayer();
         player1.setShips(tetsShips());
         player2.setShips(tetsShips());
         createGameSession(player1, player2);

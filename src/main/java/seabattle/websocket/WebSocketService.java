@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import seabattle.game.player.Player;
+import seabattle.game.player.UserPlayer;
 import seabattle.msgsystem.Message;
 
 import javax.validation.constraints.NotNull;
@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketService {
     private static final Logger LOGGER = LoggerFactory.getLogger(WebSocketService.class);
     private Map<Long, WebSocketSession> sessions = new ConcurrentHashMap<>();
-    private Map<String, Player> players = new ConcurrentHashMap<>();
+    private Map<String, UserPlayer> players = new ConcurrentHashMap<>();
     private final ObjectMapper objectMapper;
 
 
@@ -27,7 +27,7 @@ public class WebSocketService {
         this.objectMapper = objectMapper;
     }
 
-    public void registerUser(@NotNull Player player, @NotNull WebSocketSession webSocketSession) {
+    public void registerUser(@NotNull UserPlayer player, @NotNull WebSocketSession webSocketSession) {
         sessions.put(player.getPlayerId(), webSocketSession);
         players.put(webSocketSession.getId(), player);
     }
@@ -45,8 +45,8 @@ public class WebSocketService {
         return players.get(sessionId).getPlayerId();
     }
 
-    public Player removeUser(@NotNull String sessionId) {
-        final Player player = players.remove(sessionId);
+    public UserPlayer removeUser(@NotNull String sessionId) {
+        final UserPlayer player = players.remove(sessionId);
         sessions.remove(player.getPlayerId());
         return player;
     }
