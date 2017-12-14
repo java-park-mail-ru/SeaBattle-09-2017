@@ -98,4 +98,117 @@ public final class Field {
         final Boolean checkCol = (cell.getColPos() < 0) || (cell.getColPos() >= FIELD_SIZE);
         return checkCol || checkRow;
     }
+
+    public void blockBorderForPlacement(final Ship ship) {
+        Integer minBlockedRow;
+        Integer minBlockedCol;
+        if (ship.getIsVertical().equals(Boolean.FALSE)) {
+            minBlockedRow = 0;
+            minBlockedCol = FIELD_SIZE - ship.getLength() + 1;
+        } else {
+            minBlockedRow = getFieldSize() - ship.getLength() + 1;
+            minBlockedCol = 0;
+        }
+
+        for (Integer blockedRow = minBlockedRow; blockedRow < getFieldSize(); ++blockedRow) {
+            for (Integer blockedCol = minBlockedCol; blockedCol < FIELD_SIZE; ++blockedCol) {
+                if (getCellStatus(Cell.of(blockedRow, blockedCol)).equals(CellStatus.FREE)) {
+                    setCellStatus(Cell.of(blockedRow, blockedCol), CellStatus.BLOCKED);
+                }
+            }
+        }
+    }
+
+    public void preventCollisionsOnPlacement(final Ship ship) {
+        for (Integer row = 0; row < FIELD_SIZE; ++row) {
+            for (Integer col = 0; col < FIELD_SIZE; ++col) {
+                if (getCellStatus(Cell.of(row, col)) == CellStatus.OCCUPIED) {
+                    Integer minBlockedRow = row - 1;
+                    if (ship.getIsVertical().equals(Boolean.TRUE)) {
+                        minBlockedRow -= ship.getLength() - 1;
+                    }
+                    if (minBlockedRow < 0) {
+                        minBlockedRow = 0;
+                    }
+                    Integer maxBlockedRow = row + 1;
+                    if (maxBlockedRow >= FIELD_SIZE) {
+                        maxBlockedRow = FIELD_SIZE - 1;
+                    }
+
+                    Integer minBlockedCol = col - 1;
+                    if (ship.getIsVertical().equals(Boolean.FALSE)) {
+                        minBlockedCol -= ship.getLength() - 1;
+                    }
+                    if (minBlockedCol < 0) {
+                        minBlockedCol = 0;
+                    }
+                    Integer maxBlockedCol = col + 1;
+                    if (maxBlockedCol >= FIELD_SIZE) {
+                        maxBlockedCol = FIELD_SIZE - 1;
+                    }
+
+                    for (Integer idxRow = minBlockedRow; idxRow <= maxBlockedRow; ++idxRow) {
+                        for (Integer idxCol = minBlockedCol; idxCol <= maxBlockedCol; ++idxCol) {
+                            if (getCellStatus(Cell.of(idxRow, idxCol)).equals(CellStatus.FREE)) {
+                                setCellStatus(Cell.of(idxRow, idxCol), CellStatus.BLOCKED);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public Integer countFreeCells() {
+        Integer count = 0;
+        for (List<CellStatus> row : cells) {
+            for (CellStatus cellStatus : row) {
+                if (cellStatus.equals(CellStatus.FREE)) {
+                    ++count;
+                }
+            }
+        }
+        return count;
+    }
+
+    public void freeBlockedCells() {
+        for (Integer row = 0; row < FIELD_SIZE; ++row) {
+            for (Integer col = 0; col < FIELD_SIZE; ++col) {
+                if (getCellStatus(Cell.of(row, col)).equals(CellStatus.BLOCKED)) {
+                    setCellStatus(Cell.of(row, col), CellStatus.FREE);
+                }
+            }
+        }
+    }
+
+    /**
+     * created by MikeGus on 12.11.17
+     * @param row: row position
+     * @param col: col position
+     * @return true if horizontal, false if vertical, null if undefined
+     */
+    public Boolean shipIsHorizontal(final Integer row, final Integer col) {
+
+        Boolean isHorizontal = null;
+        if (row > 0) {
+            if (getCellStatus(Cell.of(row - 1, col)) == CellStatus.ON_FIRE) {
+                return true;
+            }
+        }
+        if (row < FIELD_SIZE - 1) {
+            if (getCellStatus(Cell.of(row + 1, col)) == CellStatus.ON_FIRE) {
+                return true;
+            }
+        }
+        if (col > 0) {
+            if (getCellStatus(Cell.of(row, col - 1)) == CellStatus.ON_FIRE) {
+                return false;
+            }
+        }
+        if (col < FIELD_SIZE - 1) {
+            return false;
+        }
+
+        return null;
+    }
 }
