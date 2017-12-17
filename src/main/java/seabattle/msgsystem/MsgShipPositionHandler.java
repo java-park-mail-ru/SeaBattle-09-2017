@@ -4,12 +4,12 @@ import org.springframework.stereotype.Component;
 import seabattle.game.field.Field;
 import seabattle.game.gamesession.GameSession;
 import seabattle.game.gamesession.GameSessionService;
-import seabattle.game.gamesession.GameSessionStatus;
 import seabattle.game.messages.MsgShipPosition;
 import seabattle.game.ship.ShipsValidator;
 
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
+import java.util.concurrent.atomic.AtomicReference;
 
 @SuppressWarnings("unused")
 @Component
@@ -46,20 +46,16 @@ public class MsgShipPositionHandler extends MessageHandler<MsgShipPosition> {
         }
         if (gameSessionService.isPlaying(id)) {
             GameSession gameSession = gameSessionService.getGameSession(id);
-            if (gameSession.getStatus().equals(GameSessionStatus.SETUP)) {
-                if (gameSession.getPlayer1Id().equals(id)) {
-                    gameSession.getPlayer1().setShips(cast.getShips());
-                    gameSession.setField1(new Field(cast.getShips()));
-                } else if (gameSession.getPlayer2Id().equals(id)) {
-                    gameSession.getPlayer2().setShips(cast.getShips());
-                    gameSession.setField2(new Field(cast.getShips()));
-                } else {
-                    throw new IllegalArgumentException("Player is not in this session!");
-                }
+            if (gameSession.getPlayer1Id().equals(id)) {
+                gameSession.setField2(new Field(cast.getShips()));
+                gameSession.getPlayer2().setShips(cast.getShips());
+            } else if (gameSession.getPlayer2Id().equals(id)) {
+                gameSession.setField2(new Field(cast.getShips()));
+                gameSession.getPlayer2().setShips(cast.getShips());
             } else {
-                throw new IllegalStateException("Game is not in SETUP state!");
+                throw new IllegalArgumentException("Player is not in this session!");
             }
-            gameSessionService.tryStartGame(gameSession);
+            gameSessionService.tryStartGame(new AtomicReference<>(gameSession));
         } else {
             throw new IllegalArgumentException("Player is not currently playing!");
         }

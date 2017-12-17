@@ -4,184 +4,51 @@ import seabattle.game.field.Cell;
 import seabattle.game.field.CellStatus;
 import seabattle.game.field.Field;
 import seabattle.game.player.Player;
-import seabattle.game.ship.Ship;
 
 import javax.validation.constraints.NotNull;
-import java.util.concurrent.atomic.AtomicLong;
 
-
-@SuppressWarnings({"unused", "FieldCanBeLocal"})
-public class GameSession {
-    private static final AtomicLong SESSION_ID_GENERATOR = new AtomicLong(0);
+public interface GameSession {
 
     @NotNull
-    private GameSessionStatus status;
-    @NotNull
-    private Long sessionId;
-    @NotNull
-    private Player player1;
-    @NotNull
-    private Player player2;
-
-    private Player damagedPlayer;
-    private Field damagedField;
-
-    public Player getDamagedPlayer() {
-        return damagedPlayer;
-    }
-
-    private Field field1 = null;
-    private Field field2 = null;
+    Long getSessionId();
 
     @NotNull
-    private GameSessionService gameSessionService;
-
-
-    GameSession(@NotNull Player player1, @NotNull Player player2,
-                       @NotNull GameSessionService gameSessionService) {
-        this.sessionId = SESSION_ID_GENERATOR.getAndIncrement();
-        this.player1 = player1;
-        this.player2 = player2;
-        this.gameSessionService = gameSessionService;
-
-        this.status = GameSessionStatus.SETUP;
-    }
+    Player getPlayer1();
 
     @NotNull
-    public GameSessionStatus getStatus() {
-        return status;
-    }
+    Long getPlayer1Id();
+
+    void setPlayer1(@NotNull Player player1) throws IllegalStateException;
 
     @NotNull
-    public Player getPlayer1() {
-        return player1;
-    }
+    Player getPlayer2();
 
     @NotNull
-    public Long getPlayer1Id() {
-        return player1.getPlayerId();
-    }
+    Long getPlayer2Id();
 
-    public void setPlayer1(@NotNull Player player1) {
-        this.player1 = player1;
-    }
+    void setPlayer2(@NotNull Player player2) throws IllegalStateException;
 
-    @NotNull
-    public Player getPlayer2() {
-        return player2;
-    }
+    Boolean bothFieldsAccepted();
 
-    @NotNull
-    public Long getPlayer2Id() {
-        return player2.getPlayerId();
-    }
+    Player getWinner() throws IllegalStateException;
 
-    public void  setPlayer2(@NotNull Player player2) {
-        this.player2 = player2;
-    }
+    void setField1(@NotNull Field field) throws IllegalStateException;
 
-    Boolean bothFieldsAccepted() {
-        return field1 != null && field2 != null;
-    }
+    void setField2(@NotNull Field field) throws IllegalStateException;
 
-    public Player getWinner() {
-        if (status == GameSessionStatus.WIN_P1) {
-            return player1;
-        } else if (status == GameSessionStatus.WIN_P2) {
-            return player2;
-        }
-        throw new IllegalStateException("Game did not end!");
-    }
+    void setDamagedSide(@NotNull Player player) throws IllegalStateException;
 
-    public void setField1(@NotNull Field field) {
-        this.field1 = field;
-    }
+    Player getAttackingPlayer();
 
-    public void setField2(@NotNull Field field) {
-        this.field2 = field;
-    }
+    Player getDamagedPlayer();
 
-    void setDamagedSide(@NotNull Player player) {
-        if (player == player1) {
-            this.damagedField = field1;
-            this.damagedPlayer = player1;
-        } else if (player == player2) {
-            this.damagedField = field2;
-            this.damagedPlayer = player2;
-        } else {
-            throw new IllegalArgumentException("Player not in current session!");
-        }
-    }
+    Field getDamagedField() throws IllegalStateException;
 
-    Boolean toGamePhase() {
-        if (this.status != GameSessionStatus.SETUP || this.field1 == null || this.field2 == null) {
-            return Boolean.FALSE;
-        }
+    GameSession nextPhase();
 
-        if (this.damagedPlayer == player1) {
-            this.status = GameSessionStatus.MOVE_P2;
-        } else {
-            this.status = GameSessionStatus.MOVE_P1;
-        }
+    Field getField1();
 
-        return Boolean.TRUE;
-    }
+    Field getField2();
 
-    public Field getField1() {
-        return field1;
-    }
-
-    public Field getField2() {
-        return field2;
-    }
-
-    CellStatus makeMove(Cell cell) throws IllegalStateException {
-
-        if (this.status != GameSessionStatus.MOVE_P1 && this.status != GameSessionStatus.MOVE_P2) {
-            throw new IllegalStateException("Illegal state for move!");
-        }
-
-        switch (damagedField.fire(cell)) {
-            case BLOCKED:
-                switch (status) {
-                    case MOVE_P1:
-                        status = GameSessionStatus.MOVE_P2;
-                        damagedField = field1;
-                        damagedPlayer = player1;
-                        return CellStatus.BLOCKED;
-                    case MOVE_P2:
-                        status = GameSessionStatus.MOVE_P1;
-                        damagedField = field2;
-                        damagedPlayer = player2;
-                        return CellStatus.BLOCKED;
-                    default:
-                        throw new IllegalStateException("Illegal state!");
-                }
-            case ON_FIRE:
-                for (Ship ship : damagedPlayer.getAliveShips()) {
-                    if (ship.inShip(cell) && damagedField.shipKilled(ship)) {
-                        damagedPlayer.getAliveShips().remove(ship);
-                        damagedPlayer.getDeadShips().add(ship);
-                        damagedField.killShip(ship);
-                        if (damagedPlayer.allShipsDead()) {
-                            switch (status) {
-                                case MOVE_P1:
-                                    status = GameSessionStatus.WIN_P1;
-                                    break;
-                                case MOVE_P2:
-                                    status = GameSessionStatus.WIN_P2;
-                                    break;
-                                default:
-                                    throw new IllegalStateException("Illegal state!");
-                            }
-                        }
-                        return CellStatus.DESTRUCTED;
-                    }
-                }
-                return CellStatus.ON_FIRE;
-            default:
-                throw new IllegalStateException("Illegal state!");
-        }
-    }
-
+    CellStatus makeMove(Cell cell) throws IllegalStateException;
 }

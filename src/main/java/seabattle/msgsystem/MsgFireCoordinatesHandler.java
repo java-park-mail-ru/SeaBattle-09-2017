@@ -13,6 +13,7 @@ import seabattle.websocket.WebSocketService;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicReference;
 
 @SuppressWarnings({"unused", "SpringAutowiredFieldsWarningInspection"})
 @Component
@@ -45,9 +46,8 @@ public class MsgFireCoordinatesHandler extends MessageHandler<MsgFireCoordinates
     public void handle(MsgFireCoordinates cast, Long id) {
         if (gameSessionService.isPlaying(id)) {
             GameSession gameSession = gameSessionService.getGameSession(id);
-            if (!gameSession.getDamagedPlayer().getPlayerId().equals(id)
-                    && (gameSession.getPlayer1Id().equals(id) || gameSession.getPlayer2Id().equals(id))) {
-                gameSessionService.makeMove(gameSession, cast.getCoordinates());
+            if (gameSession.getAttackingPlayer().getPlayerId().equals(id)) {
+                gameSessionService.makeMove(new AtomicReference<>(gameSession), cast.getCoordinates());
             } else {
                 try {
                     webSocketService.sendMessage(id, new MsgError("It's not currently this player's move! "));
@@ -57,9 +57,9 @@ public class MsgFireCoordinatesHandler extends MessageHandler<MsgFireCoordinates
             }
         } else {
             try {
-                    webSocketService.sendMessage(id, new MsgError("Player is not currently playing!"));
+                webSocketService.sendMessage(id, new MsgError("Player is not currently playing!"));
             } catch (IOException ex) {
-                    LOGGER.warn("Unable to send message");
+                LOGGER.warn("Unable to send message");
             }
         }
 

@@ -21,15 +21,14 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicReference;
 
 @SuppressWarnings({"unused", "WeakerAccess", "SpringAutowiredFieldsWarningInspection"})
 @Service
 public class GameSessionService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameSessionService.class);
 
-    @NotNull
     private final Map<Long, GameSession> gameSessions = new HashMap<>();
-
 
     @NotNull
     private final ArrayDeque<UserPlayer> waitingPlayers = new ArrayDeque<>();
@@ -59,8 +58,8 @@ public class GameSessionService {
     }
 
     public Boolean sessionAlive(@NotNull GameSession session) {
-        return webSocketService.isConnected(session.getPlayer1().getPlayerId())
-                && webSocketService.isConnected(session.getPlayer2().getPlayerId());
+        return webSocketService.isConnected(session.getPlayer1Id())
+                && webSocketService.isConnected(session.getPlayer2Id());
     }
 
     public GameSession getGameSession(Long userId) {
@@ -89,7 +88,7 @@ public class GameSessionService {
 
     public void createSession(Player player1, Player player2) {
 
-        final GameSession gameSession = new GameSession(player1, player2, this);
+        final GameSession gameSession = new GameSessionSetup(player1, player2);
 
         gameSessions.put(player1.getPlayerId(), gameSession);
         gameSessions.put(player2.getPlayerId(), gameSession);
@@ -115,19 +114,23 @@ public class GameSessionService {
         }
     }
 
-    public void tryStartGame(@NotNull GameSession gameSession) {
+    public void tryStartGame(@NotNull AtomicReference<GameSession> gameSessionReference) {
 
+        GameSession gameSession = gameSessionReference.get();
         if (gameSession.bothFieldsAccepted() == Boolean.FALSE) {
             return;
         }
         try {
             Player damagedPlayer = chooseDamagedPlayer(gameSession.getPlayer1(), gameSession.getPlayer2());
             gameSession.setDamagedSide(damagedPlayer);
+            sessionToNextPhase(gameSessionReference);
+
             MsgGameStarted gameStarted1 = createGameStartedMessage(gameSession.getPlayer1(), damagedPlayer);
             webSocketService.sendMessage(gameSession.getPlayer1Id(), gameStarted1);
+
             MsgGameStarted gameStarted2 = createGameStartedMessage(gameSession.getPlayer2(), damagedPlayer);
             webSocketService.sendMessage(gameSession.getPlayer2Id(), gameStarted2);
-            gameSession.toGamePhase();
+
         } catch (IOException ex) {
             LOGGER.warn("Can't start game! " + ex);
         }
@@ -221,26 +224,20 @@ public class GameSessionService {
         return new MsgEndGame(Boolean.FALSE, current.getScore());
     }
 
-    public void makeMove(@NotNull GameSession gameSession, @NotNull Cell cell) {
-        if (gameSession.toGamePhase()) {
-            try {
-                webSocketService.sendMessage(gameSession.getPlayer1Id(),
-                        new MsgError("Not Game phase! "));
-                webSocketService.sendMessage(gameSession.getPlayer2Id(),
-                        new MsgError("Not Game phase! "));
-            } catch (IOException ex) {
-                LOGGER.warn("Can't send message! ", ex);
-            }
-            return;
-        }
+    public void makeMove(@NotNull AtomicReference<GameSession> gameSessionReference, @NotNull Cell cell) {
         try {
+            GameSession gameSession = gameSessionReference.get();
             CellStatus cellStatus = gameSession.makeMove(cell);
-            if (cellStatus == CellStatus.DESTRUCTED
-                    && (gameSession.getStatus().equals(GameSessionStatus.WIN_P1)
-                    || gameSession.getStatus().equals(GameSessionStatus.WIN_P2))) {
-                endSession(gameSession);
+            if (cellStatus == CellStatus.DESTRUCTED) {
+                if (gameSession.getDamagedPlayer().allShipsDead()) {
+
+                    gameSessionReference.set(gameSession);
+                    sessionToNextPhase(gameSessionReference);
+                    endSession(gameSessionReference.get());
+                }
             }
             Message resultMove = null;
+
             if (cellStatus == CellStatus.DESTRUCTED) {
                 for (Ship ship: gameSession.getDamagedPlayer().getDeadShips()) {
                     if (ship.inShip(cell)) {
@@ -248,12 +245,9 @@ public class GameSessionService {
                     }
                 }
             } else {
-                if (gameSession.getStatus().equals(GameSessionStatus.MOVE_P1)) {
-                    resultMove = new MsgResultMove(cell, cellStatus, gameSession.getPlayer1().getUsername());
-                } else {
-                    resultMove = new MsgResultMove(cell, cellStatus, gameSession.getPlayer2().getUsername());
-                }
+                resultMove = new MsgResultMove(cell, cellStatus, gameSession.getAttackingPlayer().getUsername());
             }
+
             try {
                 webSocketService.sendMessage(gameSession.getPlayer1Id(), resultMove);
                 webSocketService.sendMessage(gameSession.getPlayer2Id(), resultMove);
@@ -262,19 +256,11 @@ public class GameSessionService {
             }
 
         } catch (IllegalArgumentException ex) {
-            if (gameSession.getStatus().equals(GameSessionStatus.MOVE_P1)) {
-                try {
-                    webSocketService.sendMessage(gameSession.getPlayer1Id(), new MsgError("unacceptable move "));
-                } catch (IOException sendEx) {
-                    LOGGER.warn("Can't send message! ", ex);
-                }
-
-            } else {
-                try {
-                    webSocketService.sendMessage(gameSession.getPlayer2Id(), new MsgError("unacceptable move "));
-                } catch (IOException sendEx) {
-                    LOGGER.warn("Can't send message! ", ex);
-                }
+            try {
+                webSocketService.sendMessage(gameSessionReference.get().getAttackingPlayer().getPlayerId(),
+                        new MsgError("unacceptable move "));
+            } catch (IOException sendEx) {
+                LOGGER.warn("Can't send message! ", ex);
             }
             LOGGER.warn(ex.getMessage());
         } catch (IllegalStateException sEx) {
@@ -305,5 +291,13 @@ public class GameSessionService {
         } catch (IOException ex) {
             LOGGER.warn("Can't send message! ", ex);
         }
+    }
+
+    private void sessionToNextPhase(@NotNull AtomicReference<GameSession> gameSessionReference) {
+        GameSession gameSession = gameSessionReference.get();
+        gameSession = gameSession.nextPhase();
+        gameSessions.replace(gameSession.getPlayer1Id(), gameSession);
+        gameSessions.replace(gameSession.getPlayer2Id(), gameSession);
+        gameSessionReference.set(gameSession);
     }
 }
