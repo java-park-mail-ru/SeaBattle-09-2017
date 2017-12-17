@@ -51,7 +51,7 @@ public class WebSocketService {
         return player;
     }
 
-    private void removeUser(@NotNull Long userId) {
+    void removeUser(@NotNull Long userId) {
         players.remove(sessions.remove(userId).getId());
     }
 
@@ -60,9 +60,6 @@ public class WebSocketService {
         if (webSocketSession != null && webSocketSession.isOpen()) {
             try {
                 webSocketSession.close(closeStatus);
-                sessions.remove(userId);
-                removeUser(userId);
-
             } catch (IOException ignore) {
                 LOGGER.warn("Can't close session");
             }
