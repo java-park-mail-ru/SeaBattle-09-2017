@@ -47,8 +47,8 @@ public class MsgShipPositionHandler extends MessageHandler<MsgShipPosition> {
         if (gameSessionService.isPlaying(id)) {
             GameSession gameSession = gameSessionService.getGameSession(id);
             if (gameSession.getPlayer1Id().equals(id)) {
-                gameSession.setField2(new Field(cast.getShips()));
-                gameSession.getPlayer2().setShips(cast.getShips());
+                gameSession.setField1(new Field(cast.getShips()));
+                gameSession.getPlayer1().setShips(cast.getShips());
             } else if (gameSession.getPlayer2Id().equals(id)) {
                 gameSession.setField2(new Field(cast.getShips()));
                 gameSession.getPlayer2().setShips(cast.getShips());
