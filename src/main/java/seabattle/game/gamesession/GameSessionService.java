@@ -123,6 +123,7 @@ public class GameSessionService {
         try {
             Player damagedPlayer = chooseDamagedPlayer(gameSession.getPlayer1(), gameSession.getPlayer2());
             gameSession.setDamagedSide(damagedPlayer);
+            gameSessionReference.set(gameSession);
             sessionToNextPhase(gameSessionReference);
 
             MsgGameStarted gameStarted1 = createGameStartedMessage(gameSession.getPlayer1(), damagedPlayer);
