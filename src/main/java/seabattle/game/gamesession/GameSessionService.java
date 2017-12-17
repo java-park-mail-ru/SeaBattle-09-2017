@@ -235,6 +235,7 @@ public class GameSessionService {
                     gameSessionReference.set(gameSession);
                     sessionToNextPhase(gameSessionReference);
                     endSession(gameSessionReference.get());
+                    return;
                 }
             }
             Message resultMove = null;
