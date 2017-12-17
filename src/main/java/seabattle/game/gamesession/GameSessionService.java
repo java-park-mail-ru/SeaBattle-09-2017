@@ -162,6 +162,9 @@ public class GameSessionService {
 
             endGame = createMsgEndGame(gameSession, gameSession.getPlayer2());
             webSocketService.sendMessage(gameSession.getPlayer2Id(), endGame);
+
+            webSocketService.closeSession(gameSession.getPlayer1Id(), CloseStatus.NORMAL);
+            webSocketService.closeSession(gameSession.getPlayer1Id(), CloseStatus.NORMAL);
         } catch (IOException ex) {
             LOGGER.warn("Failed to send MsgEndGame to user " + gameSession.getPlayer1().getPlayerId(), ex);
         } catch (IllegalStateException ex) {
