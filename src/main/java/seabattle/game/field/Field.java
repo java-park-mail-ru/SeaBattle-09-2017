@@ -199,7 +199,10 @@ public final class Field {
                     break;
                 }
                 CellStatus cellStatus = getCellStatus(currentCell);
-                if (!cellStatus.equals(CellStatus.BLOCKED)) {
+                if (cellStatus.equals(CellStatus.BLOCKED)) {
+                    break;
+                }
+                if (!cellStatus.equals(CellStatus.ON_FIRE)) {
                     result.add(currentCell);
                     break;
                 }
@@ -210,7 +213,10 @@ public final class Field {
                     break;
                 }
                 CellStatus cellStatus = getCellStatus(currentCell);
-                if (!cellStatus.equals(CellStatus.BLOCKED)) {
+                if (cellStatus.equals(CellStatus.BLOCKED)) {
+                    break;
+                }
+                if (!cellStatus.equals(CellStatus.ON_FIRE)) {
                     result.add(currentCell);
                     break;
                 }
@@ -223,7 +229,10 @@ public final class Field {
                     break;
                 }
                 CellStatus cellStatus = getCellStatus(currentCell);
-                if (!cellStatus.equals(CellStatus.BLOCKED)) {
+                if (cellStatus.equals(CellStatus.BLOCKED)) {
+                    break;
+                }
+                if (!cellStatus.equals(CellStatus.ON_FIRE)) {
                     result.add(currentCell);
                     break;
                 }
@@ -234,7 +243,10 @@ public final class Field {
                     break;
                 }
                 CellStatus cellStatus = getCellStatus(currentCell);
-                if (!cellStatus.equals(CellStatus.BLOCKED)) {
+                if (cellStatus.equals(CellStatus.BLOCKED)) {
+                    break;
+                }
+                if (!cellStatus.equals(CellStatus.ON_FIRE)) {
                     result.add(currentCell);
                     break;
                 }
