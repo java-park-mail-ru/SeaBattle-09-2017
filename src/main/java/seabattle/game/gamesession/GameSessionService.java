@@ -9,6 +9,7 @@ import seabattle.authorization.service.UserService;
 import seabattle.authorization.views.UserView;
 import seabattle.game.field.Cell;
 import seabattle.game.field.CellStatus;
+import seabattle.game.field.Field;
 import seabattle.game.messages.*;
 import seabattle.game.player.Player;
 import seabattle.game.player.UserPlayer;
@@ -85,8 +86,7 @@ public class GameSessionService {
         }
     }
 
-
-    public void createSession(Player player1, Player player2) {
+    public void createSession(@NotNull Player player1, @NotNull Player player2) {
 
         final GameSession gameSession = new GameSessionSetup(player1, player2);
 
@@ -114,6 +114,31 @@ public class GameSessionService {
         }
     }
 
+    public void createSessionWithBot(@NotNull Player player) {
+
+        final Player bot = new AIPlayer();
+        final GameSession gameSession = new GameSessionSetup(player, bot);
+        gameSession.setField2(new Field(bot.getAliveShips()));
+
+        gameSessions.put(player.getPlayerId(), gameSession);
+
+        try {
+            final MsgLobbyCreated initMessage = new MsgLobbyCreated(bot.getUsername());
+            webSocketService.sendMessage(player.getPlayerId(), initMessage);
+        } catch (IOException ex) {
+            final String error = "Failed to create session with " + player.getPlayerId()
+                    + " and " + bot.getPlayerId();
+            try {
+                webSocketService.sendMessage(player.getPlayerId(), new MsgError(error));
+            } catch (IOException sendEx) {
+                LOGGER.warn("Unable to send message");
+            }
+            webSocketService.closeSession(player.getPlayerId(), CloseStatus.SERVER_ERROR);
+
+            LOGGER.warn(error, ex);
+        }
+    }
+
     public void tryStartGame(@NotNull AtomicReference<GameSession> gameSessionReference) {
 
         GameSession gameSession = gameSessionReference.get();
@@ -121,16 +146,23 @@ public class GameSessionService {
             return;
         }
         try {
-            Player damagedPlayer = chooseDamagedPlayer(gameSession.getPlayer1(), gameSession.getPlayer2());
-            gameSession.setDamagedSide(damagedPlayer);
+            Player damagedPlayer;
+            if (gameSession.getPlayer2Id() == null) {
+                damagedPlayer = gameSession.getPlayer2();
+            } else {
+                damagedPlayer = chooseDamagedPlayer(gameSession.getPlayer1(), gameSession.getPlayer2());
+                gameSession.setDamagedSide(damagedPlayer);
+            }
             gameSessionReference.set(gameSession);
             sessionToNextPhase(gameSessionReference);
 
             MsgGameStarted gameStarted1 = createGameStartedMessage(gameSession.getPlayer1(), damagedPlayer);
             webSocketService.sendMessage(gameSession.getPlayer1Id(), gameStarted1);
 
-            MsgGameStarted gameStarted2 = createGameStartedMessage(gameSession.getPlayer2(), damagedPlayer);
-            webSocketService.sendMessage(gameSession.getPlayer2Id(), gameStarted2);
+            if (gameSession.getPlayer2Id() != null) {
+                MsgGameStarted gameStarted2 = createGameStartedMessage(gameSession.getPlayer2(), damagedPlayer);
+                webSocketService.sendMessage(gameSession.getPlayer2Id(), gameStarted2);
+            }
 
         } catch (IOException ex) {
             LOGGER.warn("Can't start game! " + ex);
@@ -160,23 +192,29 @@ public class GameSessionService {
             MsgEndGame endGame = createMsgEndGame(gameSession, gameSession.getPlayer1());
             webSocketService.sendMessage(gameSession.getPlayer1Id(), endGame);
 
-            endGame = createMsgEndGame(gameSession, gameSession.getPlayer2());
-            webSocketService.sendMessage(gameSession.getPlayer2Id(), endGame);
+            if (gameSession.getPlayer2Id() != null) {
+                endGame = createMsgEndGame(gameSession, gameSession.getPlayer2());
+                webSocketService.sendMessage(gameSession.getPlayer2Id(), endGame);
+            }
 
+            gameSessions.remove(gameSession.getPlayer1Id());
             webSocketService.closeSession(gameSession.getPlayer1Id(), CloseStatus.NORMAL);
-            webSocketService.closeSession(gameSession.getPlayer1Id(), CloseStatus.NORMAL);
+            if (gameSession.getPlayer2Id() != null) {
+                gameSessions.remove(gameSession.getPlayer2Id());
+                webSocketService.closeSession(gameSession.getPlayer2Id(), CloseStatus.NORMAL);
+            }
         } catch (IOException ex) {
             LOGGER.warn("Failed to send MsgEndGame to user " + gameSession.getPlayer1().getPlayerId(), ex);
         } catch (IllegalStateException ex) {
             LOGGER.warn(ex.getMessage());
         }
-        gameSessions.remove(gameSession.getPlayer1Id());
-        gameSessions.remove(gameSession.getPlayer2Id());
-        webSocketService.closeSession(gameSession.getPlayer1Id(), CloseStatus.NORMAL);
-        webSocketService.closeSession(gameSession.getPlayer2Id(), CloseStatus.NORMAL);
     }
 
     private void calculationScore(@NotNull GameSession gameSession) throws IllegalStateException {
+        if (gameSession.getPlayer2Id() == null) {
+            return;
+        }
+
         final Player winnerPlayer = gameSession.getWinner();
         final Player loserPlayer;
         if (winnerPlayer.equals(gameSession.getPlayer1())) {
@@ -255,7 +293,9 @@ public class GameSessionService {
 
             try {
                 webSocketService.sendMessage(gameSession.getPlayer1Id(), resultMove);
-                webSocketService.sendMessage(gameSession.getPlayer2Id(), resultMove);
+                if (gameSession.getPlayer2Id() != null) {
+                    webSocketService.sendMessage(gameSession.getPlayer2Id(), resultMove);
+                }
             } catch (IOException ex) {
                 LOGGER.warn("Can't send message! ", ex);
             }
@@ -302,7 +342,10 @@ public class GameSessionService {
         GameSession gameSession = gameSessionReference.get();
         gameSession = gameSession.nextPhase();
         gameSessions.replace(gameSession.getPlayer1Id(), gameSession);
-        gameSessions.replace(gameSession.getPlayer2Id(), gameSession);
+        if (gameSession.getPlayer2Id() != null) {
+            gameSessions.replace(gameSession.getPlayer2Id(), gameSession);
+        }
         gameSessionReference.set(gameSession);
     }
+
 }

@@ -14,21 +14,15 @@ import java.util.concurrent.ThreadLocalRandom;
 @SuppressWarnings({"unused", "FieldCanBeLocal"})
 public  final class AIPlayer implements Player {
 
-    @NotNull
-    private Long playerId;
-    @NotNull
-    private String username;
-    @NotNull
-    private Integer score = 0;
+    private Long playerId = null;
 
-    private List<Ship> aliveShips;
+    @NotNull
+    private String username = "Mysterious stranger";
+
+    private Integer score = null;
+
+    private List<Ship> aliveShips = generateShips();
     private List<Ship> deadShips = new ArrayList<>();
-
-    public AIPlayer() {
-        playerId = (long) -1;
-        username = "John Doe";
-        aliveShips = generateShips();
-    }
 
     @Override
     public UserView getUser() {

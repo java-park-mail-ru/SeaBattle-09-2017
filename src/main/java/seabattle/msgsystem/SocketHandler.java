@@ -64,7 +64,13 @@ public class SocketHandler extends TextWebSocketHandler {
             }
         }
         webSocketService.registerUser(connectedPlayer, webSocketSession);
-        gameSessionService.addWaitingPlayer(connectedPlayer);
+
+        final Boolean playWithBot = (boolean) webSocketSession.getAttributes().get("playWithBot");
+        if (playWithBot.equals(Boolean.TRUE)) {
+            return;
+        } else {
+            gameSessionService.addWaitingPlayer(connectedPlayer);
+        }
     }
 
     @Override
