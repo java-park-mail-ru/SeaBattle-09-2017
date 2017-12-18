@@ -130,6 +130,7 @@ public  final class AIPlayer implements Player {
 
         Integer freeCells = 0;
         final Integer maxDistance = 3;
+        final Integer minDistance = 1;
 
         for (Integer row =  0; row < field.getFieldSize(); ++row) {
             for (Integer col = 0; col < field.getFieldSize(); ++col) {
@@ -141,45 +142,49 @@ public  final class AIPlayer implements Player {
 
                         Boolean isHorizontal = field.shipIsHorizontal(row, col);
                         if (isHorizontal != Boolean.FALSE) {
-                            for (Integer distance = 0; distance < maxDistance; ++distance) {
+                            for (Integer distance = minDistance; distance < maxDistance; ++distance) {
                                 CellStatus cellStatus = field.getCellStatus(Cell.of(row, col - distance));
-                                if (cellStatus != CellStatus.ON_FIRE) {
-                                    if (cellStatus == CellStatus.BLOCKED) {
+                                if (!cellStatus.equals(CellStatus.ON_FIRE)) {
+                                    if (cellStatus.equals(CellStatus.DESTRUCTED)
+                                            || cellStatus.equals(CellStatus.BLOCKED)) {
                                         break;
+                                    } else {
+                                        return Cell.of(row, col - distance);
                                     }
-                                } else {
-                                    return new Cell(row, col - distance);
                                 }
                             }
-                            for (Integer distance = 0; distance < maxDistance; ++distance) {
+                            for (Integer distance = minDistance; distance < maxDistance; ++distance) {
                                 CellStatus cellStatus = field.getCellStatus(Cell.of(row, col + distance));
-                                if (cellStatus != CellStatus.ON_FIRE) {
-                                    if (cellStatus == CellStatus.BLOCKED) {
+                                if (!cellStatus.equals(CellStatus.ON_FIRE)) {
+                                    if (cellStatus.equals(CellStatus.DESTRUCTED)
+                                            || cellStatus.equals(CellStatus.BLOCKED)) {
                                         break;
+                                    } else {
+                                        return Cell.of(row, col + distance);
                                     }
-                                } else {
-                                    return new Cell(row, col - distance);
                                 }
                             }
                         } else {
-                            for (Integer distance = 0; distance < maxDistance; ++distance) {
+                            for (Integer distance = minDistance; distance < maxDistance; ++distance) {
                                 CellStatus cellStatus = field.getCellStatus(Cell.of(row - distance, col));
-                                if (cellStatus != CellStatus.ON_FIRE) {
-                                    if (cellStatus == CellStatus.BLOCKED) {
+                                if (!cellStatus.equals(CellStatus.ON_FIRE)) {
+                                    if (cellStatus.equals(CellStatus.DESTRUCTED)
+                                            || cellStatus.equals(CellStatus.BLOCKED)) {
                                         break;
+                                    } else {
+                                        return Cell.of(row - distance, col);
                                     }
-                                } else {
-                                    return new Cell(row - distance, col);
                                 }
                             }
-                            for (Integer distance = 0; distance < maxDistance; ++distance) {
+                            for (Integer distance = minDistance; distance < maxDistance; ++distance) {
                                 CellStatus cellStatus = field.getCellStatus(Cell.of(row + distance, col));
-                                if (cellStatus != CellStatus.ON_FIRE) {
-                                    if (cellStatus == CellStatus.BLOCKED) {
+                                if (!cellStatus.equals(CellStatus.ON_FIRE)) {
+                                    if (cellStatus.equals(CellStatus.DESTRUCTED)
+                                            || cellStatus.equals(CellStatus.BLOCKED)) {
                                         break;
+                                    } else {
+                                        return Cell.of(row + distance, col);
                                     }
-                                } else {
-                                    return new Cell(row + distance, col);
                                 }
                             }
                         }
@@ -196,13 +201,13 @@ public  final class AIPlayer implements Player {
             }
         }
 
-        Integer randomPosition = ThreadLocalRandom.current().nextInt(0, freeCells);
+        Integer randomPosition = ThreadLocalRandom.current().nextInt(1, freeCells + 1);
 
         for (Integer row =  0; row < field.getFieldSize(); ++row) {
             for (Integer col = 0; col < field.getFieldSize(); ++col) {
                 CellStatus currentCellStatus = field.getCellStatus(Cell.of(row, col));
-                --freeCells;
-                if (freeCells == 0) {
+                --randomPosition;
+                if (randomPosition == 0) {
                     if (currentCellStatus == CellStatus.FREE || currentCellStatus == CellStatus.OCCUPIED) {
                         return new Cell(row, col);
                     }
