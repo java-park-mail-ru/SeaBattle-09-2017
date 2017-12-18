@@ -34,12 +34,12 @@ public class SocketHandler extends TextWebSocketHandler {
 
     public SocketHandler(@NotNull MessageHandlerContainer messageHandlerContainer,
                          @NotNull UserService userService,
-                         @NotNull GameSessionService gamseSessionService,
+                         @NotNull GameSessionService gameSessionService,
                          @NotNull WebSocketService webSocketService,
                          ObjectMapper objectMapper) {
         this.messageHandlerContainer = messageHandlerContainer;
         this.userService = userService;
-        this.gameSessionService = gamseSessionService;
+        this.gameSessionService = gameSessionService;
         this.webSocketService = webSocketService;
         this.objectMapper = objectMapper;
     }
