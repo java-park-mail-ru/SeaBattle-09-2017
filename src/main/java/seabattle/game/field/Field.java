@@ -181,74 +181,65 @@ public final class Field {
         final Integer minDistance = 1;
         final Integer maxDistance = 3;
 
-        Boolean checkBottom = true;
-        Boolean checkTop = true;
-        Boolean checkLeft = true;
-        Boolean checkRight = true;
+        Boolean checkVertical = true;
+        Boolean checkHorizontal = true;
 
         Boolean shipIsHorizontal = shipIsHorizontal(cell.getRowPos(), cell.getColPos());
         if (shipIsHorizontal != null) {
             if (shipIsHorizontal.equals(Boolean.TRUE)) {
-                checkBottom = false;
-                checkTop = false;
+                checkVertical = false;
             } else {
-                checkLeft = false;
-                checkRight = false;
+                checkHorizontal = false;
             }
         }
-        if (checkTop) {
+        if (checkVertical) {
             for (Integer distance = minDistance; distance < maxDistance; ++distance) {
                 Cell currentCell = Cell.of(cell.getRowPos() + distance, cell.getColPos());
                 if (currentCell.getRowPos() >= FIELD_SIZE) {
                     break;
                 }
                 CellStatus cellStatus = getCellStatus(currentCell);
-                if (cellStatus.equals(CellStatus.BLOCKED) || cellStatus.equals(CellStatus.DESTRUCTED)) {
+                if (!cellStatus.equals(CellStatus.BLOCKED)) {
+                    result.add(currentCell);
                     break;
                 }
-                result.add(currentCell);
             }
-        }
-        if (checkBottom) {
             for (Integer distance = minDistance; distance < maxDistance; ++distance) {
                 Cell currentCell = Cell.of(cell.getRowPos() - distance, cell.getColPos());
                 if (currentCell.getRowPos() < 0) {
                     break;
                 }
                 CellStatus cellStatus = getCellStatus(currentCell);
-                if (cellStatus.equals(CellStatus.BLOCKED) || cellStatus.equals(CellStatus.DESTRUCTED)) {
+                if (!cellStatus.equals(CellStatus.BLOCKED)) {
+                    result.add(currentCell);
                     break;
                 }
-                result.add(currentCell);
             }
         }
-        if (checkLeft) {
+        if (checkHorizontal) {
             for (Integer distance = minDistance; distance < maxDistance; ++distance) {
                 Cell currentCell = Cell.of(cell.getRowPos(), cell.getColPos() - distance);
                 if (currentCell.getRowPos() < 0) {
                     break;
                 }
                 CellStatus cellStatus = getCellStatus(currentCell);
-                if (cellStatus.equals(CellStatus.BLOCKED) || cellStatus.equals(CellStatus.DESTRUCTED)) {
+                if (!cellStatus.equals(CellStatus.BLOCKED)) {
+                    result.add(currentCell);
                     break;
                 }
-                result.add(currentCell);
             }
-        }
-        if (checkRight) {
             for (Integer distance = minDistance; distance < maxDistance; ++distance) {
                 Cell currentCell = Cell.of(cell.getRowPos(), cell.getColPos() + distance);
                 if (currentCell.getRowPos() >= FIELD_SIZE) {
                     break;
                 }
                 CellStatus cellStatus = getCellStatus(currentCell);
-                if (cellStatus.equals(CellStatus.BLOCKED) || cellStatus.equals(CellStatus.DESTRUCTED)) {
+                if (!cellStatus.equals(CellStatus.BLOCKED)) {
+                    result.add(currentCell);
                     break;
                 }
-                result.add(currentCell);
             }
         }
-
 
         return result;
     }
