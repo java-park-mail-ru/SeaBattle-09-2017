@@ -135,69 +135,12 @@ public  final class AIPlayer implements Player {
         for (Integer row =  0; row < field.getFieldSize(); ++row) {
             for (Integer col = 0; col < field.getFieldSize(); ++col) {
                 CellStatus currentCellStatus = field.getCellStatus(Cell.of(row, col));
-                switch (currentCellStatus) {
-                    case ON_FIRE:
-                        Integer checkRow = row;
-                        Integer checkCol = col;
-
-                        Boolean isHorizontal = field.shipIsHorizontal(row, col);
-                        if (isHorizontal != Boolean.FALSE) {
-                            for (Integer distance = minDistance; distance < maxDistance; ++distance) {
-                                CellStatus cellStatus = field.getCellStatus(Cell.of(row, col - distance));
-                                if (!cellStatus.equals(CellStatus.ON_FIRE)) {
-                                    if (cellStatus.equals(CellStatus.DESTRUCTED)
-                                            || cellStatus.equals(CellStatus.BLOCKED)) {
-                                        break;
-                                    } else {
-                                        return Cell.of(row, col - distance);
-                                    }
-                                }
-                            }
-                            for (Integer distance = minDistance; distance < maxDistance; ++distance) {
-                                CellStatus cellStatus = field.getCellStatus(Cell.of(row, col + distance));
-                                if (!cellStatus.equals(CellStatus.ON_FIRE)) {
-                                    if (cellStatus.equals(CellStatus.DESTRUCTED)
-                                            || cellStatus.equals(CellStatus.BLOCKED)) {
-                                        break;
-                                    } else {
-                                        return Cell.of(row, col + distance);
-                                    }
-                                }
-                            }
-                        } else {
-                            for (Integer distance = minDistance; distance < maxDistance; ++distance) {
-                                CellStatus cellStatus = field.getCellStatus(Cell.of(row - distance, col));
-                                if (!cellStatus.equals(CellStatus.ON_FIRE)) {
-                                    if (cellStatus.equals(CellStatus.DESTRUCTED)
-                                            || cellStatus.equals(CellStatus.BLOCKED)) {
-                                        break;
-                                    } else {
-                                        return Cell.of(row - distance, col);
-                                    }
-                                }
-                            }
-                            for (Integer distance = minDistance; distance < maxDistance; ++distance) {
-                                CellStatus cellStatus = field.getCellStatus(Cell.of(row + distance, col));
-                                if (!cellStatus.equals(CellStatus.ON_FIRE)) {
-                                    if (cellStatus.equals(CellStatus.DESTRUCTED)
-                                            || cellStatus.equals(CellStatus.BLOCKED)) {
-                                        break;
-                                    } else {
-                                        return Cell.of(row + distance, col);
-                                    }
-                                }
-                            }
-                        }
-                        break;
-                    case FREE:
-                        ++freeCells;
-                        break;
-                    case OCCUPIED:
-                        ++freeCells;
-                        break;
-                    default:
-                        break;
+                if (currentCellStatus.equals(CellStatus.ON_FIRE)) {
+                    List<Cell> possibleCells = field.possibleCells(Cell.of(row, col));
+                    Integer randomPosition = ThreadLocalRandom.current().nextInt(0, possibleCells.size());
+                    return possibleCells.get(randomPosition);
                 }
+                addPossibleCells(currentCellStatus, freeCells);
             }
         }
 
@@ -215,6 +158,12 @@ public  final class AIPlayer implements Player {
             }
         }
         throw new RuntimeException("Wrong field structure!");
+    }
+
+    private void addPossibleCells(CellStatus cellStatus, Integer counter) {
+        if (cellStatus.equals(CellStatus.FREE) || cellStatus.equals(CellStatus.OCCUPIED)) {
+            ++counter;
+        }
     }
 
 }
