@@ -219,7 +219,7 @@ public final class Field {
         if (checkHorizontal) {
             for (Integer distance = minDistance; distance < maxDistance; ++distance) {
                 Cell currentCell = Cell.of(cell.getRowPos(), cell.getColPos() - distance);
-                if (currentCell.getRowPos() < 0) {
+                if (currentCell.getColPos() < 0) {
                     break;
                 }
                 CellStatus cellStatus = getCellStatus(currentCell);
@@ -230,7 +230,7 @@ public final class Field {
             }
             for (Integer distance = minDistance; distance < maxDistance; ++distance) {
                 Cell currentCell = Cell.of(cell.getRowPos(), cell.getColPos() + distance);
-                if (currentCell.getRowPos() >= FIELD_SIZE) {
+                if (currentCell.getColPos() >= FIELD_SIZE) {
                     break;
                 }
                 CellStatus cellStatus = getCellStatus(currentCell);
@@ -255,22 +255,22 @@ public final class Field {
         Boolean isHorizontal = null;
         if (row > 0) {
             if (getCellStatus(Cell.of(row - 1, col)).equals(CellStatus.ON_FIRE)) {
-                return true;
+                return false;
             }
         }
         if (row < FIELD_SIZE - 1) {
             if (getCellStatus(Cell.of(row + 1, col)).equals(CellStatus.ON_FIRE)) {
-                return true;
+                return false;
             }
         }
         if (col > 0) {
             if (getCellStatus(Cell.of(row, col - 1)).equals(CellStatus.ON_FIRE)) {
-                return false;
+                return true;
             }
         }
         if (col < FIELD_SIZE - 1) {
             if (getCellStatus(Cell.of(row, col + 1)).equals(CellStatus.ON_FIRE)) {
-                return false;
+                return true;
             }
         }
 
