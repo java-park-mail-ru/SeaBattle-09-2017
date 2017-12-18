@@ -32,6 +32,9 @@ public class GameSessionService {
     private final Map<Long, GameSession> gameSessions = new HashMap<>();
 
     @NotNull
+    private final Map<Long, UserPlayer> playerMap = new HashMap<>();
+
+    @NotNull
     private final ArrayDeque<UserPlayer> waitingPlayers = new ArrayDeque<>();
 
     @NotNull
@@ -67,8 +70,8 @@ public class GameSessionService {
         return gameSessions.get(userId);
     }
 
-    public void addWaitingPlayer(@NotNull UserPlayer player) {
-        waitingPlayers.add(player);
+    public void addPlayer(@NotNull UserPlayer player) {
+        playerMap.put(player.getPlayerId(), player);
         final MsgYouInQueue msgYouInQueue = new MsgYouInQueue(player.getUsername());
         try {
             webSocketService.sendMessage(player.getPlayerId(), msgYouInQueue);
@@ -80,9 +83,25 @@ public class GameSessionService {
             }
             webSocketService.closeSession(player.getPlayerId(), CloseStatus.SERVER_ERROR);
         }
-        Integer numberOfPlayersInSession = 2;
-        if (waitingPlayers.size() >= numberOfPlayersInSession) {
-            createSession(waitingPlayers.pollFirst(), waitingPlayers.pollFirst());
+    }
+
+    public void addWaitingPlayer(@NotNull Long id) {
+        if (playerMap.containsKey(id)) {
+            waitingPlayers.add(playerMap.remove(id));
+            Integer numberOfPlayersInSession = 2;
+            if (waitingPlayers.size() >= numberOfPlayersInSession) {
+                createSession(waitingPlayers.pollFirst(), waitingPlayers.pollFirst());
+            }
+        } else {
+            LOGGER.warn("Player is not registered!");
+        }
+    }
+
+    public void setupGameWithBot(@NotNull Long id) {
+        if (playerMap.containsKey(id)) {
+            createSessionWithBot(playerMap.remove(id));
+        } else {
+            LOGGER.warn("Player is not registered!");
         }
     }
 
