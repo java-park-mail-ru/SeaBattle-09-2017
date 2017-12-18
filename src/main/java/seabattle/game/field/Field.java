@@ -179,7 +179,7 @@ public final class Field {
         List<Cell> result = new ArrayList<>();
 
         final Integer minDistance = 1;
-        final Integer maxDistance = 3;
+        final Integer maxDistance = 4;
 
         Boolean checkVertical = true;
         Boolean checkHorizontal = true;
