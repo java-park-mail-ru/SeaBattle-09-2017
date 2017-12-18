@@ -170,8 +170,8 @@ public class GameSessionService {
                 damagedPlayer = gameSession.getPlayer2();
             } else {
                 damagedPlayer = chooseDamagedPlayer(gameSession.getPlayer1(), gameSession.getPlayer2());
-                gameSession.setDamagedSide(damagedPlayer);
             }
+            gameSession.setDamagedSide(damagedPlayer);
             gameSessionReference.set(gameSession);
             sessionToNextPhase(gameSessionReference);
 
