@@ -140,7 +140,7 @@ public  final class AIPlayer implements Player {
                     Integer randomPosition = ThreadLocalRandom.current().nextInt(0, possibleCells.size());
                     return possibleCells.get(randomPosition);
                 }
-                addPossibleCells(currentCellStatus, freeCells);
+                freeCells += possibleCellAddition(currentCellStatus);
             }
         }
 
@@ -149,9 +149,9 @@ public  final class AIPlayer implements Player {
         for (Integer row =  0; row < field.getFieldSize(); ++row) {
             for (Integer col = 0; col < field.getFieldSize(); ++col) {
                 CellStatus currentCellStatus = field.getCellStatus(Cell.of(row, col));
-                --randomPosition;
-                if (randomPosition == 0) {
-                    if (currentCellStatus == CellStatus.FREE || currentCellStatus == CellStatus.OCCUPIED) {
+                if (currentCellStatus.equals(CellStatus.FREE) || currentCellStatus.equals(CellStatus.OCCUPIED)) {
+                    --randomPosition;
+                    if (randomPosition == 0) {
                         return new Cell(row, col);
                     }
                 }
@@ -160,10 +160,11 @@ public  final class AIPlayer implements Player {
         throw new RuntimeException("Wrong field structure!");
     }
 
-    private void addPossibleCells(CellStatus cellStatus, Integer counter) {
+    private Integer possibleCellAddition(CellStatus cellStatus) {
         if (cellStatus.equals(CellStatus.FREE) || cellStatus.equals(CellStatus.OCCUPIED)) {
-            ++counter;
+            return 1;
         }
+        return 0;
     }
 
 }
