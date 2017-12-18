@@ -92,7 +92,7 @@ public class SocketHandler extends TextWebSocketHandler {
             message = objectMapper.readValue(text.getPayload(), Message.class);
         } catch (IOException ex) {
             try {
-                webSocketService.sendMessage(userId, new MsgError("wrong json format at game response"));
+                webSocketService.sendMessage(userId, new MsgError("Wrong json format at game response"));
             } catch (IOException sendEx) {
                 LOGGER.warn("Unable to send message");
             }
