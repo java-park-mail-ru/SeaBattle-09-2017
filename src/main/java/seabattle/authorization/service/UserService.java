@@ -17,5 +17,5 @@ public interface UserService {
 
     UserView setScore(UserView user);
 
-    Integer getPosition(Integer score);
+    Integer getPosition(UserView user);
 }

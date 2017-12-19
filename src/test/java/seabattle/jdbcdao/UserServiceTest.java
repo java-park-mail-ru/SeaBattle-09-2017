@@ -111,8 +111,7 @@ public class UserServiceTest {
 
     @Test
     public void getPosition(){
-        final Integer testScore = 7;
-        final Integer testPosition = 4;
-        assertEquals(testPosition, userService.getPosition(testScore));
+        final Integer testPosition = 10;
+        assertEquals(testPosition, userService.getPosition(testUser));
     }
 }

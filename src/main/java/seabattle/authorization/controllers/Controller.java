@@ -136,7 +136,7 @@ public class Controller {
         } else {
             final UserView currentUserView = dbUsers.getByLoginOrEmail(currentUser);
             if (currentUserView != null) {
-                leaders.add(new LeaderboardView(dbUsers.getPosition(currentUserView.getScore()),
+                leaders.add(new LeaderboardView(dbUsers.getPosition(currentUserView),
                         currentUserView.getLogin(), currentUserView.getScore()));
             }
         }
