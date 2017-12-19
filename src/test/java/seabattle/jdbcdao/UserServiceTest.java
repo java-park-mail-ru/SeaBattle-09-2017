@@ -108,4 +108,11 @@ public class UserServiceTest {
         final UserView changeUser = userService.getByLoginOrEmail(testUser.getLogin());
         assertEquals(changeUser, testUser);
     }
+
+    @Test
+    public void getPosition(){
+        final Integer testScore = 7;
+        final Integer testPosition = 4;
+        assertEquals(testPosition, userService.getPosition(testScore));
+    }
 }

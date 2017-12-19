@@ -70,7 +70,7 @@ public class JdbcUserService implements UserService {
 
     @Override
     public Integer getPosition(Integer score) {
-        String sql = "SELECT count(*) as position FROM users WHERE score < ?";
+        String sql = "SELECT count(*) as position FROM users WHERE score > ?";
         return template.query(sql, ps -> ps.setInt(1, score),
                 READ_POSITION_MAPPER).get(0) + 1;
     }
