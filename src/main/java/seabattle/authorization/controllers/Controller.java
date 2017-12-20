@@ -128,6 +128,7 @@ public class Controller {
             iter++;
             if (leaderboardView.getLogin().equals(currentUser)) {
                 isLeaderUser = true;
+                leaders.add(leaderboardView);
             }
         }
 
