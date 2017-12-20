@@ -9,7 +9,6 @@ import seabattle.game.ship.ShipsValidator;
 
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
-import java.util.concurrent.atomic.AtomicReference;
 
 @SuppressWarnings("unused")
 @Component
@@ -55,7 +54,7 @@ public class MsgShipPositionHandler extends MessageHandler<MsgShipPosition> {
             } else {
                 throw new IllegalArgumentException("Player is not in this session!");
             }
-            gameSessionService.tryStartGame(new AtomicReference<>(gameSession));
+            gameSessionService.tryStartGame(gameSession);
         } else {
             throw new IllegalArgumentException("Player is not currently playing!");
         }

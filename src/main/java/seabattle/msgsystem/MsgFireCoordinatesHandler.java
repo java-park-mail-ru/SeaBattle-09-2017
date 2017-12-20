@@ -13,7 +13,7 @@ import seabattle.websocket.WebSocketService;
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicReference;
+
 
 @SuppressWarnings({"unused", "SpringAutowiredFieldsWarningInspection"})
 @Component
@@ -47,12 +47,10 @@ public class MsgFireCoordinatesHandler extends MessageHandler<MsgFireCoordinates
         if (gameSessionService.isPlaying(id)) {
             GameSession gameSession = gameSessionService.getGameSession(id);
             if (gameSession.getAttackingPlayer().getPlayerId().equals(id)) {
-                AtomicReference<GameSession> gameSessionReference = new AtomicReference<>(gameSession);
-                gameSessionService.makeMove(gameSessionReference, cast.getCoordinates());
-                while (gameSessionReference.get().getAttackingPlayer().getPlayerId() == null) {
-                    GameSession gameSession1 = gameSessionReference.get();
-                    gameSessionService.makeMove(gameSessionReference,
-                            gameSession1.getAttackingPlayer().makeDecision(gameSession1.getDamagedField()));
+                gameSessionService.makeMove(gameSession, cast.getCoordinates());
+                while (gameSession.getAttackingPlayer().getPlayerId() == null) {
+                    gameSessionService.makeMove(gameSession,
+                            gameSession.getAttackingPlayer().makeDecision(gameSession.getDamagedField()));
                 }
             } else {
                 try {

@@ -8,14 +8,9 @@ import seabattle.game.ship.Ship;
 
 import javax.validation.constraints.NotNull;
 
-public class GameSessionActive implements GameSession {
-
+public class SessionActive implements SessionState {
     @NotNull
-    private Long sessionId;
-    @NotNull
-    private Player player1;
-    @NotNull
-    private Player player2;
+    private GameSession gameSession;
     @NotNull
     private Player damagedPlayer;
     @NotNull
@@ -25,54 +20,12 @@ public class GameSessionActive implements GameSession {
     @NotNull
     private Field field2;
 
-    GameSessionActive(@NotNull GameSessionSetup sessionSetup) {
-        this.sessionId = sessionSetup.getSessionId();
-        this.player1 = sessionSetup.getPlayer1();
-        this.player2 = sessionSetup.getPlayer2();
+    public SessionActive(@NotNull SessionSetup sessionSetup) {
+        this.gameSession = sessionSetup.getGameSession();
         this.damagedPlayer = sessionSetup.getDamagedPlayer();
         this.damagedField = sessionSetup.getDamagedField();
         this.field1 = sessionSetup.getField1();
         this.field2 = sessionSetup.getField2();
-    }
-
-    @Override
-    @NotNull
-    public Long getSessionId() {
-        return sessionId;
-    }
-
-    @NotNull
-    @Override
-    public Player getPlayer1() {
-        return player1;
-    }
-
-    @NotNull
-    @Override
-    public Long getPlayer1Id() {
-        return player1.getPlayerId();
-    }
-
-    @Override
-    public void setPlayer1(@NotNull Player player1) throws IllegalStateException {
-        throw new IllegalStateException("Game is in active phase!");
-    }
-
-    @NotNull
-    @Override
-    public Player getPlayer2() {
-        return player2;
-    }
-
-    @NotNull
-    @Override
-    public Long getPlayer2Id() {
-        return player2.getPlayerId();
-    }
-
-    @Override
-    public void setPlayer2(@NotNull Player player2) throws IllegalStateException {
-        throw new IllegalStateException("Game is in active phase!");
     }
 
     @NotNull
@@ -116,16 +69,16 @@ public class GameSessionActive implements GameSession {
     @NotNull
     @Override
     public Player getAttackingPlayer() {
-        if (damagedPlayer.equals(player1)) {
-            return player2;
+        if (damagedPlayer.equals(gameSession.getPlayer1())) {
+            return gameSession.getPlayer2();
         }
-        return player1;
+        return gameSession.getPlayer1();
     }
 
     @NotNull
     @Override
-    public GameSession nextPhase() {
-        GameSessionEndgame sessionEndgame = new GameSessionEndgame(this);
+    public SessionState nextPhase() {
+        SessionEndGame sessionEndgame = new SessionEndGame(this);
         return sessionEndgame;
     }
 
@@ -164,12 +117,17 @@ public class GameSessionActive implements GameSession {
     }
 
     private void switchDamagedPlayer() {
-        if (damagedPlayer.equals(player1)) {
-            damagedPlayer = player2;
+        if (damagedPlayer.equals(gameSession.getPlayer1())) {
+            damagedPlayer = gameSession.getPlayer2();
             damagedField = field2;
         } else {
-            damagedPlayer = player1;
+            damagedPlayer = gameSession.getPlayer1();
             damagedField = field1;
         }
+    }
+
+    @Override
+    public GameSession getGameSession() {
+        return gameSession;
     }
 }

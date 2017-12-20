@@ -7,21 +7,9 @@ import seabattle.game.player.Player;
 
 import javax.validation.constraints.NotNull;
 
-public interface GameSession {
-    @NotNull
-    Long getSessionId();
+public interface SessionState {
 
-    @NotNull
-    Player getPlayer1();
-
-    @NotNull
-    Long getPlayer1Id();
-
-    @NotNull
-    Player getPlayer2();
-
-    @NotNull
-    Long getPlayer2Id();
+    GameSession getGameSession();
 
     Boolean bothFieldsAccepted();
 
@@ -39,7 +27,7 @@ public interface GameSession {
 
     Field getDamagedField() throws IllegalStateException;
 
-    void nextPhase();
+    SessionState nextPhase();
 
     Field getField1();
 
