@@ -148,7 +148,6 @@ public class GameSessionService {
 
 
         gameSessions.put(player.getPlayerId(), gameSession);
-        aiService.addSession(player.getPlayerId(), gameSession);
 
         try {
             final MsgLobbyCreated initMessage = new MsgLobbyCreated(bot.getUsername());
@@ -180,6 +179,10 @@ public class GameSessionService {
             }
             gameSession.setDamagedSide(damagedPlayer);
             sessionToNextPhase(gameSession);
+
+            if (gameSession.getPlayer2Id() == null) {
+                aiService.addSession(gameSession.getPlayer1Id(), gameSession);
+            }
 
             MsgGameStarted gameStarted1 = createGameStartedMessage(gameSession.getPlayer1(), damagedPlayer);
             webSocketService.sendMessage(gameSession.getPlayer1Id(), gameStarted1);
