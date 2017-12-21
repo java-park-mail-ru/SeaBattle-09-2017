@@ -37,9 +37,15 @@ public class GameService implements Runnable {
         while (!Thread.interrupted()) {
             try {
                 while (!tasks.isEmpty()) {
-                    for (Thread task : tasks.values()) {
-                        if (!task.isAlive()) {
-                            task.start();
+                    for (Long id : tasks.keySet()) {
+                        if (tasks.get(id) != null) {
+                            if (!tasks.get(id).isAlive()) {
+                                try {
+                                    tasks.get(id).start();
+                                } catch (IllegalStateException ex) {
+                                    tasks.remove(id);
+                                }
+                            }
                         }
                     }
                 }

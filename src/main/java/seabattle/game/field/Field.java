@@ -53,7 +53,7 @@ public final class Field {
         }
     }
 
-    public synchronized CellStatus fire(Cell cell) {
+    public CellStatus fire(Cell cell) {
         switch (getCellStatus(cell)) {
             case FREE:
                 setCellStatus(cell, CellStatus.BLOCKED);

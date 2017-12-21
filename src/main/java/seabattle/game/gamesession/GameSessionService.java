@@ -343,6 +343,17 @@ public class GameSessionService {
             gameService.removeTask(gameSession.getSessionId());
         } catch (IllegalStateException sEx) {
             LOGGER.warn(sEx.getMessage());
+            if (gameSession.getAttackingPlayer().equals(gameSession.getPlayer2()) && gameSession.getPlayer2Id() == null) {
+                makeMove(gameSession, gameSession.getAttackingPlayer().makeDecision(gameSession.getDamagedField()));
+            } else {
+                try {
+                    webSocketService.sendMessage(gameSession.getAttackingPlayer().getPlayerId(),
+                            new MsgError("unacceptable move "));
+
+                } catch (IOException sendEx) {
+                    LOGGER.warn("Can't send message! ", sendEx);
+                }
+            }
             gameService.removeTask(gameSession.getSessionId());
         }
 
