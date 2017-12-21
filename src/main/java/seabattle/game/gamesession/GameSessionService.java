@@ -21,6 +21,8 @@ import seabattle.websocket.WebSocketService;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 @SuppressWarnings({"unused", "WeakerAccess", "SpringAutowiredFieldsWarningInspection"})
@@ -28,16 +30,19 @@ import java.util.concurrent.ThreadLocalRandom;
 public class GameSessionService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GameSessionService.class);
 
-    private final Map<Long, GameSession> gameSessions = new HashMap<>();
+    private final Map<Long, GameSession> gameSessions = new ConcurrentHashMap<>();
 
     @NotNull
-    private final Map<Long, UserPlayer> playerMap = new HashMap<>();
+    private final Map<Long, UserPlayer> playerMap = new ConcurrentHashMap<>();
 
     @NotNull
-    private final ArrayDeque<UserPlayer> waitingPlayers = new ArrayDeque<>();
+    private final ConcurrentLinkedQueue<UserPlayer> waitingPlayers = new ConcurrentLinkedQueue<>();
+
 
     @NotNull
     private final WebSocketService webSocketService;
+
+
 
     @Autowired
     private UserService dbUsers;
@@ -89,7 +94,7 @@ public class GameSessionService {
             waitingPlayers.add(playerMap.remove(id));
             Integer numberOfPlayersInSession = 2;
             if (waitingPlayers.size() >= numberOfPlayersInSession) {
-                createSession(waitingPlayers.pollFirst(), waitingPlayers.pollFirst());
+                createSession(waitingPlayers.poll(), waitingPlayers.poll());
             }
         } else {
             LOGGER.warn("Player is not registered!");
@@ -353,5 +358,6 @@ public class GameSessionService {
     private void sessionToNextPhase(@NotNull GameSession gameSession) {
         gameSession.nextPhase();
     }
+
 
 }

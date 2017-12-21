@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import seabattle.game.gamesession.GameService;
 import seabattle.game.gamesession.GameSession;
 import seabattle.game.gamesession.GameSessionService;
 import seabattle.game.messages.MsgError;
@@ -27,6 +28,9 @@ public class MsgFireCoordinatesHandler extends MessageHandler<MsgFireCoordinates
     @NotNull
     private MessageHandlerContainer messageHandlerContainer;
 
+    @NotNull
+    private GameService gameService;
+
     @Autowired
     private WebSocketService webSocketService;
 
@@ -47,10 +51,10 @@ public class MsgFireCoordinatesHandler extends MessageHandler<MsgFireCoordinates
         if (gameSessionService.isPlaying(id)) {
             GameSession gameSession = gameSessionService.getGameSession(id);
             if (gameSession.getAttackingPlayer().getPlayerId().equals(id)) {
-                gameSessionService.makeMove(gameSession, cast.getCoordinates());
+                gameService.addTask(()-> gameSessionService.makeMove(gameSession, cast.getCoordinates()));
                 while (gameSession.getAttackingPlayer().getPlayerId() == null) {
-                    gameSessionService.makeMove(gameSession,
-                            gameSession.getAttackingPlayer().makeDecision(gameSession.getDamagedField()));
+                    gameService.addTask(()-> gameSessionService.makeMove(gameSession,
+                            gameSession.getAttackingPlayer().makeDecision(gameSession.getDamagedField())));
                 }
             } else {
                 try {
