@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class GameService implements Runnable {
 
     @NotNull
-    private static final int IDLE_TIME = 1000;
+    private static final int IDLE_TIME = 50;
 
     @NotNull
     private final Queue<Runnable> tasks = new ConcurrentLinkedQueue<>();
@@ -31,7 +31,7 @@ public class GameService implements Runnable {
     public void run() {
         while (!Thread.interrupted()) {
             try {
-                if (!tasks.isEmpty()) {
+                while (!tasks.isEmpty()) {
                     tasks.remove().run();
                 }
                 Thread.sleep(IDLE_TIME);
