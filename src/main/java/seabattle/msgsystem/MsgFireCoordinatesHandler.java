@@ -2,9 +2,7 @@ package seabattle.msgsystem;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import seabattle.game.gamesession.GameService;
 import seabattle.game.gamesession.GameSession;
 import seabattle.game.gamesession.GameSessionService;
 import seabattle.game.messages.MsgError;
@@ -22,25 +20,23 @@ public class MsgFireCoordinatesHandler extends MessageHandler<MsgFireCoordinates
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MsgFireCoordinatesHandler.class);
 
-    @NotNull
-    private GameSessionService gameSessionService;
 
     @NotNull
     private MessageHandlerContainer messageHandlerContainer;
 
     @NotNull
-    private GameService gameService;
+    private GameSessionService gameSessionService;
 
-    @Autowired
     private WebSocketService webSocketService;
+
 
     public MsgFireCoordinatesHandler(@NotNull GameSessionService gameSessionService,
                                      @NotNull MessageHandlerContainer messageHandlerContainer,
-                                     @NotNull GameService gameService) {
+                                     @NotNull WebSocketService webSocketService) {
         super(MsgFireCoordinates.class);
-        this.gameSessionService = gameSessionService;
         this.messageHandlerContainer = messageHandlerContainer;
-        this.gameService = gameService;
+        this.gameSessionService = gameSessionService;
+        this.webSocketService = webSocketService;
     }
 
     @PostConstruct
@@ -53,8 +49,11 @@ public class MsgFireCoordinatesHandler extends MessageHandler<MsgFireCoordinates
         if (gameSessionService.isPlaying(id)) {
             GameSession gameSession = gameSessionService.getGameSession(id);
             if (gameSession.getAttackingPlayer().getPlayerId().equals(id)) {
-                gameService.addTask(gameSession.getSessionId(),
-                        new Thread(()-> gameSessionService.makeMove(gameSession, cast.getCoordinates())));
+                gameSessionService.makeMove(gameSession, cast.getCoordinates());
+                while (gameSession.getAttackingPlayer().getPlayerId() == null) {
+                    gameSessionService.makeMove(gameSession,
+                            gameSession.getAttackingPlayer().makeDecision(gameSession.getDamagedField()));
+                }
             } else {
                 try {
                     webSocketService.sendMessage(id, new MsgError("It's not currently this player's move! "));
@@ -69,6 +68,5 @@ public class MsgFireCoordinatesHandler extends MessageHandler<MsgFireCoordinates
                 LOGGER.warn("Unable to send message");
             }
         }
-
     }
 }
