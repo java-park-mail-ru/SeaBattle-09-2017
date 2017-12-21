@@ -322,8 +322,8 @@ public class GameSessionService {
                 } else {
                     if (gameSession.getAttackingPlayer().equals(gameSession.getPlayer2())) {
                         makeMove(gameSession, gameSession.getAttackingPlayer().makeDecision(gameSession.getDamagedField()));
-                        gameService.removeTask(gameSession.getSessionId());
                     }
+                    gameService.removeTask(gameSession.getSessionId());
                 }
             } catch (IOException ex) {
                 LOGGER.warn("Can't send message! ", ex);

@@ -122,17 +122,19 @@ public class Controller {
         List<LeaderboardView> leaders = dbUsers.getLeaderboard(limit);
         final String currentUser = (String) httpSession.getAttribute(CURRENT_USER_KEY);
         int iter = 1;
-        boolean isLeaderUser = false;
+        LeaderboardView addView = null;
         for (LeaderboardView leaderboardView: leaders) {
             leaderboardView.setPosition(iter);
             iter++;
             if (leaderboardView.getLogin().equals(currentUser)) {
-                isLeaderUser = true;
-                leaders.add(leaderboardView);
+                addView = leaderboardView;
             }
         }
+        if (addView != null) {
+            leaders.add(addView);
+        }
 
-        if (currentUser == null || isLeaderUser) {
+        if (currentUser == null || addView != null) {
             return ResponseEntity.status(HttpStatus.OK).body(leaders);
         } else {
             final UserView currentUserView = dbUsers.getByLoginOrEmail(currentUser);
