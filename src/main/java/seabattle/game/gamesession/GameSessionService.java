@@ -43,7 +43,7 @@ public class GameSessionService {
     @NotNull
     private final WebSocketService webSocketService;
 
-    @NotNull
+    @Autowired
     private AIService aiService;
 
 
@@ -51,9 +51,8 @@ public class GameSessionService {
     @Autowired
     private UserService dbUsers;
 
-    public GameSessionService(@NotNull WebSocketService webSocketService, @NotNull AIService aiService) {
+    public GameSessionService(@NotNull WebSocketService webSocketService) {
         this.webSocketService = webSocketService;
-        this.aiService = aiService;
     }
 
     public Boolean isPlaying(@NotNull Long userId) {
