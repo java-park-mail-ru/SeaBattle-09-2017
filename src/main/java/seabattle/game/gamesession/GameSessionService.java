@@ -11,6 +11,7 @@ import seabattle.game.field.Cell;
 import seabattle.game.field.CellStatus;
 import seabattle.game.field.Field;
 import seabattle.game.messages.*;
+import seabattle.game.player.AIService;
 import seabattle.game.player.Player;
 import seabattle.game.player.UserPlayer;
 import seabattle.game.player.AIPlayer;
@@ -42,13 +43,17 @@ public class GameSessionService {
     @NotNull
     private final WebSocketService webSocketService;
 
+    @NotNull
+    private AIService aiService;
+
 
 
     @Autowired
     private UserService dbUsers;
 
-    public GameSessionService(@NotNull WebSocketService webSocketService) {
+    public GameSessionService(@NotNull WebSocketService webSocketService, @NotNull AIService aiService) {
         this.webSocketService = webSocketService;
+        this.aiService = aiService;
     }
 
     public Boolean isPlaying(@NotNull Long userId) {
@@ -143,7 +148,9 @@ public class GameSessionService {
         final GameSession gameSession = new GameSessionImpl(player, bot);
         gameSession.setField2(new Field(bot.getAliveShips()));
 
+
         gameSessions.put(player.getPlayerId(), gameSession);
+        aiService.addSession(player.getPlayerId(), gameSession);
 
         try {
             final MsgLobbyCreated initMessage = new MsgLobbyCreated(bot.getUsername());
@@ -218,6 +225,7 @@ public class GameSessionService {
             }
 
             gameSessions.remove(gameSession.getPlayer1Id());
+            aiService.delSession(gameSession.getPlayer1Id());
             webSocketService.closeSession(gameSession.getPlayer1Id(), CloseStatus.NORMAL);
             if (gameSession.getPlayer2Id() != null) {
                 gameSessions.remove(gameSession.getPlayer2Id());
