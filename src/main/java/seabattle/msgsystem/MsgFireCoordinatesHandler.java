@@ -35,10 +35,12 @@ public class MsgFireCoordinatesHandler extends MessageHandler<MsgFireCoordinates
     private WebSocketService webSocketService;
 
     public MsgFireCoordinatesHandler(@NotNull GameSessionService gameSessionService,
-                                     @NotNull MessageHandlerContainer messageHandlerContainer) {
+                                     @NotNull MessageHandlerContainer messageHandlerContainer,
+                                     @NotNull GameService gameService) {
         super(MsgFireCoordinates.class);
         this.gameSessionService = gameSessionService;
         this.messageHandlerContainer = messageHandlerContainer;
+        this.gameService = gameService;
     }
 
     @PostConstruct
