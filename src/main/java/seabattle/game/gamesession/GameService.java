@@ -19,6 +19,14 @@ public class GameService implements Runnable {
         tasks.add(newTask);
     }
 
+    GameService() {
+        start();
+    }
+
+    public void start() {
+        (new Thread(this)).start();
+    }
+
     @Override
     public void run() {
         while (!Thread.interrupted()) {
