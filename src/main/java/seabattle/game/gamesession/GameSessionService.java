@@ -298,6 +298,7 @@ public class GameSessionService {
                 if (gameSession.getDamagedPlayer().allShipsDead()) {
                     sessionToNextPhase(gameSession);
                     endSession(gameSession);
+                    gameService.removeTask(gameSession.getSessionId());
                     return;
                 }
             }
@@ -317,13 +318,16 @@ public class GameSessionService {
                 webSocketService.sendMessage(gameSession.getPlayer1Id(), resultMove);
                 if (gameSession.getPlayer2Id() != null) {
                     webSocketService.sendMessage(gameSession.getPlayer2Id(), resultMove);
+                    gameService.removeTask(gameSession.getSessionId());
                 } else {
                     if (gameSession.getAttackingPlayer().equals(gameSession.getPlayer2())) {
                         makeMove(gameSession, gameSession.getAttackingPlayer().makeDecision(gameSession.getDamagedField()));
+                        gameService.removeTask(gameSession.getSessionId());
                     }
                 }
             } catch (IOException ex) {
                 LOGGER.warn("Can't send message! ", ex);
+                gameService.removeTask(gameSession.getSessionId());
             }
 
 
@@ -331,14 +335,17 @@ public class GameSessionService {
             try {
                 webSocketService.sendMessage(gameSession.getAttackingPlayer().getPlayerId(),
                         new MsgError("unacceptable move "));
+
             } catch (IOException sendEx) {
                 LOGGER.warn("Can't send message! ", ex);
             }
             LOGGER.warn(ex.getMessage());
+            gameService.removeTask(gameSession.getSessionId());
         } catch (IllegalStateException sEx) {
             LOGGER.warn(sEx.getMessage());
+            gameService.removeTask(gameSession.getSessionId());
         }
-        gameService.removeTask(gameSession.getSessionId());
+
     }
 
     public void deleteWaitingPlayer(@NotNull UserPlayer player) {
