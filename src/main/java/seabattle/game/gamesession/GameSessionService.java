@@ -11,7 +11,6 @@ import seabattle.game.field.Cell;
 import seabattle.game.field.CellStatus;
 import seabattle.game.field.Field;
 import seabattle.game.messages.*;
-import seabattle.game.player.AIService;
 import seabattle.game.player.Player;
 import seabattle.game.player.UserPlayer;
 import seabattle.game.player.AIPlayer;
@@ -43,8 +42,9 @@ public class GameSessionService {
     @NotNull
     private final WebSocketService webSocketService;
 
+
     @Autowired
-    private AIService aiService;
+    private GameService gameService;
 
 
     @Autowired
@@ -180,9 +180,6 @@ public class GameSessionService {
             gameSession.setDamagedSide(damagedPlayer);
             sessionToNextPhase(gameSession);
 
-            if (gameSession.getPlayer2Id() == null) {
-                aiService.addSession(gameSession.getPlayer1Id(), gameSession);
-            }
 
             MsgGameStarted gameStarted1 = createGameStartedMessage(gameSession.getPlayer1(), damagedPlayer);
             webSocketService.sendMessage(gameSession.getPlayer1Id(), gameStarted1);
@@ -226,7 +223,6 @@ public class GameSessionService {
             }
 
             gameSessions.remove(gameSession.getPlayer1Id());
-            aiService.delSession(gameSession.getPlayer1Id());
             webSocketService.closeSession(gameSession.getPlayer1Id(), CloseStatus.NORMAL);
             if (gameSession.getPlayer2Id() != null) {
                 gameSessions.remove(gameSession.getPlayer2Id());
@@ -321,10 +317,15 @@ public class GameSessionService {
                 webSocketService.sendMessage(gameSession.getPlayer1Id(), resultMove);
                 if (gameSession.getPlayer2Id() != null) {
                     webSocketService.sendMessage(gameSession.getPlayer2Id(), resultMove);
+                } else {
+                    if (gameSession.getAttackingPlayer().equals(gameSession.getPlayer2())) {
+                        makeMove(gameSession, gameSession.getAttackingPlayer().makeDecision(gameSession.getDamagedField()));
+                    }
                 }
             } catch (IOException ex) {
                 LOGGER.warn("Can't send message! ", ex);
             }
+
 
         } catch (IllegalArgumentException ex) {
             try {
@@ -337,6 +338,7 @@ public class GameSessionService {
         } catch (IllegalStateException sEx) {
             LOGGER.warn(sEx.getMessage());
         }
+        gameService.removeTask(gameSession.getSessionId());
     }
 
     public void deleteWaitingPlayer(@NotNull UserPlayer player) {

@@ -14,10 +14,14 @@ public class GameService implements Runnable {
     private static final int IDLE_TIME = 50;
 
     @NotNull
-    private final Map<Long, Runnable> tasks = new ConcurrentHashMap<>();
+    private final Map<Long, Thread> tasks = new ConcurrentHashMap<>();
 
-    public void addTask(@NotNull Long id, Runnable newTask) {
+    public void addTask(@NotNull Long id, Thread newTask) {
         tasks.put(id, newTask);
+    }
+
+    public void removeTask(@NotNull Long id) {
+        tasks.remove(id);
     }
 
     GameService() {
@@ -33,8 +37,10 @@ public class GameService implements Runnable {
         while (!Thread.interrupted()) {
             try {
                 while (!tasks.isEmpty()) {
-                    for (Long id : tasks.keySet()) {
-                        tasks.remove(id).run();
+                    for (Thread task : tasks.values()) {
+                        if (!task.isAlive()) {
+                            task.start();
+                        }
                     }
                 }
                 Thread.sleep(IDLE_TIME);

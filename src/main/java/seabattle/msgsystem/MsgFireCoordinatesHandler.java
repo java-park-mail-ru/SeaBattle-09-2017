@@ -53,7 +53,8 @@ public class MsgFireCoordinatesHandler extends MessageHandler<MsgFireCoordinates
         if (gameSessionService.isPlaying(id)) {
             GameSession gameSession = gameSessionService.getGameSession(id);
             if (gameSession.getAttackingPlayer().getPlayerId().equals(id)) {
-                gameService.addTask(id, ()-> gameSessionService.makeMove(gameSession, cast.getCoordinates()));
+                gameService.addTask(gameSession.getSessionId(),
+                        new Thread(()-> gameSessionService.makeMove(gameSession, cast.getCoordinates())));
             } else {
                 try {
                     webSocketService.sendMessage(id, new MsgError("It's not currently this player's move! "));
