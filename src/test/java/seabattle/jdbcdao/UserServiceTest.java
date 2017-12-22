@@ -9,8 +9,9 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
-import seabattle.dao.UserService;
-import seabattle.views.UserView;
+import seabattle.authorization.service.UserService;
+import seabattle.authorization.views.LeaderboardView;
+import seabattle.authorization.views.UserView;
 
 
 import java.util.List;
@@ -91,10 +92,26 @@ public class UserServiceTest {
 
     @Test
     public void getLeaderboard(){
-        List<UserView> returnedUserList = userService.getLeaderboard();
+        final Integer limit = 11;
+        final List<LeaderboardView> returnedUserList = userService.getLeaderboard(limit);
         int i = returnedUserList.size();
-        for (UserView userView: returnedUserList) {
-            assertSame(userView.getScore(),--i);
+        for (LeaderboardView leaderboardView: returnedUserList) {
+            assertSame(leaderboardView.getScore(),--i);
         }
+    }
+
+    @Test
+    public void setScore(){
+        final Integer testScore = 20;
+        testUser.setScore(testScore);
+        userService.setScore(testUser);
+        final UserView changeUser = userService.getByLoginOrEmail(testUser.getLogin());
+        assertEquals(changeUser, testUser);
+    }
+
+    @Test
+    public void getPosition(){
+        final Integer testPosition = 10;
+        assertEquals(testPosition, userService.getPosition(testUser));
     }
 }

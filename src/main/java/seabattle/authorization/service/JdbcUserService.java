@@ -1,10 +1,10 @@
-package seabattle.jdbcdao;
+package seabattle.authorization.service;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
-import seabattle.dao.UserService;
-import seabattle.views.UserView;
+import seabattle.authorization.views.LeaderboardView;
+import seabattle.authorization.views.UserView;
 
 import java.util.List;
 
@@ -19,9 +19,12 @@ public class JdbcUserService implements UserService {
                     resultSet.getString("password"),
                     resultSet.getInt("score"));
 
-    private static final RowMapper<UserView> READ_USER_LOGIN_SCORE_MAPPER = (resultSet, rowNumber) ->
-            new UserView(null, resultSet.getString("login"),
-                    null, resultSet.getInt("score"));
+    private static final RowMapper<LeaderboardView> READ_USER_LOGIN_SCORE_MAPPER = (resultSet, rowNumber) ->
+            new LeaderboardView(null, resultSet.getString("login"),
+                    resultSet.getInt("score"));
+
+    private static final RowMapper<Integer> READ_POSITION_MAPPER = (resultSet, rowNumber) ->
+            resultSet.getInt("position");
 
     private JdbcTemplate template;
 
@@ -51,8 +54,25 @@ public class JdbcUserService implements UserService {
     }
 
     @Override
-    public List<UserView> getLeaderboard() {
-        String sql = "SELECT login, score FROM users ORDER BY score DESC";
-        return template.query(sql, READ_USER_LOGIN_SCORE_MAPPER);
+    public List<LeaderboardView> getLeaderboard(Integer limit) {
+        String sql = "SELECT login, score FROM users ORDER BY score DESC LIMIT ?";
+        return template.query(sql, ps -> ps.setInt(1, limit), READ_USER_LOGIN_SCORE_MAPPER);
+    }
+
+    @Override
+    public UserView setScore(UserView user) {
+        String sql = "UPDATE users SET score = ? WHERE login = ?";
+        if (template.update(sql, user.getScore(), user.getLogin()) != 0) {
+            return user;
+        }
+        return null;
+    }
+
+    @Override
+    public Integer getPosition(UserView user) {
+        String sql = "SELECT count(*) as position FROM users WHERE score >= ? AND login < ?";
+        return template.query(sql, ps -> { ps.setInt(1, user.getScore());
+                ps.setString(2, user.getLogin()); },
+                READ_POSITION_MAPPER).get(0) + 1;
     }
 }

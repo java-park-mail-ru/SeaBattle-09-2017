@@ -1,6 +1,11 @@
 # SeaBattle-09-2017
 
 Классический морской бой
+
+- Frontend [Deploy](https://sbattle.ru) [Github](https://github.com/frontend-park-mail-ru/2017_2_Sea_battle)   
+- Backend [Deploy](https://sea-battle-back.herokuapp.com/api/) [Github](https://github.com/java-park-mail-ru/SeaBattle-09-2017)  
+ 
+
 ## Команда
 
 - Михаил - [@MikeGus](https://github.com/MikeGus)
@@ -80,7 +85,7 @@ HttpStatus 400
 ##### URL
 `/api/logout`
 #### Method
-`POST`
+`GET`
 #### Response
 В случае успеха возвращается сообщение\
 HttpStatus: 200
@@ -163,21 +168,22 @@ HttpStatus: 404
 `/api/leaderboard`
 #### Method
 `GET`
+#### Params
+Integer limit
 #### Response
-В случае успеха возвращает лист пользователей до 10 человек в порядке убывания их счета\
+В случае успеха возвращает лист пользователей  в порядке убывания их счета,
+а также текущего пользователя и его позицию в рейтинге\
 HttpStatus: 200
 ```
 [{
+  "position": integer,
   "login": string,
-  "email": null,
-  "password": null,
   "score": integer
 },
 ...
 {
+  "position": integer,
   "login": string,
-  "email": null,
-  "password": null,
   "score": integer
 }]
 ```

@@ -1,20 +1,16 @@
-package seabattle.controllers;
+package seabattle.authorization.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
-import seabattle.dao.UserService;
-import seabattle.views.AuthorisationView;
-import seabattle.views.UserView;
+import seabattle.authorization.service.UserService;
+import seabattle.authorization.views.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-import seabattle.views.ResponseView;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -22,7 +18,8 @@ import java.util.List;
 
 @SuppressWarnings("SpringAutowiredFieldsWarningInspection")
 @RestController
-//@CrossOrigin (origins = "https://sea-battle-front.herokuapp.com")
+@CrossOrigin(origins = {"http://localhost:8080", "http://sea-battle-front.herokuapp.com",
+                        "http://top-sea-battle.herokuapp.com", "https://sbattle.ru"})
 @RequestMapping(path = "/api")
 @Validated
 public class Controller {
@@ -30,10 +27,8 @@ public class Controller {
     @Autowired
     private UserService dbUsers;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private static final String CURRENT_USER_KEY = "currentUser";
 
@@ -59,7 +54,7 @@ public class Controller {
         try {
             UserView currentUser = dbUsers.getByLoginOrEmail(loggingData.getLoginEmail());
 
-            if (passwordEncoder().matches(loggingData.getPassword(), currentUser.getPassword())) {
+            if (passwordEncoder.matches(loggingData.getPassword(), currentUser.getPassword())) {
                 httpSession.setAttribute(CURRENT_USER_KEY, currentUser.getLogin());
                 currentUser.setPassword(null);
                 return ResponseEntity.status(HttpStatus.OK).body(currentUser);
@@ -80,7 +75,7 @@ public class Controller {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity register(@Valid @RequestBody UserView registerData) {
         try {
-            String encodedPassword = passwordEncoder().encode(registerData.getPassword());
+            String encodedPassword = passwordEncoder.encode(registerData.getPassword());
             registerData.setPassword(encodedPassword);
             dbUsers.addUser(registerData);
         } catch (DuplicateKeyException ex) {
@@ -106,7 +101,7 @@ public class Controller {
                     oldUser.setEmail(newData.getEmail());
                 }
                 if (newData.getPassword() != null) {
-                    String encodedPassword = passwordEncoder().encode(newData.getPassword());
+                    String encodedPassword = passwordEncoder.encode(newData.getPassword());
                     oldUser.setPassword(encodedPassword);
                 }
                 dbUsers.changeUser(oldUser);
@@ -118,10 +113,44 @@ public class Controller {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ResponseView.ERROR_NO_RIGHTS_TO_CHANGE_USER);
     }
 
+
     @RequestMapping(method = RequestMethod.GET, path = "leaderboard",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<UserView>> getLeaderboard() {
-        List<UserView> leaders = dbUsers.getLeaderboard();
+    public ResponseEntity<List<LeaderboardView>> getLeaderboard(
+            @Valid @RequestParam(value = "limit", required = false, defaultValue = "10") Integer limit,
+            HttpSession httpSession) {
+        List<LeaderboardView> leaders = dbUsers.getLeaderboard(limit);
+        final String currentUser = (String) httpSession.getAttribute(CURRENT_USER_KEY);
+        int iter = 1;
+        LeaderboardView addView = null;
+        for (LeaderboardView leaderboardView: leaders) {
+            leaderboardView.setPosition(iter);
+            iter++;
+            if (leaderboardView.getLogin().equals(currentUser)) {
+                addView = leaderboardView;
+            }
+        }
+        if (addView != null) {
+            leaders.add(addView);
+        }
+
+        if (currentUser == null || addView != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(leaders);
+        } else {
+            final UserView currentUserView = dbUsers.getByLoginOrEmail(currentUser);
+            if (currentUserView != null) {
+                leaders.add(new LeaderboardView(dbUsers.getPosition(currentUserView),
+                        currentUserView.getLogin(), currentUserView.getScore()));
+            }
+        }
+
         return ResponseEntity.status(HttpStatus.OK).body(leaders);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, path = "about",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<AboutView> getAbout() {
+        String about = "Sea battle by Technopark students.\nRelease date: winter 2017";
+        return ResponseEntity.status(HttpStatus.OK).body(new AboutView(about));
     }
 }
