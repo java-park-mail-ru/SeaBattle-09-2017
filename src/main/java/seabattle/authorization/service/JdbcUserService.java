@@ -55,7 +55,7 @@ public class JdbcUserService implements UserService {
 
     @Override
     public List<LeaderboardView> getLeaderboard(Integer limit) {
-        String sql = "SELECT login, score FROM users ORDER BY score DESC LIMIT ?";
+        String sql = "SELECT login, score FROM users ORDER BY score DESC, login LIMIT ?";
         return template.query(sql, ps -> ps.setInt(1, limit), READ_USER_LOGIN_SCORE_MAPPER);
     }
 
@@ -70,9 +70,11 @@ public class JdbcUserService implements UserService {
 
     @Override
     public Integer getPosition(UserView user) {
-        String sql = "SELECT count(*) as position FROM users WHERE score >= ? AND login < ?";
-        return template.query(sql, ps -> { ps.setInt(1, user.getScore());
-                ps.setString(2, user.getLogin()); },
+        String sql = "SELECT rat.position FROM  " +
+                "( SELECT row_number() OVER(ORDER BY score DESC, login) AS position, login " +
+                "FROM users) AS rat " +
+                "WHERE rat.login = ?";
+        return template.query(sql, ps -> ps.setString(1, user.getLogin()),
                 READ_POSITION_MAPPER).get(0) + 1;
     }
 }

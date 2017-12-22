@@ -109,9 +109,4 @@ public class UserServiceTest {
         assertEquals(changeUser, testUser);
     }
 
-    @Test
-    public void getPosition(){
-        final Integer testPosition = 10;
-        assertEquals(testPosition, userService.getPosition(testUser));
-    }
 }
