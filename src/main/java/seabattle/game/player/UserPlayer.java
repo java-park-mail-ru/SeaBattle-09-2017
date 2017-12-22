@@ -8,6 +8,7 @@ import seabattle.game.ship.Ship;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
 @SuppressWarnings("unused")
@@ -38,14 +39,14 @@ public class UserPlayer implements Player {
 
     public UserPlayer(List<Ship> ships) {
         this.playerId = PLAYER_ID_GENERATOR.getAndIncrement();
-        this.username = "Unknown username " + playerId.toString();
+        this.username = usernameGenerator();
         this.user = null;
         aliveShips.addAll(ships);
     }
 
     public UserPlayer() {
         this.playerId = PLAYER_ID_GENERATOR.getAndIncrement();
-        this.username = "Unknown username " + playerId.toString();
+        this.username = usernameGenerator();
         this.user = null;
     }
 
@@ -113,5 +114,18 @@ public class UserPlayer implements Player {
     public void setUser(UserView user) {
         this.user = user;
         this.username = user.getLogin();
+    }
+
+    private String usernameGenerator() {
+        final ArrayList<String> alphabet = new ArrayList<String>();
+
+        for (char c = 'A';c<= 'Z';c++){
+            alphabet.add(String.valueOf(c));
+        }
+
+        final Random random = new Random();
+
+        return "Clone trooper " + alphabet.get(random.nextInt(alphabet.size()))
+                + alphabet.get(random.nextInt(alphabet.size())) + '-' + playerId.toString();
     }
 }
