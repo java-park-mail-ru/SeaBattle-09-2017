@@ -70,10 +70,10 @@ public class JdbcUserService implements UserService {
 
     @Override
     public Integer getPosition(UserView user) {
-        String sql = "SELECT rat.position FROM  " +
-                "( SELECT row_number() OVER(ORDER BY score DESC, login) AS position, login " +
-                "FROM users) AS rat " +
-                "WHERE rat.login = ?";
+        String sql = "SELECT rat.position FROM  "
+                + "( SELECT row_number() OVER(ORDER BY score DESC, login) AS position, login "
+                + "FROM users) AS rat "
+                + "WHERE rat.login = ?";
         return template.query(sql, ps -> ps.setString(1, user.getLogin()),
                 READ_POSITION_MAPPER).get(0) + 1;
     }
