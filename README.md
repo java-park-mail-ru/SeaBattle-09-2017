@@ -1,6 +1,11 @@
 # SeaBattle-09-2017
 
 Классический морской бой
+
+- Frontend [Deploy](https://sbattle.ru) [Github](https://github.com/frontend-park-mail-ru/2017_2_Sea_battle)   
+- Backend [Deploy](https://sea-battle-back.herokuapp.com/api/) [Github](https://github.com/java-park-mail-ru/SeaBattle-09-2017)  
+ 
+
 ## Команда
 
 - Михаил - [@MikeGus](https://github.com/MikeGus)
