@@ -119,7 +119,7 @@ public class UserPlayer implements Player {
     private String usernameGenerator() {
         final ArrayList<String> alphabet = new ArrayList<String>();
 
-        for (char c = 'A';c<= 'Z';c++){
+        for (char c = 'A'; c <= 'Z'; c++) {
             alphabet.add(String.valueOf(c));
         }
 
