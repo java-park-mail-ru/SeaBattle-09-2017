@@ -23,6 +23,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
         registry.addHandler(webSocketHandler, "/game")
                 .addInterceptors(new HttpSessionHandshakeInterceptor())
                 .setAllowedOrigins("http://localhost:8080", "http://sea-battle-front.herokuapp.com",
-                        "http://top-sea-battle.herokuapp.com", "https://sbattle.ru");
+                        "http://top-sea-battle.herokuapp.com", "https://sea-battle-front.herokuapp.com",
+                        "https://top-sea-battle.herokuapp.com", "https://sbattle.ru");
     }
 }
